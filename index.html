@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Premium Rewards</title>
+
+    <!-- ====================================================================================
+         SECTION 1: EXTERNAL LIBRARIES (লাইব্রেরি ইমপোর্ট)
+    ===================================================================================== -->
+    
+    <!-- Tailwind CSS (UI Design) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase Client (Database) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 (Popups) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- ====================================================================================
+         SECTION 2: CSS STYLES (SCROLL LOCK & DESIGN)
+    ===================================================================================== -->
+    <style>
+        /* ফন্ট সেটআপ */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+        
+        /* বেসিক রিসেট */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent; /* মোবাইলে ট্যাপ হাইলাইট বন্ধ */
+        }
+
+        /* বডি স্টাইল - স্ক্রল লক */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0f0f0f; /* কালো ব্যাকগ্রাউন্ড */
+            color: #ffffff;
+            height: 100vh; /* সম্পূর্ণ স্ক্রিন */
+            width: 100vw;
+            overflow: hidden; /* বডি স্ক্রল বন্ধ */
+            display: flex;
+            flex-direction: column;
+            user-select: none; /* টেক্সট কপি বন্ধ */
+            overscroll-behavior: none; /* বাউন্স ইফেক্ট বন্ধ */
+        }
+
+        /* গোল্ডেন গ্রেডিয়েন্ট বাটন */
+        .gold-gradient {
+            background: linear-gradient(135deg, #FFD700 0%, #FDB931 50%, #d4af37 100%);
+            color: #000;
+        }
+        
+        /* গোল্ডেন টেক্সট */
+        .gold-text {
+            background: linear-gradient(to right, #FFD700, #FDB931);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* গ্লাস প্যানেল ডিজাইন */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* কন্টেন্ট এরিয়া (শুধুমাত্র এই অংশ স্ক্রল হবে) */
+        #main-app {
+            flex: 1; /* বাকি জায়গা নিবে */
+            overflow-y: auto; /* ভার্টিক্যাল স্ক্রল অন */
+            padding: 16px;
+            padding-bottom: 100px; /* নিচে জায়গা রাখা */
+            scrollbar-width: none; /* ফায়ারফক্স স্ক্রলবার হাইড */
+            -ms-overflow-style: none; /* IE স্ক্রলবার হাইড */
+        }
+
+        /* ক্রোম/সাফারির জন্য স্ক্রলবার হাইড */
+        #main-app::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* বটম নেভিগেশন বার */
+        .nav-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #6b7280;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #FFD700;
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item.active i {
+            transform: translateY(-5px);
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        /* লোডিং স্পিনার */
+        .loader-container {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background-color: #0f0f0f;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader {
+            border: 4px solid #333;
+            border-top: 4px solid #FFD700;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* ইনপুট ফিল্ড ডিজাইন */
+        .custom-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+            padding: 12px 16px;
+            border-radius: 12px;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .custom-input:focus {
+            border-color: #FFD700;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ডিসেবল বাটন স্টাইল */
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        /* সুইট অ্যালার্ট কাস্টমাইজেশন */
+        div:where(.swal2-container) div:where(.swal2-popup) {
+            background: #1a1a1a !important;
+            border: 1px solid #FFD700;
+            color: white;
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ====================================================================================
+         SECTION 3: LOADING SCREEN
+    ===================================================================================== -->
+    <div id="loading-screen" class="loader-container">
+        <div class="loader"></div>
+        <h2 class="text-2xl font-bold gold-text tracking-[4px]">PREMIUM</h2>
+        <p class="text-xs text-gray-500 mt-2 tracking-widest">LOADING DATA...</p>
+        
+        <!-- Error Retry Box -->
+        <div id="error-box" class="hidden mt-8 px-6 w-full max-w-sm">
+            <div class="bg-red-500/10 border border-red-500/50 rounded-xl p-4 text-center">
+                <i class="fas fa-exclamation-circle text-red-500 text-3xl mb-3"></i>
+                <h4 class="text-white font-bold mb-1">Connection Error</h4>
+                <p id="error-msg" class="text-gray-400 text-xs mb-4">Unable to connect.</p>
+                <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-full text-xs font-bold shadow-lg hover:bg-red-600 transition">
+                    RETRY
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====================================================================================
+         SECTION 4: HEADER (Fixed Top)
+    ===================================================================================== -->
+    <header class="glass-panel border-b-0 rounded-b-3xl p-5 z-40 shrink-0 relative">
+        <div class="flex justify-between items-center">
+            <!-- User Info -->
+            <div class="flex items-center gap-4">
+                <div class="relative">
+                    <img id="user-photo" src="https://ui-avatars.com/api/?name=U&background=random" class="w-12 h-12 rounded-full border-2 border-[#FFD700] object-cover p-0.5 shadow-[0_0_15px_rgba(255,215,0,0.3)]">
+                    <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-[#0f0f0f] rounded-full animate-pulse"></div>
+                </div>
+                <div>
+                    <h3 id="user-name" class="font-bold text-lg leading-tight text-white tracking-wide">...</h3>
+                    <div class="flex items-center gap-1 mt-1">
+                        <span class="bg-[#FFD700]/10 text-[#FFD700] text-[9px] px-2 py-0.5 rounded-full border border-[#FFD700]/20 font-bold uppercase tracking-wider">
+                            VIP MEMBER
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Balance -->
+            <div class="text-right">
+                <p class="text-[10px] text-gray-400 uppercase tracking-[2px] mb-1 font-semibold">Balance</p>
+                <div class="flex items-center justify-end gap-2 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10">
+                    <i class="fas fa-coins text-[#FFD700] text-sm drop-shadow-md"></i>
+                    <span id="user-balance" class="text-xl font-bold text-white tracking-wide">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ====================================================================================
+         SECTION 5: MAIN CONTENT (Scrollable)
+    ===================================================================================== -->
+    <div id="main-app" class="hidden">
+        <!-- Pages will load here -->
+    </div>
+
+    <!-- ====================================================================================
+         SECTION 6: BOTTOM NAVIGATION (Fixed Bottom)
+    ===================================================================================== -->
+    <nav class="glass-panel rounded-t-3xl pb-4 pt-3 z-50 shrink-0 h-20">
+        <div class="nav-container">
+            <div onclick="router('home')" class="nav-item active" id="btn-home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div onclick="router('tasks')" class="nav-item" id="btn-tasks">
+                <i class="fas fa-list-check"></i>
+                <span>Tasks</span>
+            </div>
+            <div onclick="router('wallet')" class="nav-item" id="btn-wallet">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </div>
+            <div onclick="router('history')" class="nav-item" id="btn-history">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </div>
+            <div onclick="router('refer')" class="nav-item" id="btn-refer">
+                <i class="fas fa-users"></i>
+                <span>Refer</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ====================================================================================
+         SECTION 7: JAVASCRIPT LOGIC
+    ===================================================================================== -->
+    <script>
+        const _0x5c034d=_0x4dcf;(function(_0x1b4c3a,_0x5a8ee2){const _0x1ab839=_0x4dcf,_0x4a8f93=_0x1b4c3a();while(!![]){try{const _0x1e41a6=parseInt(_0x1ab839(0x195))/0x1*(-parseInt(_0x1ab839(0x1b9))/0x2)+-parseInt(_0x1ab839(0x1b5))/0x3+parseInt(_0x1ab839(0x160))/0x4+parseInt(_0x1ab839(0x18e))/0x5*(parseInt(_0x1ab839(0x14f))/0x6)+-parseInt(_0x1ab839(0x169))/0x7+parseInt(_0x1ab839(0x1f0))/0x8+-parseInt(_0x1ab839(0x197))/0x9;if(_0x1e41a6===_0x5a8ee2)break;else _0x4a8f93['push'](_0x4a8f93['shift']());}catch(_0x3f7bf8){_0x4a8f93['push'](_0x4a8f93['shift']());}}}(_0x4896,0x5e41e));const SUPABASE_URL='https://wnmwvbeydsrehtsnkfoc.supabase.co',SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndubXd2YmV5ZHNyZWh0c25rZm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMDg4MzIsImV4cCI6MjA3OTg4NDgzMn0.4vSObxBEr8r11-dqkp9y6bVroMVoSTEnIOTF8Vo8sxk',supabase=window[_0x5c034d(0x167)]['createClient'](SUPABASE_URL,SUPABASE_KEY),tg=window['Telegram']['WebApp'];let currentUser=null,appSettings={},adFuncs={'interstitial':null,'rewarded':null,'popup':null},adStartTime=0x0,pendingTask=null;const MIN_AD_DURATION=0x2710;async function initApp(){const _0x4b48b5=_0x5c034d;tg[_0x4b48b5(0x1f1)](),tg[_0x4b48b5(0x16a)]('#0f0f0f');const _0x35f1cb=tg[_0x4b48b5(0x194)]?.[_0x4b48b5(0x1b8)];if(!_0x35f1cb){showError(_0x4b48b5(0x161));return;}try{const {data:_0x337e85,error:_0x11f165}=await supabase[_0x4b48b5(0x1e1)](_0x4b48b5(0x1fa))[_0x4b48b5(0x15f)]('*')[_0x4b48b5(0x1a1)]();_0x11f165?(console[_0x4b48b5(0x12d)](_0x4b48b5(0x142),_0x11f165),appSettings={'conversion_rate':0.05,'min_withdraw_amount':0x32,'bot_username':_0x4b48b5(0x1cd),'daily_task_limit':0xa,'anti_cheat_enabled':!![]}):appSettings=_0x337e85;loadAdScripts();let {data:_0x21f395,error:_0x314bf6}=await supabase['from'](_0x4b48b5(0x19d))['select']('*')['eq']('id',_0x35f1cb['id'])[_0x4b48b5(0x1a1)]();if(!_0x21f395){const _0x32d046=tg[_0x4b48b5(0x194)]?.[_0x4b48b5(0x146)];let _0x1e413d=_0x32d046&&_0x32d046!=_0x35f1cb['id']?parseInt(_0x32d046):null;appSettings['anti_cheat_enabled']&&_0x1e413d&&localStorage[_0x4b48b5(0x1db)](_0x4b48b5(0x1d3))&&(_0x1e413d=null);const {data:_0x13a6f2,error:_0x4b3cf5}=await supabase[_0x4b48b5(0x1e1)]('users')[_0x4b48b5(0x177)]([{'id':_0x35f1cb['id'],'first_name':_0x35f1cb['first_name'],'username':_0x35f1cb['username'],'photo_url':_0x35f1cb[_0x4b48b5(0x1c4)],'referred_by':_0x1e413d,'balance':0x0}])[_0x4b48b5(0x15f)]()[_0x4b48b5(0x1a1)]();if(_0x4b3cf5)throw new Error(_0x4b48b5(0x141));_0x21f395=_0x13a6f2,_0x1e413d&&(await supabase['rpc'](_0x4b48b5(0x134),{'referrer_id':_0x1e413d}),localStorage[_0x4b48b5(0x1e5)](_0x4b48b5(0x1d3),_0x4b48b5(0x13d)));}currentUser=_0x21f395,updateHeaderUI(),setTimeout(()=>{const _0x18840b=_0x4b48b5;document[_0x18840b(0x1c1)](_0x18840b(0x144))[_0x18840b(0x19b)][_0x18840b(0x1dd)](_0x18840b(0x185)),document[_0x18840b(0x1c1)](_0x18840b(0x1f8))['classList'][_0x18840b(0x165)](_0x18840b(0x185)),router(_0x18840b(0x16f));},0x3e8);}catch(_0x5bd9c1){showError(_0x5bd9c1['message']);}}function loadAdScripts(){const _0x593e6e=_0x5c034d;if(appSettings[_0x593e6e(0x145)])loadScript(appSettings[_0x593e6e(0x145)],_0xc54aeb=>adFuncs['interstitial']=_0xc54aeb);if(appSettings[_0x593e6e(0x171)])loadScript(appSettings[_0x593e6e(0x171)],_0x19bc8f=>adFuncs[_0x593e6e(0x196)]=_0x19bc8f);if(appSettings['monetag_popup_id'])loadScript(appSettings['monetag_popup_id'],_0x4f9fd5=>adFuncs[_0x593e6e(0x190)]=_0x4f9fd5);}function loadScript(_0x177565,_0x12fc67){const _0x49c8ab=_0x5c034d,_0x1e254e=document['createElement'](_0x49c8ab(0x133));_0x1e254e['src']=_0x49c8ab(0x1f4);const _0x125235=_0x49c8ab(0x156)+_0x177565;_0x1e254e['setAttribute'](_0x49c8ab(0x143),_0x177565),_0x1e254e[_0x49c8ab(0x1f3)](_0x49c8ab(0x180),_0x125235),_0x1e254e[_0x49c8ab(0x1fb)]=()=>_0x12fc67(_0x125235),document[_0x49c8ab(0x1ac)]['appendChild'](_0x1e254e);}function showError(_0xefd14f){const _0x3744ee=_0x5c034d;document[_0x3744ee(0x1c1)]('error-msg')['innerText']=_0xefd14f,document[_0x3744ee(0x1c1)](_0x3744ee(0x198))[_0x3744ee(0x19b)]['remove'](_0x3744ee(0x185)),document[_0x3744ee(0x179)](_0x3744ee(0x1cf))[_0x3744ee(0x164)][_0x3744ee(0x17b)]=_0x3744ee(0x12b);}function updateHeaderUI(){const _0x323ae2=_0x5c034d;if(!currentUser)return;document[_0x323ae2(0x1c1)](_0x323ae2(0x135))['innerText']=currentUser[_0x323ae2(0x1ce)],document[_0x323ae2(0x1c1)](_0x323ae2(0x17e))['innerText']=currentUser[_0x323ae2(0x18d)];if(currentUser[_0x323ae2(0x1c4)])document[_0x323ae2(0x1c1)](_0x323ae2(0x1cb))['src']=currentUser[_0x323ae2(0x1c4)];}function router(_0x5b206d){const _0x2f5bb3=_0x5c034d;document[_0x2f5bb3(0x1c7)](_0x2f5bb3(0x1a7))[_0x2f5bb3(0x1d1)](_0xf9312b=>{const _0x3d2d38=_0x2f5bb3;_0xf9312b[_0x3d2d38(0x19b)][_0x3d2d38(0x165)](_0x3d2d38(0x14d),_0x3d2d38(0x150)),_0xf9312b['classList'][_0x3d2d38(0x1dd)](_0x3d2d38(0x163));});const _0x2bf958=document[_0x2f5bb3(0x1c1)](_0x2f5bb3(0x14a)+_0x5b206d);_0x2bf958&&(_0x2bf958[_0x2f5bb3(0x19b)][_0x2f5bb3(0x1dd)](_0x2f5bb3(0x14d),_0x2f5bb3(0x150)),_0x2bf958[_0x2f5bb3(0x19b)][_0x2f5bb3(0x165)](_0x2f5bb3(0x163)));const _0x22028a=document['getElementById'](_0x2f5bb3(0x1f8));if(_0x5b206d===_0x2f5bb3(0x16f))renderHome(_0x22028a);else{if(_0x5b206d===_0x2f5bb3(0x1e9))renderTasks(_0x22028a);else{if(_0x5b206d===_0x2f5bb3(0x1c2))renderWallet(_0x22028a);else{if(_0x5b206d===_0x2f5bb3(0x1c5))renderHistory(_0x22028a);else{if(_0x5b206d===_0x2f5bb3(0x1df))renderRefer(_0x22028a);}}}}}function renderHome(_0x4f104e){const _0x404c8d=_0x5c034d,_0x3c3e59=(currentUser[_0x404c8d(0x18d)]*appSettings[_0x404c8d(0x1a6)])[_0x404c8d(0x1d6)](0x2);adFuncs[_0x404c8d(0x1e8)]&&window[adFuncs[_0x404c8d(0x1e8)]]&&window[adFuncs['interstitial']]({'type':_0x404c8d(0x178),'inAppSettings':{'frequency':0x2,'capping':0.1,'interval':0x1e,'timeout':0x5,'everyPage':![]}}),_0x4f104e['innerHTML']=_0x404c8d(0x151)+currentUser['balance']+_0x404c8d(0x1f2)+_0x3c3e59+'\x20BDT</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22router(\x27tasks\x27)\x22\x20class=\x22mt-8\x20w-full\x20py-4\x20rounded-2xl\x20gold-gradient\x20text-black\x20font-bold\x20shadow-lg\x20active:scale-95\x20transition-transform\x20text-sm\x20uppercase\x20tracking-wider\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Start\x20Earning\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22grid\x20grid-cols-2\x20gap-4\x20mt-6\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-5\x20rounded-2xl\x20flex\x20flex-col\x20items-center\x20justify-center\x20border\x20border-white/5\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-users\x20text-3xl\x20mb-2\x20text-blue-400\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-2xl\x20font-bold\x22>'+currentUser[_0x404c8d(0x16c)]+_0x404c8d(0x1d5)+(appSettings[_0x404c8d(0x1b2)]?_0x404c8d(0x1a3)+appSettings['home_banner_url']+'\x22\x20class=\x22w-full\x20h-full\x20object-cover\x22></div>':'')+_0x404c8d(0x13f);}async function renderTasks(_0x3e0386){const _0x5a37cc=_0x5c034d;_0x3e0386['innerHTML']='<div\x20class=\x22flex\x20justify-center\x20mt-20\x22><div\x20class=\x22loader\x22></div></div>';const {data:_0x18378a}=await supabase[_0x5a37cc(0x1e1)](_0x5a37cc(0x1e9))[_0x5a37cc(0x15f)]('*')['eq']('is_active',!![])[_0x5a37cc(0x1d2)]('id'),_0x4993d8=new Date()[_0x5a37cc(0x1f6)]()[_0x5a37cc(0x174)]('T')[0x0],{data:_0x70da4a}=await supabase[_0x5a37cc(0x1e1)]('task_logs')[_0x5a37cc(0x15f)](_0x5a37cc(0x1b3))['eq'](_0x5a37cc(0x1d4),currentUser['id'])['eq']('created_at',_0x4993d8),_0x59e8b5={};if(_0x70da4a)_0x70da4a['forEach'](_0x3b5cc6=>_0x59e8b5[_0x3b5cc6['task_id']]=(_0x59e8b5[_0x3b5cc6[_0x5a37cc(0x1b3)]]||0x0)+0x1);const _0x43d598=appSettings[_0x5a37cc(0x136)]&&currentUser[_0x5a37cc(0x16c)]<appSettings['min_referrals_req'],_0x2c3c82=appSettings[_0x5a37cc(0x1c0)]||0xa;let _0x151ddd=_0x5a37cc(0x1ba)+_0x2c3c82+_0x5a37cc(0x184);_0x43d598&&(_0x151ddd+=_0x5a37cc(0x192)+(appSettings[_0x5a37cc(0x1d8)]-currentUser[_0x5a37cc(0x16c)])+'</b>\x20more\x20friends\x20to\x20unlock.</div>'),_0x151ddd+=_0x5a37cc(0x1e0),_0x18378a[_0x5a37cc(0x1d1)](_0x26d648=>{const _0x499c8f=_0x5a37cc;let _0x1f54bb=_0x499c8f(0x18a),_0x12af48='Claim',_0x12b488='AD',_0x14796e='bg-gray-500/20';if(_0x26d648[_0x499c8f(0x1aa)]===_0x499c8f(0x158))_0x1f54bb=_0x499c8f(0x140),_0x12af48=_0x499c8f(0x199),_0x12b488=_0x499c8f(0x12f),_0x14796e=_0x499c8f(0x166);else{if(_0x26d648['task_type']==='telegram')_0x1f54bb='paper-plane',_0x12af48=_0x499c8f(0x186),_0x12b488='TG',_0x14796e=_0x499c8f(0x1da);else _0x26d648[_0x499c8f(0x1aa)]===_0x499c8f(0x137)&&(_0x1f54bb=_0x499c8f(0x19f),_0x12af48='Watch',_0x12b488=_0x499c8f(0x13c),_0x14796e=_0x499c8f(0x157));}const _0x20d5b7=_0x59e8b5[_0x26d648['id']]||0x0,_0x17cd9c=_0x43d598||_0x20d5b7>=_0x2c3c82,_0x18378c=_0x17cd9c?_0x499c8f(0x17d):_0x499c8f(0x13b);_0x151ddd+=_0x499c8f(0x1af)+(_0x17cd9c?'opacity-60\x20grayscale':'')+_0x499c8f(0x18f)+_0x1f54bb+_0x499c8f(0x1b0)+_0x26d648[_0x499c8f(0x189)]+_0x499c8f(0x154)+_0x14796e+'\x20px-1.5\x20py-0.5\x20rounded\x20font-bold\x20tracking-wider\x22>'+_0x12b488+_0x499c8f(0x130)+_0x26d648['reward']+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-[10px]\x20text-gray-500\x20font-mono\x20pl-2\x20border-l\x20border-white/10\x22>'+_0x20d5b7+'/'+_0x2c3c82+_0x499c8f(0x1b7)+_0x26d648['id']+',\x20'+_0x26d648[_0x499c8f(0x1be)]+_0x499c8f(0x187)+_0x26d648[_0x499c8f(0x1aa)]+'\x27,\x20\x27'+(_0x26d648[_0x499c8f(0x1ee)]||'')+_0x499c8f(0x14c)+(_0x17cd9c?_0x499c8f(0x1b1):'')+'\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22px-5\x20py-2.5\x20rounded-xl\x20text-xs\x20font-bold\x20transition-all\x20'+_0x18378c+_0x499c8f(0x16e)+(_0x20d5b7>=_0x2c3c82?_0x499c8f(0x1c9):_0x12af48)+_0x499c8f(0x1bc);}),_0x3e0386[_0x5a37cc(0x13e)]=_0x151ddd+_0x5a37cc(0x1d7);}document[_0x5c034d(0x1f5)](_0x5c034d(0x1fd),()=>{const _0x489aee=_0x5c034d;if(document[_0x489aee(0x176)]===_0x489aee(0x159)&&adStartTime>0x0&&pendingTask){const _0x59332e=Date['now']()-adStartTime;_0x59332e>=MIN_AD_DURATION?claimReward(pendingTask['id'],pendingTask[_0x489aee(0x1be)]):Swal[_0x489aee(0x1fc)]({'icon':'warning','title':_0x489aee(0x15e),'text':'Returned\x20in\x20'+(_0x59332e/0x3e8)[_0x489aee(0x1d6)](0x1)+_0x489aee(0x172),'confirmButtonColor':_0x489aee(0x188)}),adStartTime=0x0,pendingTask=null;}}),window[_0x5c034d(0x162)]=async(_0x179139,_0x4ae503,_0x51f6d6,_0xd00c3d)=>{const _0x282f77=_0x5c034d;pendingTask={'id':_0x179139,'reward':_0x4ae503},adStartTime=Date[_0x282f77(0x1e3)]();if(_0x51f6d6===_0x282f77(0x158)){const _0x3141b4=_0xd00c3d&&_0xd00c3d!==_0x282f77(0x17f)?_0xd00c3d:appSettings[_0x282f77(0x1bd)];_0x3141b4?(window[_0x282f77(0x182)](_0x3141b4,_0x282f77(0x1f7)),setTimeout(()=>{const _0x4d91f6=_0x282f77;if(adFuncs[_0x4d91f6(0x1e8)]&&window[adFuncs['interstitial']])window[adFuncs[_0x4d91f6(0x1e8)]]();},0x3e8)):Swal[_0x282f77(0x1fc)]('Error',_0x282f77(0x1ec),_0x282f77(0x12d));}else{if(_0x51f6d6===_0x282f77(0x1ef)){if(_0xd00c3d)window[_0x282f77(0x182)](_0xd00c3d,_0x282f77(0x1f7));if(adFuncs['popup']&&window[adFuncs[_0x282f77(0x190)]])window[adFuncs[_0x282f77(0x190)]](_0x282f77(0x1d9));}else{if(_0x51f6d6===_0x282f77(0x137))adFuncs[_0x282f77(0x196)]&&window[adFuncs[_0x282f77(0x196)]]&&window[adFuncs[_0x282f77(0x196)]]()['then'](()=>{claimReward(_0x179139,_0x4ae503),adStartTime=0x0,pendingTask=null;});else{if(_0xd00c3d&&_0xd00c3d!==_0x282f77(0x17f))window[_0x282f77(0x182)](_0xd00c3d,_0x282f77(0x1f7));if(adFuncs['interstitial']&&window[adFuncs[_0x282f77(0x1e8)]])window[adFuncs['interstitial']]();}}}};async function claimReward(_0x4af47,_0x12d3c4){const _0x11eb09=_0x5c034d;Swal[_0x11eb09(0x1a0)]();const {data:_0x7bdf}=await supabase[_0x11eb09(0x19c)](_0x11eb09(0x155),{'user_id_input':currentUser['id'],'task_id_input':_0x4af47,'reward_amount':_0x12d3c4,'daily_limit_input':appSettings[_0x11eb09(0x1c0)]});Swal['close'](),_0x7bdf&&_0x7bdf[_0x11eb09(0x1a5)]?(currentUser[_0x11eb09(0x18d)]+=_0x12d3c4,updateHeaderUI(),Swal['fire']({'icon':_0x11eb09(0x1a5),'title':'+'+_0x12d3c4,'toast':!![],'position':_0x11eb09(0x1de),'showConfirmButton':![],'timer':0x5dc}),router(_0x11eb09(0x1e9))):Swal[_0x11eb09(0x1fc)]({'icon':'error','title':_0x11eb09(0x173),'text':_0x7bdf?.[_0x11eb09(0x1cc)]});}function renderWallet(_0x3ee341){const _0x4ffb0e=_0x5c034d,_0x5404ff=(currentUser[_0x4ffb0e(0x18d)]*appSettings[_0x4ffb0e(0x1a6)])[_0x4ffb0e(0x1d6)](0x2);_0x3ee341[_0x4ffb0e(0x13e)]=_0x4ffb0e(0x1b6)+_0x5404ff+_0x4ffb0e(0x12c)+appSettings[_0x4ffb0e(0x15d)]+_0x4ffb0e(0x1ca)+appSettings[_0x4ffb0e(0x15d)]+'\x22\x20class=\x22custom-input\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22w-btn\x22\x20onclick=\x22processWithdraw()\x22\x20class=\x22w-full\x20py-4\x20rounded-xl\x20gold-gradient\x20text-black\x20font-bold\x20mt-4\x20shadow-lg\x20active:scale-95\x20transition-transform\x20text-sm\x20uppercase\x20tracking-wide\x20flex\x20items-center\x20justify-center\x20gap-2\x22>Submit\x20Request</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>';}function _0x4896(){const _0x103588=['style','remove','bg-blue-500/20\x20text-blue-400','supabase','</span></div>','392224SMSqIq','setHeaderColor','text-yellow-400','referral_count','</p></div></div><span\x20class=\x22text-[10px]\x20font-bold\x20','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','home','<div\x20class=\x22my-4\x20px-1\x22><h2\x20class=\x22text-lg\x20font-bold\x20mb-4\x20ml-1\x20text-white\x22>Transaction\x20History</h2>','monetag_rewarded_id','s.\x20Wait\x2010s.','Oops','split','<div\x20class=\x22glass-panel\x20p-5\x20rounded-xl\x20mt-5\x20border\x20border-[#FFD700]/20\x20bg-[#FFD700]/5\x22><p\x20class=\x22text-xs\x20text-gray-300\x20mb-3\x20font-bold\x22>Enter\x20Referral\x20Code</p><div\x20class=\x22flex\x20gap-2\x22><input\x20type=\x22number\x22\x20id=\x22ref-code-input\x22\x20placeholder=\x22ID\x22\x20class=\x22custom-input\x22><button\x20onclick=\x22submitRef()\x22\x20class=\x22gold-gradient\x20text-black\x20text-xs\x20font-bold\x20px-6\x20py-2\x20rounded-lg\x22>Apply</button></div></div>','visibilityState','insert','inApp','querySelector','Submit\x20Request','display','\x20points</b>\x20per\x20referral!</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-3\x20rounded-xl\x20mt-6\x20flex\x20items-center\x20gap-3\x20bg-black/30\x20border\x20border-white/10\x22><input\x20type=\x22text\x22\x20value=\x22','bg-white/5\x20text-gray-500\x20cursor-not-allowed','user-balance','null','data-sdk','submit_referral_code','open','border-green-500/50','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','hidden','Join',',\x20\x27','#FFD700','title','star','<div\x20class=\x22glass-panel\x20p-4\x20rounded-xl\x20flex\x20justify-between\x20items-center\x20border-l-4\x20','Blocked','balance','3499955tbhZJw','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20items-center\x20gap-4\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22w-12\x20h-12\x20rounded-xl\x20bg-white/5\x20flex\x20items-center\x20justify-center\x20text-[#FFD700]\x20border\x20border-white/10\x20shadow-lg\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-','popup','warning','<div\x20class=\x22bg-red-500/10\x20border\x20border-red-500/50\x20p-4\x20rounded-xl\x20mb-6\x20text-center\x20text-xs\x20text-red-400\x22><i\x20class=\x22fas\x20fa-lock\x20text-xl\x20mb-2\x20block\x22></i>Invite\x20<b>','referred_by','initDataUnsafe','65259PyvMiS','rewarded','1803573iNvRpm','error-box','Visit','paid','classList','rpc','users','innerText','play-circle','showLoading','single','catch','<div\x20class=\x22mt-6\x20mb-4\x20rounded-2xl\x20overflow-hidden\x20shadow-lg\x20border\x20border-[#FFD700]/30\x20w-full\x20h-40\x22><img\x20src=\x22','\x22\x20readonly\x20class=\x22bg-transparent\x20text-xs\x20w-full\x20text-gray-300\x20outline-none\x20font-mono\x22\x20id=\x22ref-link\x22><button\x20onclick=\x22copyLink()\x22\x20class=\x22p-2.5\x20bg-[#FFD700]\x20rounded-lg\x20text-black\x20font-bold\x20text-xs\x22><i\x20class=\x22fas\x20fa-copy\x22></i></button></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','success','conversion_rate','.nav-item','<div\x20class=\x22space-y-3\x20pb-20\x22>','referral_bonus','task_type','border-yellow-500/50','head','</h4><p\x20class=\x22text-[10px]\x20text-gray-400\x20font-mono\x22>','\x20uppercase\x20bg-white/5\x20px-2\x20py-1\x20rounded\x22>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-4\x20rounded-2xl\x20flex\x20justify-between\x20items-center\x20','\x20text-xl\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h4\x20class=\x22font-bold\x20text-sm\x20text-white\x20line-clamp-1\x20mb-1\x22>','disabled','home_banner_url','task_id','toLocaleDateString','1932735SyGgZn','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-6\x20rounded-2xl\x20text-center\x20mb-6\x20mt-4\x20relative\x20overflow-hidden\x20shadow-2xl\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22absolute\x20-right-10\x20-top-10\x20w-32\x20h-32\x20bg-green-500/20\x20rounded-full\x20blur-[60px]\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-gray-400\x20text-xs\x20font-bold\x20uppercase\x20tracking-widest\x22>Available\x20Funds</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h1\x20class=\x22text-5xl\x20font-bold\x20gold-text\x20my-3\x22>à§³\x20','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22handleTask(','user','6SlDSZf','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-5\x20mt-2\x20px-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22text-lg\x20font-bold\x20text-white\x22>Task\x20List</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-[10px]\x20bg-white/10\x20px-3\x20py-1\x20rounded-lg\x20text-gray-300\x20border\x20border-white/10\x22>Limit:\x20','withdrawals','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','monetag_direct_link','reward','<div\x20class=\x22w-full\x20h-full\x20flex\x20justify-center\x20items-center\x20mt-20\x22><div\x20class=\x22loader\x22></div></div>','daily_task_limit','getElementById','wallet','Fill\x20all\x20fields','photo_url','history','</h4></div><div\x20class=\x22text-right\x22><p\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x22>Bonus</p><h4\x20class=\x22text-3xl\x20font-bold\x20text-[#FFD700]\x22>','querySelectorAll','amount_bdt','Done','</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22space-y-6\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><label\x20class=\x22text-xs\x20text-gray-400\x20ml-1\x20font-bold\x20uppercase\x22>Method</label><div\x20class=\x22mt-2\x20glass-panel\x20p-4\x20rounded-xl\x20border\x20border-[#FFD700]\x20flex\x20items-center\x20justify-between\x20bg-[#FFD700]/5\x22><div\x20class=\x22flex\x20items-center\x20gap-3\x22><img\x20src=\x22https://freelogopng.com/images/all_img/1656234745bkash-app-logo-png.png\x22\x20class=\x22h-8\x20object-contain\x22><span\x20class=\x22font-bold\x20text-sm\x20text-white\x22>Bkash\x20Personal</span></div><i\x20class=\x22fas\x20fa-check-circle\x20text-[#FFD700]\x20text-xl\x22></i></div></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22space-y-3\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><label\x20class=\x22text-xs\x20text-gray-400\x20ml-1\x20font-bold\x22>Number</label><input\x20type=\x22number\x22\x20id=\x22w-num\x22\x20placeholder=\x22017xxxxxxxx\x22\x20class=\x22custom-input\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><label\x20class=\x22text-xs\x20text-gray-400\x20ml-1\x20font-bold\x22>Amount</label><input\x20type=\x22number\x22\x20id=\x22w-amt\x22\x20placeholder=\x22Min\x20','user-photo','message','MyBot_bot','first_name','.loader','Processing...','forEach','order','device_ref_used','user_id','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x20mt-1\x22>Refers</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-5\x20rounded-2xl\x20flex\x20flex-col\x20items-center\x20justify-center\x20border\x20border-white/5\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-check-circle\x20text-3xl\x20mb-2\x20text-green-400\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-2xl\x20font-bold\x22>Active</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x20mt-1\x22>Status</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','toFixed','</div>','min_referrals_req','pop','bg-cyan-500/20\x20text-cyan-400','getItem','copy','add','top-end','refer','<div\x20class=\x22space-y-4\x20pb-10\x22>','from','Invalid\x20Code','now','increment_balance','setItem','text-red-400','ref-link','interstitial','tasks','Device\x20used!','created_at','No\x20Link','length','link','telegram','801488dLqHVV','expand','</h1>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inline-block\x20bg-white/5\x20border\x20border-white/10\x20rounded-full\x20px-5\x20py-1.5\x20mt-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-xs\x20text-[#FFD700]\x20font-bold\x20tracking-wide\x22>â‰ˆ\x20à§³\x20','setAttribute','//libtl.com/sdk.js','addEventListener','toISOString','_blank','main-app','rejected','settings','onload','fire','visibilitychange','none','</h1>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inline-block\x20bg-white/5\x20px-4\x20py-1.5\x20rounded-full\x20border\x20border-white/10\x22><p\x20class=\x22text-[10px]\x20text-gray-400\x22>Min:\x20à§³\x20','error','bot_username','WEB','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-[10px]\x20text-[#FFD700]\x20font-bold\x20border\x20border-[#FFD700]/20\x20px-1.5\x20py-0.5\x20rounded\x22>+','value','w-amt','script','increment_referral','user-name','referral_lock','video','Copied!','status','Min\x20à§³','gold-gradient\x20text-black\x20hover:opacity-90\x20active:scale-95','VID','true','innerHTML','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','globe','Register\x20Failed','Settings\x20Error:','data-zone','loading-screen','monetag_interstitial_id','start_param','Bkash','w-btn','Low\x20Balance','btn-','copyLink','\x27)\x22\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','active','<div\x20class=\x22text-center\x20text-gray-500\x20text-sm\x20mt-20\x22>No\x20transactions\x20found.</div>','6uCjVQV','text-[#FFD700]','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-6\x20rounded-3xl\x20text-center\x20relative\x20overflow-hidden\x20mt-2\x20shadow-2xl\x20border-t\x20border-white/10\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22absolute\x20-top-10\x20-left-10\x20w-40\x20h-40\x20bg-[#FFD700]\x20rounded-full\x20blur-[80px]\x20opacity-20\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-gray-400\x20text-xs\x20uppercase\x20tracking-[3px]\x20mb-2\x20font-bold\x22>Total\x20Earnings</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h1\x20class=\x22text-6xl\x20font-bold\x20text-white\x20mb-2\x20drop-shadow-2xl\x22>','anti_cheat_enabled','Error','</h4>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20items-center\x20gap-2\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22text-[9px]\x20','claim_task','show_','bg-purple-500/20\x20text-purple-400','direct_ad','visible','Success','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22mt-6\x20glass-panel\x20p-5\x20rounded-xl\x20flex\x20justify-between\x20items-center\x20shadow-lg\x20border\x20border-white/5\x22><div><p\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x22>Referrals</p><h4\x20class=\x22text-3xl\x20font-bold\x20text-white\x22>','execCommand','min_withdraw_amount','Too\x20Fast!','select','2729408ArzSDY','Please\x20open\x20inside\x20Telegram.','handleTask','text-gray-500'];_0x4896=function(){return _0x103588;};return _0x4896();}async function processWithdraw(){const _0x55e7c5=_0x5c034d,_0x2c4d5b=document[_0x55e7c5(0x1c1)](_0x55e7c5(0x148)),_0x83f9f1=document[_0x55e7c5(0x1c1)]('w-num')[_0x55e7c5(0x131)],_0x35d4f2=parseInt(document['getElementById'](_0x55e7c5(0x132))[_0x55e7c5(0x131)]);if(!_0x83f9f1||!_0x35d4f2)return Swal[_0x55e7c5(0x1fc)](_0x55e7c5(0x153),_0x55e7c5(0x1c3),'warning');if(_0x35d4f2<appSettings[_0x55e7c5(0x15d)])return Swal['fire'](_0x55e7c5(0x153),_0x55e7c5(0x13a)+appSettings[_0x55e7c5(0x15d)],_0x55e7c5(0x191));const _0x11e354=_0x35d4f2/appSettings[_0x55e7c5(0x1a6)];if(currentUser['balance']<_0x11e354)return Swal['fire'](_0x55e7c5(0x153),_0x55e7c5(0x149),_0x55e7c5(0x12d));_0x2c4d5b[_0x55e7c5(0x1b1)]=!![],_0x2c4d5b[_0x55e7c5(0x19e)]=_0x55e7c5(0x1d0);if(adFuncs[_0x55e7c5(0x1e8)]&&window[adFuncs[_0x55e7c5(0x1e8)]])await window[adFuncs[_0x55e7c5(0x1e8)]]()[_0x55e7c5(0x1a2)](()=>{});const {error:_0x1855c4}=await supabase[_0x55e7c5(0x1e1)](_0x55e7c5(0x1bb))[_0x55e7c5(0x177)]([{'user_id':currentUser['id'],'method':_0x55e7c5(0x147),'number':_0x83f9f1,'amount_bdt':_0x35d4f2,'points_deducted':_0x11e354}]);!_0x1855c4?(await supabase[_0x55e7c5(0x19c)](_0x55e7c5(0x1e4),{'user_id':currentUser['id'],'amount':-_0x11e354}),currentUser[_0x55e7c5(0x18d)]-=_0x11e354,updateHeaderUI(),Swal['fire'](_0x55e7c5(0x15a),'Sent!',_0x55e7c5(0x1a5)),router(_0x55e7c5(0x1c5))):(Swal[_0x55e7c5(0x1fc)]('Error','Failed',_0x55e7c5(0x12d)),_0x2c4d5b[_0x55e7c5(0x1b1)]=![],_0x2c4d5b['innerText']=_0x55e7c5(0x17a));}async function renderHistory(_0x5cb096){const _0x23b923=_0x5c034d;_0x5cb096['innerHTML']=_0x23b923(0x1bf);const {data:_0xc8e65e}=await supabase[_0x23b923(0x1e1)]('withdrawals')['select']('*')['eq'](_0x23b923(0x1d4),currentUser['id'])[_0x23b923(0x1d2)](_0x23b923(0x1eb),{'ascending':![]});let _0x59f9e3=_0x23b923(0x170);if(!_0xc8e65e||_0xc8e65e[_0x23b923(0x1ed)]===0x0)_0x59f9e3+=_0x23b923(0x14e);else _0x59f9e3+=_0x23b923(0x1a8),_0xc8e65e['forEach'](_0x3aabfb=>{const _0x2ccd81=_0x23b923;let _0x1dbf87=_0x3aabfb['status']==='paid'?'text-green-400':_0x3aabfb[_0x2ccd81(0x139)]===_0x2ccd81(0x1f9)?_0x2ccd81(0x1e6):_0x2ccd81(0x16b);_0x59f9e3+=_0x2ccd81(0x18b)+(_0x3aabfb[_0x2ccd81(0x139)]===_0x2ccd81(0x19a)?_0x2ccd81(0x183):_0x2ccd81(0x1ab))+'\x22><div\x20class=\x22flex\x20items-center\x20gap-4\x22><div><h4\x20class=\x22font-bold\x20text-sm\x20text-white\x22>à§³\x20'+_0x3aabfb[_0x2ccd81(0x1c8)]+_0x2ccd81(0x1ad)+new Date(_0x3aabfb[_0x2ccd81(0x1eb)])[_0x2ccd81(0x1b4)]()+_0x2ccd81(0x16d)+_0x1dbf87+_0x2ccd81(0x1ae)+_0x3aabfb[_0x2ccd81(0x139)]+_0x2ccd81(0x168);}),_0x59f9e3+='</div>';_0x5cb096[_0x23b923(0x13e)]=_0x59f9e3;}function renderRefer(_0x4533c4){const _0xba4d2d=_0x5c034d,_0x3d9d8e='https://t.me/'+(appSettings[_0xba4d2d(0x12e)]||_0xba4d2d(0x1cd))+'?start='+currentUser['id'],_0x425e2f=currentUser[_0xba4d2d(0x193)]===null,_0x174c25=appSettings[_0xba4d2d(0x1a9)]||0x32;_0x4533c4[_0xba4d2d(0x13e)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-6\x20rounded-2xl\x20text-center\x20mt-4\x20border\x20border-[#FFD700]/30\x20shadow-2xl\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22text-2xl\x20font-bold\x20text-white\x22>Invite\x20&\x20Earn</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-xs\x20text-gray-400\x20mt-2\x20px-4\x22>Get\x20<b\x20class=\x22text-[#FFD700]\x22>'+_0x174c25+_0xba4d2d(0x17c)+_0x3d9d8e+_0xba4d2d(0x1a4)+(_0x425e2f?_0xba4d2d(0x175):'')+_0xba4d2d(0x15b)+currentUser[_0xba4d2d(0x16c)]+_0xba4d2d(0x1c6)+currentUser[_0xba4d2d(0x16c)]*_0x174c25+'</h4></div></div>';}function _0x4dcf(_0x1a5018,_0x531641){const _0x48963c=_0x4896();return _0x4dcf=function(_0x4dcfb9,_0x3950f7){_0x4dcfb9=_0x4dcfb9-0x12b;let _0x1b067f=_0x48963c[_0x4dcfb9];return _0x1b067f;},_0x4dcf(_0x1a5018,_0x531641);}async function submitRef(){const _0x2e6029=_0x5c034d,_0x234c4e=document[_0x2e6029(0x1c1)]('ref-code-input')[_0x2e6029(0x131)];if(!_0x234c4e)return Swal[_0x2e6029(0x1fc)]('Error','Enter\x20Code',_0x2e6029(0x191));if(appSettings['anti_cheat_enabled']&&localStorage['getItem'](_0x2e6029(0x1d3)))return Swal[_0x2e6029(0x1fc)](_0x2e6029(0x18c),_0x2e6029(0x1ea),'error');Swal[_0x2e6029(0x1a0)]();const {data:_0xb66a43}=await supabase[_0x2e6029(0x19c)](_0x2e6029(0x181),{'user_id_input':currentUser['id'],'referrer_id_input':parseInt(_0x234c4e)});Swal['close']();if(_0xb66a43&&_0xb66a43[_0x2e6029(0x1a5)]){if(appSettings[_0x2e6029(0x152)])localStorage['setItem']('device_ref_used',_0x2e6029(0x13d));currentUser[_0x2e6029(0x193)]=parseInt(_0x234c4e),Swal[_0x2e6029(0x1fc)]('Success','Applied!',_0x2e6029(0x1a5)),router(_0x2e6029(0x1df));}else Swal[_0x2e6029(0x1fc)](_0x2e6029(0x153),_0xb66a43?.[_0x2e6029(0x1cc)]||_0x2e6029(0x1e2),'error');}window[_0x5c034d(0x14b)]=()=>{const _0x103259=_0x5c034d;document[_0x103259(0x1c1)](_0x103259(0x1e7))[_0x103259(0x15f)](),document[_0x103259(0x15c)](_0x103259(0x1dc)),Swal[_0x103259(0x1fc)]({'icon':_0x103259(0x1a5),'title':_0x103259(0x138),'toast':!![],'position':_0x103259(0x1de),'showConfirmButton':![],'timer':0x5dc});},initApp();
+    </script>
+</body>
+</html>
