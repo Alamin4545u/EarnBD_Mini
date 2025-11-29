@@ -348,6 +348,7 @@
             s.setAttribute('data-zone', zoneId);
             s.setAttribute('data-sdk', fname);
             s.onload = () => cb(fname);
+            s.onerror = () => console.error('Monetag load failed:', zoneId);
             document.head.appendChild(s);
         }
 
@@ -360,8 +361,17 @@
         function updateUI() {
             if(!currentUser) return;
             document.getElementById('user-name').innerText = currentUser.first_name;
-            document.getElementById('user-balance').innerText = currentUser.balance;
+            document.getElementById('user-balance').innerText = Math.floor(currentUser.balance);
             if(currentUser.photo_url) document.getElementById('user-photo').src = currentUser.photo_url;
+        }
+
+        function updateHeaderUI() {
+            if (!currentUser) return;
+            document.getElementById('user-balance').innerText = Math.floor(currentUser.balance);
+            document.getElementById('user-name').innerText = currentUser.first_name || 'User';
+            if (currentUser.photo_url) {
+                document.getElementById('user-photo').src = currentUser.photo_url;
+            }
         }
 
         // ---------------------------------------------------------
@@ -418,7 +428,7 @@
                 <div class="grid grid-cols-2 gap-4 mt-6">
                     <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
                         <i class="fas fa-users text-3xl mb-2 text-blue-400"></i>
-                        <span class="text-2xl font-bold">${currentUser.referral_count}</span>
+                        <span class="text-2xl font-bold">${currentUser.referral_count || 0}</span>
                         <span class="text-[10px] text-gray-400 uppercase mt-1">Total Refers</span>
                     </div>
                     <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
@@ -428,7 +438,7 @@
                     </div>
                 </div>
                 
-                ${appSettings.home_banner_url ? `<div class="mt-6 mb-4 rounded-2xl overflow-hidden shadow-lg border border-[#FFD700]/30 w-full h-40"><img src="${appSettings.home_banner_url}" class="w-full h-full object-cover"></div>` : ''}
+                \( {appSettings.home_banner_url ? `<div class="mt-6 mb-4 rounded-2xl overflow-hidden shadow-lg border border-[#FFD700]/30 w-full h-40"><img src=" \){appSettings.home_banner_url}" class="w-full h-full object-cover"></div>` : ''}
             `;
         }
 
@@ -439,7 +449,7 @@
             c.innerHTML = `<div class="flex justify-center mt-20"><div class="loader"></div></div>`;
             
             const { data: tasks } = await supabase.from('tasks').select('*').eq('is_active', true).order('id');
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date().toLocaleDateString('en-CA');
             const { data: logs } = await supabase.from('task_logs').select('task_id').eq('user_id', currentUser.id).eq('created_at', today);
 
             const counts = {};
@@ -488,11 +498,11 @@
                                     <div class="flex items-center gap-2">
                                         <span class="text-[9px] ${bCol} px-1.5 py-0.5 rounded font-bold tracking-wider">TASK</span>
                                         <span class="text-[10px] text-[#FFD700] font-bold border border-[#FFD700]/20 px-1.5 py-0.5 rounded">+${t.reward}</span>
-                                        <span class="text-[10px] text-gray-500 font-mono pl-2 border-l border-white/10">${cnt}/${limit}</span>
+                                        <span class="text-[10px] text-gray-500 font-mono pl-2 border-l border-white/10">\( {cnt}/ \){limit}</span>
                                     </div>
                                 </div>
                             </div>
-                            <button onclick="handleTask(${t.id}, ${t.reward}, '${t.task_type}', '${t.link || ''}')" 
+                            <button onclick="handleTask(\( {t.id}, \){t.reward}, '\( {t.task_type}', ' \){t.link || ''}')" 
                                 ${disabled?'disabled':''} 
                                 class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${btnClass}">
                                 ${cnt >= limit ? 'Done' : btn}
@@ -535,40 +545,28 @@
             pendingTask = { id: tid, reward: rew };
             adStartTime = Date.now();
 
-            // ১. ডিরেক্ট লিংক
-            if (type === 'direct_ad') {
-                const url = (link && link !== 'null') ? link : appSettings.monetag_direct_link;
-                if(url) { 
-                    window.open(url, '_blank'); 
-                    // ব্যাক করলে ইন্টারস্টিশিয়াল অ্যাড দেখাবে
-                    setTimeout(() => { 
-                        if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial](); 
-                    }, 1000); 
-                } else {
-                    Swal.fire('Error', 'No Link Configured', 'error');
-                }
+            if (type === 'direct_ad' || type === 'telegram' || !type) {
+                const url = link && link !== 'null' ? link : appSettings.monetag_direct_link || 'https://google.com';
+                tg.openLink(url);
+                setTimeout(() => {
+                    if (adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial]();
+                }, 1500);
             } 
-            // ২. টেলিগ্রাম (পপআপ)
-            else if (type === 'telegram') {
-                if(link) window.open(link, '_blank');
-                if(adFuncs.popup && window[adFuncs.popup]) window[adFuncs.popup]('pop');
-            } 
-            // ৩. ভিডিও (রিওয়ার্ডেড)
             else if (type === 'video') {
-                if(adFuncs.rewarded && window[adFuncs.rewarded]) {
-                    window[adFuncs.rewarded]().then(() => { 
-                        // অ্যাড দেখা শেষ হলে সরাসরি ক্লেইম
-                        claimReward(tid, rew); 
-                        adStartTime = 0; 
-                        pendingTask = null; 
+                if (adFuncs.rewarded && window[adFuncs.rewarded]) {
+                    window[adFuncs.rewarded]().then(() => {
+                        claimReward(tid, rew);
+                    }).catch(() => {
+                        adStartTime = 0;
+                        pendingTask = null;
+                        Swal.fire('Ad Error', 'Rewarded ad failed to load', 'error');
                     });
+                } else {
+                    Swal.fire('Error', 'No Rewarded Ad Configured', 'error');
+                    adStartTime = 0;
+                    pendingTask = null;
                 }
             } 
-            // ৪. অন্যান্য (ওয়েব + ইন্টারস্টিশিয়াল)
-            else {
-                if(link && link !== 'null') window.open(link, '_blank');
-                if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial]();
-            }
         };
 
         async function claimReward(tid, rew) {
@@ -679,9 +677,9 @@
                 router('history');
             } else {
                 Swal.fire('Error', 'Failed to submit', 'error');
-                btn.disabled = false; // ফেইল হলে বাটন আবার সচল
-                btn.innerText = "Submit Request";
             }
+            btn.disabled = false;
+            btn.innerText = "Submit Request";
         }
 
         // ---------------------------------------------------------
@@ -711,7 +709,7 @@
                                     <p class="text-[10px] text-gray-400 font-mono">${new Date(i.created_at).toLocaleDateString()}</p>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-bold ${col} uppercase bg-white/5 px-2 py-1 rounded">${i.status}</span>
+                            <span class="text-[10px] font-bold \( {col} uppercase bg-white/5 px-2 py-1 rounded"> \){i.status}</span>
                         </div>`;
                 });
                 html += `</div>`;
@@ -723,8 +721,8 @@
         // ৬. রেফার পেজ (REFER PAGE)
         // ---------------------------------------------------------
         function renderRefer(c) {
-            const link = `https://t.me/${appSettings.bot_username || 'MyBot_bot'}?start=${currentUser.id}`;
-            const showInput = currentUser.referred_by === null;
+            const link = `https://t.me/\( {appSettings.bot_username || 'MyBot_bot'}?start= \){currentUser.id}`;
+            const showInput = !currentUser.referred_by;
             const bonus = appSettings.referral_bonus || 50;
 
             c.innerHTML = `
@@ -748,8 +746,8 @@
                 </div>` : ''}
                 
                 <div class="mt-6 glass-panel p-5 rounded-xl flex justify-between items-center shadow-lg border border-white/5">
-                    <div><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Total Referrals</p><h4 class="text-3xl font-bold text-white">${currentUser.referral_count}</h4></div>
-                    <div class="text-right"><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Bonus Earned</p><h4 class="text-3xl font-bold text-[#FFD700]">${currentUser.referral_count * bonus}</h4></div>
+                    <div><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Total Referrals</p><h4 class="text-3xl font-bold text-white">${currentUser.referral_count || 0}</h4></div>
+                    <div class="text-right"><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Bonus Earned</p><h4 class="text-3xl font-bold text-[#FFD700]">${(currentUser.referral_count || 0) * bonus}</h4></div>
                 </div>`;
         }
 
