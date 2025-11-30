@@ -1,1 +1,460 @@
-const _0x3b3109=_0x21fa;(function(_0xe05b75,_0x466ae2){const _0x25fdbd=_0x21fa,_0x295e43=_0xe05b75();while(!![]){try{const _0x453cc6=parseInt(_0x25fdbd(0x18a))/0x1*(-parseInt(_0x25fdbd(0x11a))/0x2)+-parseInt(_0x25fdbd(0x182))/0x3*(-parseInt(_0x25fdbd(0x1ba))/0x4)+-parseInt(_0x25fdbd(0x10d))/0x5*(parseInt(_0x25fdbd(0x195))/0x6)+parseInt(_0x25fdbd(0x1a5))/0x7+-parseInt(_0x25fdbd(0x16d))/0x8*(-parseInt(_0x25fdbd(0x175))/0x9)+parseInt(_0x25fdbd(0x163))/0xa*(-parseInt(_0x25fdbd(0x197))/0xb)+parseInt(_0x25fdbd(0x1ac))/0xc;if(_0x453cc6===_0x466ae2)break;else _0x295e43['push'](_0x295e43['shift']());}catch(_0x3e3c3d){_0x295e43['push'](_0x295e43['shift']());}}}(_0x10b2,0xd304e));function _0x21fa(_0x124154,_0x7287bf){const _0x10b2a6=_0x10b2();return _0x21fa=function(_0x21fa45,_0x32b483){_0x21fa45=_0x21fa45-0x106;let _0x5e76ab=_0x10b2a6[_0x21fa45];return _0x5e76ab;},_0x21fa(_0x124154,_0x7287bf);}const SUPABASE_URL=_0x3b3109(0x1c0),SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndubXd2YmV5ZHNyZWh0c25rZm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMDg4MzIsImV4cCI6MjA3OTg4NDgzMn0.4vSObxBEr8r11-dqkp9y6bVroMVoSTEnIOTF8Vo8sxk',supabase=window[_0x3b3109(0x1bf)][_0x3b3109(0x141)](SUPABASE_URL,SUPABASE_KEY),tg=window[_0x3b3109(0x115)][_0x3b3109(0x149)];function _0x10b2(){const _0x4e0694=['Blocked','style','</div>','\x20class=\x22px-5\x20py-2.5\x20rounded-xl\x20text-xs\x20font-bold\x20transition-all\x20','increment_balance','4zqjHla','toISOString','paid','<div\x20class=\x22w-full\x20h-full\x20flex\x20justify-center\x20items-center\x20mt-20\x22><div\x20class=\x22loader\x22></div></div>','btn-','supabase','https://wnmwvbeydsrehtsnkfoc.supabase.co','<div\x20class=\x22mt-6\x20mb-4\x20rounded-2xl\x20overflow-hidden\x20shadow-lg\x20border\x20border-[#FFD700]/30\x20w-full\x20h-40\x22><img\x20src=\x22','device_ref_used','amount_bdt','rpc','open','</span><span\x20class=\x22text-[10px]\x20text-gray-500\x20font-mono\x20pl-2\x20border-l\x20border-white/10\x22>','anti_cheat_enabled','initDataUnsafe','task_type','\x22\x20class=\x22custom-input\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20id=\x22w-btn\x22\x20onclick=\x22processWithdraw()\x22\x20class=\x22w-full\x20py-4\x20rounded-xl\x20gold-gradient\x20text-black\x20font-bold\x20mt-4\x20shadow-lg\x20active:scale-95\x20transition-transform\x20text-sm\x20uppercase\x20tracking-wide\x20flex\x20items-center\x20justify-center\x20gap-2\x22>Submit\x20Request</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>','user_id','play-circle','</h1>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inline-block\x20bg-white/5\x20px-4\x20py-1.5\x20rounded-full\x20border\x20border-white/10\x22><p\x20class=\x22text-[10px]\x20text-gray-400\x22>Min:\x20৳\x20','No\x20Link','bot_username','true','Applied!','onload','fire','w-amt','reward','data-zone','withdrawals','#0f0f0f','</p></div></div><span\x20class=\x22text-[10px]\x20font-bold\x20','bg-cyan-500/20\x20text-cyan-400','bg-blue-500/20\x20text-blue-400','home_banner_url','Submit\x20Request','Enter\x20Code','from','\x20uppercase\x20bg-white/5\x20px-2\x20py-1\x20rounded\x22>','createElement','copyLink','inApp','script','message','Login\x20Failed','interstitial','w-btn','addEventListener','\x27)\x22\x20','history','5Lhdnlx','increment_referral','video','referral_count','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-6\x20rounded-2xl\x20text-center\x20mt-4\x20border\x20border-[#FFD700]/30\x20shadow-2xl\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22text-2xl\x20font-bold\x20text-white\x22>Invite\x20&\x20Earn</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-xs\x20text-gray-400\x20mt-2\x20px-4\x22>Get\x20<b\x20class=\x22text-[#FFD700]\x22>','length','globe','success','Telegram','//libtl.com/sdk.js','wallet','src','user-name','941662qVMsCr','<div\x20class=\x22text-center\x20text-gray-500\x20text-sm\x20mt-20\x22>No\x20transactions\x20found.</div>','now','Min\x20৳','null','error-box','\x22\x20class=\x22w-full\x20h-full\x20object-cover\x22></div>','setItem','.nav-item','monetag_popup_id','warning','order','ref-code-input','bg-purple-500/20\x20text-purple-400','copy','setAttribute','Sent!','</h4><div\x20class=\x22flex\x20items-center\x20gap-2\x22><span\x20class=\x22text-[9px]\x20','hidden','monetag_interstitial_id','innerText','username','visibilitychange','toLocaleDateString','data-sdk','execCommand','users','user-photo','split','</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','none','conversion_rate','querySelector','is_active','#FFD700','referral_bonus','title','forEach','</h1>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22inline-block\x20bg-white/5\x20border\x20border-white/10\x20rounded-full\x20px-5\x20py-1.5\x20mt-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-xs\x20text-[#FFD700]\x20font-bold\x20tracking-wide\x22>≈\x20৳\x20','createClient','<div\x20class=\x22glass-panel\x20p-5\x20rounded-xl\x20mt-5\x20border\x20border-[#FFD700]/20\x20bg-[#FFD700]/5\x22><p\x20class=\x22text-xs\x20text-gray-300\x20mb-3\x20font-bold\x22>Enter\x20Referral\x20Code</p><div\x20class=\x22flex\x20gap-2\x22><input\x20type=\x22number\x22\x20id=\x22ref-code-input\x22\x20placeholder=\x22ID\x22\x20class=\x22custom-input\x22><button\x20onclick=\x22submitRef()\x22\x20class=\x22gold-gradient\x20text-black\x20text-xs\x20font-bold\x20px-6\x20py-2\x20rounded-lg\x22>Apply</button></div></div>','</span></div>','disabled','</h4></div><div\x20class=\x22text-right\x22><p\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x22>Bonus</p><h4\x20class=\x22text-3xl\x20font-bold\x20text-[#FFD700]\x22>','<div\x20class=\x22flex\x20justify-center\x20mt-20\x22><div\x20class=\x22loader\x22></div></div>','submit_referral_code','Device\x20used!','WebApp',',\x20\x27','Copied!','.loader','toFixed','Bkash','classList','first_name','bg-white/5\x20text-gray-500\x20cursor-not-allowed','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22mt-6\x20glass-panel\x20p-5\x20rounded-xl\x20flex\x20justify-between\x20items-center\x20shadow-lg\x20border\x20border-white/5\x22><div><p\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x22>Referrals</p><h4\x20class=\x22text-3xl\x20font-bold\x20text-white\x22>','</span><span\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x20mt-1\x22>Refers</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-5\x20rounded-2xl\x20flex\x20flex-col\x20items-center\x20justify-center\x20border\x20border-white/5\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-check-circle\x20text-3xl\x20mb-2\x20text-green-400\x22></i><span\x20class=\x22text-2xl\x20font-bold\x22>Active</span><span\x20class=\x22text-[10px]\x20text-gray-400\x20uppercase\x20mt-1\x22>Status</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','main-app','text-[#FFD700]','task_logs','ref-link','text-yellow-400','min_withdraw_amount','text-red-400','</h4></div></div>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-6\x20rounded-3xl\x20text-center\x20relative\x20overflow-hidden\x20mt-2\x20shadow-2xl\x20border-t\x20border-white/10\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22absolute\x20-top-10\x20-left-10\x20w-40\x20h-40\x20bg-[#FFD700]\x20rounded-full\x20blur-[80px]\x20opacity-20\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-gray-400\x20text-xs\x20uppercase\x20tracking-[3px]\x20mb-2\x20font-bold\x22>Total\x20Earnings</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h1\x20class=\x22text-6xl\x20font-bold\x20text-white\x20mb-2\x22>','popup','link','referred_by','head','refer','error-msg','820GCGdtc','showLoading','settings','value','top-end','setHeaderColor','user-balance','Success','Please\x20open\x20inside\x20Telegram.','https://t.me/','536DxPHyl','MyBot_bot','balance','Failed','Fill\x20fields','monetag_rewarded_id','pop','visibilityState','100773yfCdqD','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22flex\x20items-center\x20gap-4\x22><div\x20class=\x22w-12\x20h-12\x20rounded-xl\x20bg-white/5\x20flex\x20items-center\x20justify-center\x20text-[#FFD700]\x20border\x20border-white/10\x20shadow-lg\x22><i\x20class=\x22fas\x20fa-','select','catch','w-num','\x27,\x20\x27','getElementById','<div\x20class=\x22bg-red-500/10\x20border\x20border-red-500/50\x20p-4\x20rounded-xl\x20mb-6\x20text-center\x20text-xs\x20text-red-400\x22><i\x20class=\x22fas\x20fa-lock\x20text-xl\x20mb-2\x20block\x22></i>Invite\x20','active','tasks','<div\x20class=\x22my-4\x20px-1\x22><h2\x20class=\x22text-lg\x20font-bold\x20mb-4\x20ml-1\x20text-white\x22>Transaction\x20History</h2>','add','start_param','3561252YfBJxP','Join','loading-screen','\x20points</b>\x20per\x20referral!</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-3\x20rounded-xl\x20mt-6\x20flex\x20items-center\x20gap-3\x20bg-black/30\x20border\x20border-white/10\x22><input\x20type=\x22text\x22\x20value=\x22','close','appendChild','photo_url','<div\x20class=\x22space-y-3\x20pb-20\x22>','1WFGqzc','Too\x20Fast!','\x22><div\x20class=\x22flex\x20items-center\x20gap-4\x22><div><h4\x20class=\x22font-bold\x20text-sm\x20text-white\x22>৳\x20','?start=','rewarded','\x20more\x20friends</div>','then','opacity-60\x20grayscale','\x22\x20readonly\x20class=\x22bg-transparent\x20text-xs\x20w-full\x20text-gray-300\x20outline-none\x20font-mono\x22\x20id=\x22ref-link\x22><button\x20onclick=\x22copyLink()\x22\x20class=\x22p-2.5\x20bg-[#FFD700]\x20rounded-lg\x20text-black\x20font-bold\x20text-xs\x22><i\x20class=\x22fas\x20fa-copy\x22></i></button></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','task_id','border-yellow-500/50','8134860wWEXmr','Watch','77946UBNZUG','Processing...','expand','single','user','Invalid\x20Code','<div\x20class=\x22flex\x20justify-between\x20items-center\x20mb-5\x20mt-2\x20px-1\x22><h2\x20class=\x22text-lg\x20font-bold\x20text-white\x22>Task\x20List</h2><span\x20class=\x22text-[10px]\x20bg-white/10\x20px-3\x20py-1\x20rounded-lg\x20text-gray-300\x20border\x20border-white/10\x22>Limit:\x20','<div\x20class=\x22space-y-4\x20pb-10\x22>','_blank','text-green-400','daily_task_limit','claim_task','innerHTML','\x20BDT</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22router(\x27tasks\x27)\x22\x20class=\x22mt-8\x20w-full\x20py-4\x20rounded-2xl\x20gold-gradient\x20text-black\x20font-bold\x20shadow-lg\x20active:scale-95\x20transition-transform\x20flex\x20items-center\x20justify-center\x20gap-2\x20uppercase\x20tracking-wider\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-play\x22></i>\x20Start\x20Earning\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22grid\x20grid-cols-2\x20gap-4\x20mt-6\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-5\x20rounded-2xl\x20flex\x20flex-col\x20items-center\x20justify-center\x20border\x20border-white/5\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22fas\x20fa-users\x20text-3xl\x20mb-2\x20text-blue-400\x22></i><span\x20class=\x22text-2xl\x20font-bold\x22>','6079290sTUKxr','querySelectorAll','remove','created_at','</h4><p\x20class=\x22text-[10px]\x20text-gray-400\x20font-mono\x22>','direct_ad','status','5595288daWJdE','Error','referral_lock','error','show_','\x20text-xl\x22></i></div><div><h4\x20class=\x22font-bold\x20text-sm\x20text-white\x20line-clamp-1\x20mb-1\x22>','visible','insert','</p></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22space-y-6\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><label\x20class=\x22text-xs\x20text-gray-400\x20ml-1\x20font-bold\x20uppercase\x22>Method</label><div\x20class=\x22mt-2\x20glass-panel\x20p-4\x20rounded-xl\x20border\x20border-[#FFD700]\x20flex\x20items-center\x20justify-between\x20bg-[#FFD700]/5\x22><div\x20class=\x22flex\x20items-center\x20gap-3\x22><img\x20src=\x22https://freelogopng.com/images/all_img/1656234745bkash-app-logo-png.png\x22\x20class=\x22h-8\x20object-contain\x22><span\x20class=\x22font-bold\x20text-sm\x20text-white\x22>Bkash\x20Personal</span></div><i\x20class=\x22fas\x20fa-check-circle\x20text-[#FFD700]\x20text-xl\x22></i></div></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22space-y-3\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><label\x20class=\x22text-xs\x20text-gray-400\x20ml-1\x20font-bold\x22>Number</label><input\x20type=\x22number\x22\x20id=\x22w-num\x22\x20placeholder=\x22017xxxxxxxx\x22\x20class=\x22custom-input\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div><label\x20class=\x22text-xs\x20text-gray-400\x20ml-1\x20font-bold\x22>Amount</label><input\x20type=\x22number\x22\x20id=\x22w-amt\x22\x20placeholder=\x22Min\x20'];_0x10b2=function(){return _0x4e0694;};return _0x10b2();}let currentUser=null,appSettings={},adFuncs={'interstitial':null,'rewarded':null,'popup':null},adStartTime=0x0,pendingTask=null;const MIN_AD_DURATION=0x2710;async function initApp(){const _0x59da36=_0x3b3109;tg[_0x59da36(0x199)](),tg[_0x59da36(0x168)](_0x59da36(0x1d8));const _0x23095d=tg[_0x59da36(0x1c8)]?.[_0x59da36(0x19b)];if(!_0x23095d)return showError(_0x59da36(0x16b));try{const {data:_0x1069af,error:_0xa9ef32}=await supabase[_0x59da36(0x1df)](_0x59da36(0x165))[_0x59da36(0x177)]('*')[_0x59da36(0x19a)]();appSettings=_0x1069af||{'conversion_rate':0.05,'min_withdraw_amount':0x32,'daily_task_limit':0xa,'anti_cheat_enabled':!![],'bot_username':_0x59da36(0x16e)};if(appSettings['monetag_interstitial_id'])loadScript(appSettings[_0x59da36(0x12d)],_0x39d268=>adFuncs[_0x59da36(0x108)]=_0x39d268);if(appSettings[_0x59da36(0x172)])loadScript(appSettings[_0x59da36(0x172)],_0x4f60cb=>adFuncs['rewarded']=_0x4f60cb);if(appSettings[_0x59da36(0x123)])loadScript(appSettings[_0x59da36(0x123)],_0xbedc96=>adFuncs[_0x59da36(0x15d)]=_0xbedc96);let {data:_0x229419}=await supabase[_0x59da36(0x1df)](_0x59da36(0x134))['select']('*')['eq']('id',_0x23095d['id'])[_0x59da36(0x19a)]();if(!_0x229419){const _0x1eede1=tg[_0x59da36(0x1c8)]?.[_0x59da36(0x181)];let _0x5534c8=_0x1eede1&&_0x1eede1!=_0x23095d['id']?parseInt(_0x1eede1):null;if(appSettings['anti_cheat_enabled']&&_0x5534c8&&localStorage['getItem']('device_ref_used'))_0x5534c8=null;const {data:_0xd75f54,error:_0x3d3770}=await supabase[_0x59da36(0x1df)](_0x59da36(0x134))[_0x59da36(0x1b3)]([{'id':_0x23095d['id'],'first_name':_0x23095d['first_name'],'username':_0x23095d[_0x59da36(0x12f)],'photo_url':_0x23095d['photo_url'],'referred_by':_0x5534c8,'balance':0x0}])[_0x59da36(0x177)]()[_0x59da36(0x19a)]();if(_0x3d3770)throw new Error(_0x59da36(0x107));_0x229419=_0xd75f54,_0x5534c8&&(await supabase[_0x59da36(0x1c4)](_0x59da36(0x10e),{'referrer_id':_0x5534c8}),localStorage['setItem'](_0x59da36(0x1c2),'true'));}currentUser=_0x229419,updateUI(),setTimeout(()=>{const _0x31b243=_0x59da36;document[_0x31b243(0x17b)](_0x31b243(0x184))[_0x31b243(0x14f)]['add'](_0x31b243(0x12c)),document['getElementById']('main-app')['classList'][_0x31b243(0x1a7)](_0x31b243(0x12c)),router('home');},0x3e8);}catch(_0x5e9baf){showError(_0x5e9baf['message']);}}function loadScript(_0x148379,_0x2262c5){const _0x426f3a=_0x3b3109,_0x1aa1a8=document[_0x426f3a(0x1e1)](_0x426f3a(0x1e4));_0x1aa1a8[_0x426f3a(0x118)]=_0x426f3a(0x116);const _0x36e39e=_0x426f3a(0x1b0)+_0x148379;_0x1aa1a8[_0x426f3a(0x129)](_0x426f3a(0x1d6),_0x148379),_0x1aa1a8[_0x426f3a(0x129)](_0x426f3a(0x132),_0x36e39e),_0x1aa1a8[_0x426f3a(0x1d2)]=()=>_0x2262c5(_0x36e39e),document[_0x426f3a(0x160)][_0x426f3a(0x187)](_0x1aa1a8);}function showError(_0xd32163){const _0x4b5e96=_0x3b3109;document[_0x4b5e96(0x17b)](_0x4b5e96(0x162))[_0x4b5e96(0x12e)]=_0xd32163,document['getElementById'](_0x4b5e96(0x11f))[_0x4b5e96(0x14f)][_0x4b5e96(0x1a7)]('hidden'),document[_0x4b5e96(0x13a)](_0x4b5e96(0x14c))[_0x4b5e96(0x1b6)]['display']=_0x4b5e96(0x138);}function updateUI(){const _0x475c0d=_0x3b3109;document[_0x475c0d(0x17b)](_0x475c0d(0x119))['innerText']=currentUser[_0x475c0d(0x150)],document[_0x475c0d(0x17b)](_0x475c0d(0x169))[_0x475c0d(0x12e)]=currentUser[_0x475c0d(0x16f)];if(currentUser[_0x475c0d(0x188)])document[_0x475c0d(0x17b)](_0x475c0d(0x135))[_0x475c0d(0x118)]=currentUser[_0x475c0d(0x188)];}function router(_0x203531){const _0x4d0a4f=_0x3b3109;document[_0x4d0a4f(0x1a6)](_0x4d0a4f(0x122))[_0x4d0a4f(0x13f)](_0xf8fe5c=>{const _0x389e51=_0x4d0a4f;_0xf8fe5c[_0x389e51(0x14f)][_0x389e51(0x1a7)](_0x389e51(0x17d),_0x389e51(0x155)),_0xf8fe5c[_0x389e51(0x14f)][_0x389e51(0x180)]('text-gray-500');}),document['getElementById'](_0x4d0a4f(0x1be)+_0x203531)[_0x4d0a4f(0x14f)]['add'](_0x4d0a4f(0x17d),_0x4d0a4f(0x155));const _0x21b59f=document[_0x4d0a4f(0x17b)](_0x4d0a4f(0x154));if(_0x203531==='home')renderHome(_0x21b59f);else{if(_0x203531===_0x4d0a4f(0x17e))renderTasks(_0x21b59f);else{if(_0x203531===_0x4d0a4f(0x117))renderWallet(_0x21b59f);else{if(_0x203531===_0x4d0a4f(0x10c))renderHistory(_0x21b59f);else{if(_0x203531===_0x4d0a4f(0x161))renderRefer(_0x21b59f);}}}}}function renderHome(_0x54f73b){const _0x1ac746=_0x3b3109,_0x132094=(currentUser[_0x1ac746(0x16f)]*appSettings[_0x1ac746(0x139)])[_0x1ac746(0x14d)](0x2);if(adFuncs[_0x1ac746(0x108)]&&window[adFuncs[_0x1ac746(0x108)]])window[adFuncs[_0x1ac746(0x108)]]({'type':_0x1ac746(0x1e3),'inAppSettings':{'frequency':0x2,'capping':0.1,'interval':0x1e,'timeout':0x5,'everyPage':![]}});_0x54f73b[_0x1ac746(0x1a3)]=_0x1ac746(0x15c)+currentUser[_0x1ac746(0x16f)]+_0x1ac746(0x140)+_0x132094+_0x1ac746(0x1a4)+currentUser[_0x1ac746(0x110)]+_0x1ac746(0x153)+(appSettings[_0x1ac746(0x1dc)]?_0x1ac746(0x1c1)+appSettings['home_banner_url']+_0x1ac746(0x120):'');}async function renderTasks(_0x53caa8){const _0x25e9e1=_0x3b3109;_0x53caa8['innerHTML']=_0x25e9e1(0x146);const {data:_0x2b4a46}=await supabase[_0x25e9e1(0x1df)](_0x25e9e1(0x17e))[_0x25e9e1(0x177)]('*')['eq'](_0x25e9e1(0x13b),!![])[_0x25e9e1(0x125)]('id'),{data:_0x9cc376}=await supabase[_0x25e9e1(0x1df)](_0x25e9e1(0x156))[_0x25e9e1(0x177)]('task_id')['eq'](_0x25e9e1(0x1cb),currentUser['id'])['eq'](_0x25e9e1(0x1a8),new Date()[_0x25e9e1(0x1bb)]()[_0x25e9e1(0x136)]('T')[0x0]),_0x2db470={};if(_0x9cc376)_0x9cc376[_0x25e9e1(0x13f)](_0x9dc949=>_0x2db470[_0x9dc949[_0x25e9e1(0x193)]]=(_0x2db470[_0x9dc949['task_id']]||0x0)+0x1);const _0x45e378=appSettings[_0x25e9e1(0x1ae)]&&currentUser[_0x25e9e1(0x110)]<appSettings['min_referrals_req'],_0x2b7d34=appSettings[_0x25e9e1(0x1a1)]||0xa;let _0x309d55=_0x25e9e1(0x19d)+_0x2b7d34+'</span></div>';if(_0x45e378)_0x309d55+=_0x25e9e1(0x17c)+(appSettings['min_referrals_req']-currentUser[_0x25e9e1(0x110)])+_0x25e9e1(0x18f);_0x309d55+=_0x25e9e1(0x19e),_0x2b4a46[_0x25e9e1(0x13f)](_0x5d0a47=>{const _0x5335df=_0x25e9e1;let _0x2045a8='star',_0x41841b='Claim',_0x5af4b8='bg-gray-500/20';if(_0x5d0a47[_0x5335df(0x1c9)]==='direct_ad')_0x2045a8=_0x5335df(0x113),_0x41841b='Visit',_0x5af4b8=_0x5335df(0x1db);else{if(_0x5d0a47['task_type']==='telegram')_0x2045a8='paper-plane',_0x41841b=_0x5335df(0x183),_0x5af4b8=_0x5335df(0x1da);else _0x5d0a47['task_type']===_0x5335df(0x10f)&&(_0x2045a8=_0x5335df(0x1cc),_0x41841b=_0x5335df(0x196),_0x5af4b8=_0x5335df(0x127));}const _0x212ec2=_0x2db470[_0x5d0a47['id']]||0x0,_0x5dfa03=_0x45e378||_0x212ec2>=_0x2b7d34;_0x309d55+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-4\x20rounded-2xl\x20flex\x20justify-between\x20items-center\x20'+(_0x5dfa03?_0x5335df(0x191):'')+_0x5335df(0x176)+_0x2045a8+_0x5335df(0x1b1)+_0x5d0a47[_0x5335df(0x13e)]+_0x5335df(0x12b)+_0x5af4b8+'\x20px-1.5\x20py-0.5\x20rounded\x20font-bold\x20tracking-wider\x22>TASK</span><span\x20class=\x22text-[10px]\x20text-[#FFD700]\x20font-bold\x20border\x20border-[#FFD700]/20\x20px-1.5\x20py-0.5\x20rounded\x22>+'+_0x5d0a47[_0x5335df(0x1d5)]+_0x5335df(0x1c6)+_0x212ec2+'/'+_0x2b7d34+'</span></div></div></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20onclick=\x22handleTask('+_0x5d0a47['id']+',\x20'+_0x5d0a47[_0x5335df(0x1d5)]+_0x5335df(0x14a)+_0x5d0a47[_0x5335df(0x1c9)]+_0x5335df(0x17a)+(_0x5d0a47[_0x5335df(0x15e)]||'')+_0x5335df(0x10b)+(_0x5dfa03?_0x5335df(0x144):'')+_0x5335df(0x1b8)+(_0x5dfa03?_0x5335df(0x151):'gold-gradient\x20text-black\x20hover:opacity-90\x20active:scale-95')+'\x22>'+(_0x212ec2>=_0x2b7d34?'Done':_0x41841b)+_0x5335df(0x137);}),_0x53caa8['innerHTML']=_0x309d55+_0x25e9e1(0x1b7);}document[_0x3b3109(0x10a)](_0x3b3109(0x130),()=>{const _0x29829c=_0x3b3109;if(document[_0x29829c(0x174)]===_0x29829c(0x1b2)&&adStartTime>0x0&&pendingTask){const _0x173260=Date[_0x29829c(0x11c)]()-adStartTime;if(_0x173260>=MIN_AD_DURATION)claimReward(pendingTask['id'],pendingTask[_0x29829c(0x1d5)]);else Swal[_0x29829c(0x1d3)]({'icon':_0x29829c(0x124),'title':_0x29829c(0x18b),'text':'Wait\x2010s.\x20Returned\x20in\x20'+(_0x173260/0x3e8)[_0x29829c(0x14d)](0x1)+'s','confirmButtonColor':_0x29829c(0x13c)});adStartTime=0x0,pendingTask=null;}}),window['handleTask']=async(_0x210040,_0x1bd9d0,_0x2f0e3b,_0x5425bf)=>{const _0x333036=_0x3b3109;pendingTask={'id':_0x210040,'reward':_0x1bd9d0},adStartTime=Date[_0x333036(0x11c)]();if(_0x2f0e3b===_0x333036(0x1aa)){const _0x1a7ec7=_0x5425bf&&_0x5425bf!==_0x333036(0x11e)?_0x5425bf:appSettings['monetag_direct_link'];if(_0x1a7ec7)window['open'](_0x1a7ec7,_0x333036(0x19f)),setTimeout(()=>{const _0xfeb985=_0x333036;if(adFuncs[_0xfeb985(0x108)]&&window[adFuncs[_0xfeb985(0x108)]])window[adFuncs[_0xfeb985(0x108)]]();},0x3e8);else Swal[_0x333036(0x1d3)](_0x333036(0x1ad),_0x333036(0x1ce),_0x333036(0x1af));}else{if(_0x2f0e3b==='telegram'){if(_0x5425bf)window[_0x333036(0x1c5)](_0x5425bf,_0x333036(0x19f));if(adFuncs[_0x333036(0x15d)]&&window[adFuncs[_0x333036(0x15d)]])window[adFuncs[_0x333036(0x15d)]](_0x333036(0x173));}else{if(_0x2f0e3b===_0x333036(0x10f)){if(adFuncs[_0x333036(0x18e)]&&window[adFuncs['rewarded']])window[adFuncs[_0x333036(0x18e)]]()[_0x333036(0x190)](()=>{claimReward(_0x210040,_0x1bd9d0),adStartTime=0x0,pendingTask=null;});}else{if(_0x5425bf&&_0x5425bf!==_0x333036(0x11e))window[_0x333036(0x1c5)](_0x5425bf,_0x333036(0x19f));if(adFuncs[_0x333036(0x108)]&&window[adFuncs[_0x333036(0x108)]])window[adFuncs[_0x333036(0x108)]]();}}}};async function claimReward(_0x5579c7,_0x559094){const _0x4ab7a0=_0x3b3109;Swal[_0x4ab7a0(0x164)]();const {data:_0x3e1c20}=await supabase['rpc'](_0x4ab7a0(0x1a2),{'user_id_input':currentUser['id'],'task_id_input':_0x5579c7,'reward_amount':_0x559094,'daily_limit_input':appSettings['daily_task_limit']});Swal[_0x4ab7a0(0x186)]();if(_0x3e1c20&&_0x3e1c20[_0x4ab7a0(0x114)])currentUser[_0x4ab7a0(0x16f)]+=_0x559094,updateHeaderUI(),Swal[_0x4ab7a0(0x1d3)]({'icon':'success','title':'+'+_0x559094,'toast':!![],'position':_0x4ab7a0(0x167),'showConfirmButton':![],'timer':0x5dc}),router('tasks');else Swal[_0x4ab7a0(0x1d3)]({'icon':_0x4ab7a0(0x1af),'title':'Oops','text':_0x3e1c20?.[_0x4ab7a0(0x106)]});}function renderWallet(_0x3741d7){const _0x34c7c3=_0x3b3109,_0x326e06=(currentUser[_0x34c7c3(0x16f)]*appSettings[_0x34c7c3(0x139)])[_0x34c7c3(0x14d)](0x2);_0x3741d7[_0x34c7c3(0x1a3)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22glass-panel\x20p-6\x20rounded-2xl\x20text-center\x20mb-6\x20mt-4\x20relative\x20overflow-hidden\x20shadow-2xl\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22absolute\x20-right-10\x20-top-10\x20w-32\x20h-32\x20bg-green-500/20\x20rounded-full\x20blur-[60px]\x22></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22text-gray-400\x20text-xs\x20font-bold\x20uppercase\x20tracking-widest\x22>Available\x20Funds</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h1\x20class=\x22text-5xl\x20font-bold\x20gold-text\x20my-3\x22>৳\x20'+_0x326e06+_0x34c7c3(0x1cd)+appSettings[_0x34c7c3(0x159)]+_0x34c7c3(0x1b4)+appSettings[_0x34c7c3(0x159)]+_0x34c7c3(0x1ca);}async function processWithdraw(){const _0x1c25bd=_0x3b3109,_0x1189a1=document[_0x1c25bd(0x17b)](_0x1c25bd(0x109)),_0x1011c9=document[_0x1c25bd(0x17b)](_0x1c25bd(0x179))[_0x1c25bd(0x166)],_0x835bbe=parseInt(document[_0x1c25bd(0x17b)](_0x1c25bd(0x1d4))[_0x1c25bd(0x166)]);if(!_0x1011c9||!_0x835bbe)return Swal[_0x1c25bd(0x1d3)](_0x1c25bd(0x1ad),_0x1c25bd(0x171),'warning');if(_0x835bbe<appSettings['min_withdraw_amount'])return Swal['fire']('Error',_0x1c25bd(0x11d)+appSettings[_0x1c25bd(0x159)],'warning');const _0x57d037=_0x835bbe/appSettings[_0x1c25bd(0x139)];if(currentUser[_0x1c25bd(0x16f)]<_0x57d037)return Swal[_0x1c25bd(0x1d3)]('Error','Low\x20Balance',_0x1c25bd(0x1af));_0x1189a1[_0x1c25bd(0x144)]=!![],_0x1189a1[_0x1c25bd(0x12e)]=_0x1c25bd(0x198);if(adFuncs[_0x1c25bd(0x108)]&&window[adFuncs[_0x1c25bd(0x108)]])await window[adFuncs[_0x1c25bd(0x108)]]()[_0x1c25bd(0x178)](()=>{});const {error:_0x373d50}=await supabase[_0x1c25bd(0x1df)](_0x1c25bd(0x1d7))[_0x1c25bd(0x1b3)]([{'user_id':currentUser['id'],'method':_0x1c25bd(0x14e),'number':_0x1011c9,'amount_bdt':_0x835bbe,'points_deducted':_0x57d037}]);!_0x373d50?(await supabase[_0x1c25bd(0x1c4)](_0x1c25bd(0x1b9),{'user_id':currentUser['id'],'amount':-_0x57d037}),currentUser['balance']-=_0x57d037,updateHeaderUI(),Swal['fire'](_0x1c25bd(0x16a),_0x1c25bd(0x12a),_0x1c25bd(0x114)),router(_0x1c25bd(0x10c))):(Swal[_0x1c25bd(0x1d3)]('Error',_0x1c25bd(0x170),'error'),_0x1189a1[_0x1c25bd(0x144)]=![],_0x1189a1['innerText']=_0x1c25bd(0x1dd));}async function renderHistory(_0x310139){const _0x3e4c5d=_0x3b3109;_0x310139[_0x3e4c5d(0x1a3)]=_0x3e4c5d(0x1bd);const {data:_0x2625f7}=await supabase['from']('withdrawals')[_0x3e4c5d(0x177)]('*')['eq']('user_id',currentUser['id'])['order'](_0x3e4c5d(0x1a8),{'ascending':![]});let _0x5b4f34=_0x3e4c5d(0x17f);if(!_0x2625f7||_0x2625f7[_0x3e4c5d(0x112)]===0x0)_0x5b4f34+=_0x3e4c5d(0x11b);else _0x5b4f34+=_0x3e4c5d(0x189),_0x2625f7[_0x3e4c5d(0x13f)](_0x5540d9=>{const _0x16e08f=_0x3e4c5d;let _0x47aced=_0x5540d9[_0x16e08f(0x1ab)]===_0x16e08f(0x1bc)?_0x16e08f(0x1a0):_0x5540d9[_0x16e08f(0x1ab)]==='rejected'?_0x16e08f(0x15a):_0x16e08f(0x158);_0x5b4f34+='<div\x20class=\x22glass-panel\x20p-4\x20rounded-xl\x20flex\x20justify-between\x20items-center\x20border-l-4\x20'+(_0x5540d9[_0x16e08f(0x1ab)]===_0x16e08f(0x1bc)?'border-green-500/50':_0x16e08f(0x194))+_0x16e08f(0x18c)+_0x5540d9[_0x16e08f(0x1c3)]+_0x16e08f(0x1a9)+new Date(_0x5540d9['created_at'])[_0x16e08f(0x131)]()+_0x16e08f(0x1d9)+_0x47aced+_0x16e08f(0x1e0)+_0x5540d9[_0x16e08f(0x1ab)]+_0x16e08f(0x143);}),_0x5b4f34+=_0x3e4c5d(0x1b7);_0x310139[_0x3e4c5d(0x1a3)]=_0x5b4f34;}function renderRefer(_0x321154){const _0xac0f0d=_0x3b3109,_0x506d7d=_0xac0f0d(0x16c)+(appSettings[_0xac0f0d(0x1cf)]||'MyBot_bot')+_0xac0f0d(0x18d)+currentUser['id'],_0x381993=currentUser[_0xac0f0d(0x15f)]===null;_0x321154['innerHTML']=_0xac0f0d(0x111)+appSettings[_0xac0f0d(0x13d)]+_0xac0f0d(0x185)+_0x506d7d+_0xac0f0d(0x192)+(_0x381993?_0xac0f0d(0x142):'')+_0xac0f0d(0x152)+currentUser['referral_count']+_0xac0f0d(0x145)+currentUser[_0xac0f0d(0x110)]*appSettings['referral_bonus']+_0xac0f0d(0x15b);}async function submitRef(){const _0x6d8708=_0x3b3109,_0x5360b2=document[_0x6d8708(0x17b)](_0x6d8708(0x126))['value'];if(!_0x5360b2)return Swal[_0x6d8708(0x1d3)]('Error',_0x6d8708(0x1de),_0x6d8708(0x124));if(appSettings[_0x6d8708(0x1c7)]&&localStorage['getItem'](_0x6d8708(0x1c2)))return Swal['fire'](_0x6d8708(0x1b5),_0x6d8708(0x148),'error');Swal[_0x6d8708(0x164)]();const {data:_0x42c758}=await supabase[_0x6d8708(0x1c4)](_0x6d8708(0x147),{'user_id_input':currentUser['id'],'referrer_id_input':parseInt(_0x5360b2)});Swal[_0x6d8708(0x186)]();if(_0x42c758&&_0x42c758[_0x6d8708(0x114)]){if(appSettings[_0x6d8708(0x1c7)])localStorage[_0x6d8708(0x121)](_0x6d8708(0x1c2),_0x6d8708(0x1d0));currentUser['referred_by']=parseInt(_0x5360b2),Swal[_0x6d8708(0x1d3)](_0x6d8708(0x16a),_0x6d8708(0x1d1),'success'),router(_0x6d8708(0x161));}else Swal[_0x6d8708(0x1d3)](_0x6d8708(0x1ad),_0x42c758?.['message']||_0x6d8708(0x19c),'error');}window[_0x3b3109(0x1e2)]=()=>{const _0x516724=_0x3b3109;document['getElementById'](_0x516724(0x157))[_0x516724(0x177)](),document[_0x516724(0x133)](_0x516724(0x128)),Swal['fire']({'icon':_0x516724(0x114),'title':_0x516724(0x14b),'toast':!![],'position':'top-end','showConfirmButton':![],'timer':0x5dc});},initApp();
+// --- CONFIGURATION ---
+const SUPABASE_URL = 'https://wnmwvbeydsrehtsnkfoc.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndubXd2YmV5ZHNyZWh0c25rZm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMDg4MzIsImV4cCI6MjA3OTg4NDgzMn0.4vSObxBEr8r11-dqkp9y6bVroMVoSTEnIOTF8Vo8sxk';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const tg = window.Telegram.WebApp;
+
+// --- VARIABLES ---
+let currentUser = null;
+let appSettings = {};
+let adFuncs = { interstitial: null, rewarded: null, popup: null };
+let adStartTime = 0;
+let pendingTask = null;
+const MIN_AD_DURATION = 10000; // ১০ সেকেন্ড
+
+// --- APP INIT ---
+async function initApp() {
+    tg.expand(); 
+    tg.setHeaderColor('#0f0f0f');
+    
+    const tgUser = tg.initDataUnsafe?.user;
+
+    // টেস্ট মোড (Browser Testing): নিচের লাইন আনকমেন্ট করুন
+    // const tgUser = { id: 12345, first_name: "Test", username: "user", photo_url: "" };
+
+    if (!tgUser) {
+        showError("Please open inside Telegram.");
+        return;
+    }
+
+    try {
+        // ১. সেটিংস লোড
+        const { data: sData } = await supabase.from('settings').select('*').single();
+        appSettings = sData || { 
+            conversion_rate: 0.05, min_withdraw_amount: 50, daily_task_limit: 10, 
+            anti_cheat_enabled: true, bot_username: 'MyBot_bot', referral_bonus: 50 
+        };
+
+        // ২. অ্যাড লোড (Dynamic)
+        if (appSettings.monetag_interstitial_id) loadScript(appSettings.monetag_interstitial_id, (n) => adFuncs.interstitial = n);
+        if (appSettings.monetag_rewarded_id) loadScript(appSettings.monetag_rewarded_id, (n) => adFuncs.rewarded = n);
+        if (appSettings.monetag_popup_id) loadScript(appSettings.monetag_popup_id, (n) => adFuncs.popup = n);
+
+        // ৩. ইউজার চেক
+        let { data: user } = await supabase.from('users').select('*').eq('id', tgUser.id).single();
+
+        if (!user) {
+            const startParam = tg.initDataUnsafe?.start_param;
+            let refId = (startParam && startParam != tgUser.id) ? parseInt(startParam) : null;
+            
+            // Anti-Cheat
+            if (appSettings.anti_cheat_enabled && refId && localStorage.getItem('device_ref_used')) {
+                refId = null;
+            }
+
+            const { data: newUser, error: cError } = await supabase.from('users').insert([{
+                id: tgUser.id, first_name: tgUser.first_name, username: tgUser.username,
+                photo_url: tgUser.photo_url, referred_by: refId, balance: 0
+            }]).select().single();
+
+            if (cError) throw new Error("Registration Failed");
+            user = newUser;
+
+            if (refId) {
+                await supabase.rpc('increment_referral', { referrer_id: refId });
+                localStorage.setItem('device_ref_used', 'true');
+            }
+        }
+        currentUser = user;
+        updateUI();
+        
+        setTimeout(() => {
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            router('home');
+        }, 1000);
+
+    } catch (err) { showError(err.message); }
+}
+
+// --- UTILS ---
+function loadScript(zoneId, cb) {
+    const s = document.createElement('script');
+    s.src = '//libtl.com/sdk.js';
+    const fname = 'show_' + zoneId;
+    s.setAttribute('data-zone', zoneId);
+    s.setAttribute('data-sdk', fname);
+    s.onload = () => cb(fname);
+    document.head.appendChild(s);
+}
+
+function showError(msg) {
+    document.getElementById('error-msg').innerText = msg;
+    document.getElementById('error-box').classList.remove('hidden');
+    document.querySelector('.loader').style.display = 'none';
+}
+
+function updateUI() {
+    if(!currentUser) return;
+    document.getElementById('user-name').innerText = currentUser.first_name;
+    document.getElementById('user-balance').innerText = Math.floor(currentUser.balance);
+    if(currentUser.photo_url) document.getElementById('user-photo').src = currentUser.photo_url;
+}
+
+// --- ROUTER ---
+function router(page) {
+    document.querySelectorAll('.nav-item').forEach(b => {
+        b.classList.remove('active', 'text-[#FFD700]');
+        b.classList.add('text-gray-500');
+    });
+    document.getElementById(`btn-${page}`).classList.add('active', 'text-[#FFD700]');
+    
+    const c = document.getElementById('main-app');
+    if (page === 'home') renderHome(c);
+    else if (page === 'tasks') renderTasks(c);
+    else if (page === 'wallet') renderWallet(c);
+    else if (page === 'history') renderHistory(c);
+    else if (page === 'refer') renderRefer(c);
+}
+
+// --- HOME PAGE ---
+function renderHome(c) {
+    const bdt = (currentUser.balance * appSettings.conversion_rate).toFixed(2);
+    
+    if(adFuncs.interstitial && window[adFuncs.interstitial]) {
+        window[adFuncs.interstitial]({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
+    }
+
+    c.innerHTML = `
+        <div class="glass-panel p-6 rounded-3xl text-center relative overflow-hidden mt-2 shadow-2xl border-t border-white/10">
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-[#FFD700] rounded-full blur-[80px] opacity-20"></div>
+            <p class="text-gray-400 text-xs uppercase tracking-[3px] mb-2 font-bold">Total Earnings</p>
+            <h1 class="text-6xl font-bold text-white mb-2">${currentUser.balance}</h1>
+            <div class="inline-block bg-white/5 border border-white/10 rounded-full px-5 py-1.5 mt-1">
+                <p class="text-xs text-[#FFD700] font-bold tracking-wide">≈ \u09F3 ${bdt} BDT</p>
+            </div>
+            <button onclick="router('tasks')" class="mt-8 w-full py-4 rounded-2xl gold-gradient text-black font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-wider">
+                <i class="fas fa-play"></i> Start Earning
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-4 mt-6">
+            <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
+                <i class="fas fa-users text-3xl mb-2 text-blue-400"></i>
+                <span class="text-2xl font-bold">${currentUser.referral_count}</span>
+                <span class="text-[10px] text-gray-400 uppercase mt-1">Refers</span>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
+                <i class="fas fa-check-circle text-3xl mb-2 text-green-400"></i>
+                <span class="text-2xl font-bold">Active</span>
+                <span class="text-[10px] text-gray-400 uppercase mt-1">Status</span>
+            </div>
+        </div>
+        ${appSettings.home_banner_url ? `<div class="mt-6 mb-4 rounded-2xl overflow-hidden shadow-lg border border-[#FFD700]/30 w-full h-40"><img src="${appSettings.home_banner_url}" class="w-full h-full object-cover"></div>` : ''}
+    `;
+}
+
+// --- TASKS PAGE ---
+async function renderTasks(c) {
+    c.innerHTML = `<div class="flex justify-center mt-20"><div class="loader"></div></div>`;
+    
+    const { data: tasks } = await supabase.from('tasks').select('*').eq('is_active', true).order('id');
+    const today = new Date().toISOString().split('T')[0];
+    const { data: logs } = await supabase.from('task_logs').select('task_id').eq('user_id', currentUser.id).eq('created_at', today);
+
+    const counts = {};
+    if (logs) logs.forEach(l => counts[l.task_id] = (counts[l.task_id] || 0) + 1);
+    
+    const locked = appSettings.referral_lock && (currentUser.referral_count < appSettings.min_referrals_req);
+    const limit = appSettings.daily_task_limit || 10;
+
+    let html = `
+        <div class="flex justify-between items-center mb-5 mt-2 px-1">
+            <h2 class="text-lg font-bold text-white">Task List</h2>
+            <span class="text-[10px] bg-white/10 px-3 py-1 rounded-lg text-gray-300 border border-white/10">Limit: ${limit}</span>
+        </div>
+    `;
+
+    if (locked) {
+        html += `
+            <div class="bg-red-500/10 border border-red-500/50 p-4 rounded-xl mb-6 text-center text-xs text-red-400">
+                <i class="fas fa-lock text-xl mb-2 block"></i>
+                Invite <b>${appSettings.min_referrals_req - currentUser.referral_count}</b> more friends to unlock.
+            </div>`;
+    }
+
+    html += `<div class="space-y-4 pb-10">`;
+    
+    tasks.forEach(t => {
+        let icon = 'star', btn = 'Claim', bCol = 'bg-gray-500/20';
+        
+        if (t.task_type === 'direct_ad') { icon = 'globe'; btn = 'Visit'; bCol = 'bg-blue-500/20 text-blue-400'; }
+        else if (t.task_type === 'telegram') { icon = 'paper-plane'; btn = 'Join'; bCol = 'bg-cyan-500/20 text-cyan-400'; }
+        else if (t.task_type === 'video') { icon = 'play-circle'; btn = 'Watch'; bCol = 'bg-purple-500/20 text-purple-400'; }
+
+        const cnt = counts[t.id] || 0;
+        const disabled = locked || cnt >= limit;
+        const btnClass = disabled ? 'bg-white/5 text-gray-500 cursor-not-allowed' : 'gold-gradient text-black hover:opacity-90 active:scale-95';
+
+        html += `
+            <div class="glass-panel p-4 rounded-2xl flex justify-between items-center ${disabled?'opacity-60 grayscale':''}">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-[#FFD700] border border-white/10 shadow-lg"><i class="fas fa-${icon} text-xl"></i></div>
+                    <div>
+                        <h4 class="font-bold text-sm text-white line-clamp-1 mb-1">${t.title}</h4>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] ${bCol} px-1.5 py-0.5 rounded font-bold tracking-wider">TASK</span>
+                            <span class="text-[10px] text-[#FFD700] font-bold border border-[#FFD700]/20 px-1.5 py-0.5 rounded">+${t.reward}</span>
+                            <span class="text-[10px] text-gray-500 font-mono pl-2 border-l border-white/10">${cnt}/${limit}</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="handleTask(${t.id}, ${t.reward}, '${t.task_type}', '${t.link || ''}')" 
+                    ${disabled?'disabled':''} 
+                    class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${btnClass}">
+                    ${cnt >= limit ? 'Done' : btn}
+                </button>
+            </div>`;
+    });
+    c.innerHTML = html + `</div>`;
+}
+
+// --- AD & TIMER LOGIC ---
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && adStartTime > 0 && pendingTask) {
+        const duration = Date.now() - adStartTime;
+        if (duration >= MIN_AD_DURATION) {
+            claimReward(pendingTask.id, pendingTask.reward);
+        } else {
+            Swal.fire({ icon: 'warning', title: 'Too Fast!', text: `Wait 10s. Returned in ${(duration/1000).toFixed(1)}s`, confirmButtonColor: '#FFD700' });
+        }
+        adStartTime = 0; pendingTask = null;
+    }
+});
+
+window.handleTask = async (tid, rew, type, link) => {
+    pendingTask = { id: tid, reward: rew };
+    adStartTime = Date.now();
+
+    if (type === 'direct_ad') {
+        const url = (link && link !== 'null') ? link : appSettings.monetag_direct_link;
+        if(url) { 
+            window.open(url, '_blank'); 
+            setTimeout(() => { if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial](); }, 1000); 
+        } else {
+            Swal.fire('Error', 'No Link', 'error');
+        }
+    } 
+    else if (type === 'telegram') {
+        if(link) window.open(link, '_blank');
+        if(adFuncs.popup && window[adFuncs.popup]) window[adFuncs.popup]('pop');
+    } 
+    else if (type === 'video') {
+        if(adFuncs.rewarded && window[adFuncs.rewarded]) {
+            window[adFuncs.rewarded]().then(() => { 
+                claimReward(tid, rew); 
+                adStartTime = 0; 
+                pendingTask = null; 
+            });
+        }
+    } 
+    else {
+        if(link && link !== 'null') window.open(link, '_blank');
+        if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial]();
+    }
+};
+
+async function claimReward(tid, rew) {
+    Swal.fire({title: 'Verifying...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background:'#1a1a1a', color:'#fff', showConfirmButton: false});
+    
+    // FIXED PARAMETER NAMES (p_user_id)
+    const { data: res } = await supabase.rpc('claim_task', { 
+        p_user_id: currentUser.id, 
+        p_task_id: tid, 
+        p_reward: rew, 
+        p_limit: appSettings.daily_task_limit 
+    });
+
+    Swal.close();
+
+    if (res && res.success) {
+        currentUser.balance += rew; 
+        updateUI();
+        Swal.fire({ icon: 'success', title: `+${rew} Points`, toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
+        router('tasks');
+    } else {
+        Swal.fire({ icon: 'error', title: 'Oops', text: res?.message });
+    }
+}
+
+// --- WALLET PAGE ---
+function renderWallet(c) {
+    const bdt = (currentUser.balance * appSettings.conversion_rate).toFixed(2);
+    c.innerHTML = `
+        <div class="glass-panel p-6 rounded-2xl text-center mb-6 mt-4 relative overflow-hidden shadow-2xl">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-green-500/20 rounded-full blur-[60px]"></div>
+            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Available Funds</p>
+            <h1 class="text-5xl font-bold gold-text my-3">\u09F3 ${bdt}</h1>
+            <div class="inline-block bg-white/5 px-4 py-1.5 rounded-full border border-white/10"><p class="text-[10px] text-gray-400">Min: \u09F3 ${appSettings.min_withdraw_amount}</p></div>
+        </div>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="text-xs text-gray-400 ml-1 font-bold uppercase">Payment Method</label>
+                <div class="mt-2 glass-panel p-4 rounded-xl border border-[#FFD700] flex items-center justify-between bg-[#FFD700]/5 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+                    <div class="flex items-center gap-3">
+                        <img src="https://freelogopng.com/images/all_img/1656234745bkash-app-logo-png.png" class="h-8 object-contain">
+                        <span class="font-bold text-sm text-white">Bkash Personal</span>
+                    </div>
+                    <i class="fas fa-check-circle text-[#FFD700] text-xl"></i>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-gray-400 ml-1 font-bold">Bkash Number</label>
+                    <input type="number" id="w-num" placeholder="017xxxxxxxx" class="custom-input">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 ml-1 font-bold">Amount (BDT)</label>
+                    <input type="number" id="w-amt" placeholder="Min ${appSettings.min_withdraw_amount}" class="custom-input">
+                </div>
+            </div>
+            
+            <button id="w-btn" onclick="processWithdraw()" class="w-full py-4 rounded-xl gold-gradient text-black font-bold mt-4 shadow-lg active:scale-95 transition-transform text-sm uppercase tracking-wide flex items-center justify-center gap-2">Submit Request</button>
+        </div>`;
+}
+
+async function processWithdraw() {
+    const btn = document.getElementById('w-btn');
+    const num = document.getElementById('w-num').value;
+    const amt = parseInt(document.getElementById('w-amt').value);
+    
+    if (!num || !amt) return Swal.fire('Error', 'Fill all fields', 'warning');
+    if (amt < appSettings.min_withdraw_amount) return Swal.fire('Error', `Min \u09F3${appSettings.min_withdraw_amount}`, 'warning');
+    
+    const pts = amt / appSettings.conversion_rate;
+    if (currentUser.balance < pts) return Swal.fire('Error', 'Insufficient Balance', 'error');
+
+    btn.disabled = true; 
+    btn.innerText = "Processing...";
+
+    if(adFuncs.interstitial && window[adFuncs.interstitial]) await window[adFuncs.interstitial]().catch(()=>{});
+
+    // SECURE RPC CALL
+    const { data: res } = await supabase.rpc('process_withdrawal', { 
+        p_user_id: currentUser.id, 
+        p_method: 'Bkash', 
+        p_number: num, 
+        p_amount_bdt: amt, 
+        p_points_needed: pts 
+    });
+
+    if (res && res.success) {
+        currentUser.balance -= pts; 
+        updateUI();
+        Swal.fire('Success', 'Request Sent!', 'success'); 
+        router('history');
+    } else {
+        Swal.fire('Error', res?.message || 'Failed', 'error');
+        btn.disabled = false; 
+        btn.innerText = "Submit Request";
+    }
+}
+
+// --- HISTORY PAGE ---
+async function renderHistory(c) {
+    c.innerHTML = `<div class="w-full h-full flex justify-center items-center mt-20"><div class="loader"></div></div>`;
+    
+    const { data: w } = await supabase.from('withdrawals')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+    
+    let html = `<div class="my-4 px-1"><h2 class="text-lg font-bold mb-4 ml-1 text-white flex items-center gap-2"><i class="fas fa-history text-[#FFD700]"></i> Transaction History</h2>`;
+    
+    if (!w || w.length === 0) {
+        html += `<div class="text-center text-gray-500 text-sm mt-20">No transactions found.</div>`;
+    } else {
+        html += `<div class="space-y-3 pb-20">`;
+        w.forEach(i => {
+            let col = i.status==='paid'?'text-green-400':(i.status==='rejected'?'text-red-400':'text-yellow-400');
+            html += `
+                <div class="glass-panel p-4 rounded-xl flex justify-between items-center border-l-4 ${i.status==='paid'?'border-green-500/50':'border-yellow-500/50'} shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <h4 class="font-bold text-sm text-white">\u09F3 ${i.amount_bdt}</h4>
+                            <p class="text-[10px] text-gray-400 font-mono">${new Date(i.created_at).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-bold ${col} uppercase bg-white/5 px-2 py-1 rounded border border-white/5">${i.status}</span>
+                </div>`;
+        });
+        html += `</div>`;
+    }
+    c.innerHTML = html;
+}
+
+// --- REFER PAGE ---
+function renderRefer(c) {
+    const link = `https://t.me/${appSettings.bot_username || 'MyBot_bot'}?start=${currentUser.id}`;
+    const showInput = currentUser.referred_by === null;
+    const bonus = appSettings.referral_bonus || 50;
+
+    c.innerHTML = `
+        <div class="glass-panel p-6 rounded-2xl text-center mt-4 border border-[#FFD700]/30 shadow-2xl">
+            <h2 class="text-2xl font-bold text-white">Invite & Earn</h2>
+            <p class="text-xs text-gray-400 mt-2 px-4">Get <b class="text-[#FFD700]">${bonus} points</b> per referral!</p>
+        </div>
+        
+        <div class="glass-panel p-3 rounded-xl mt-6 flex items-center gap-3 bg-black/30 border border-white/10">
+            <input type="text" value="${link}" readonly class="bg-transparent text-xs w-full text-gray-300 outline-none font-mono" id="ref-link">
+            <button onclick="copyLink()" class="p-2.5 bg-[#FFD700] rounded-lg text-black font-bold text-xs"><i class="fas fa-copy"></i></button>
+        </div>
+        
+        ${showInput ? `
+        <div class="glass-panel p-5 rounded-xl mt-5 border border-[#FFD700]/20 bg-[#FFD700]/5">
+            <p class="text-xs text-gray-300 mb-3 font-bold">Enter Referral Code</p>
+            <div class="flex gap-2">
+                <input type="number" id="ref-code-input" placeholder="ID" class="custom-input">
+                <button onclick="submitRef()" class="gold-gradient text-black text-xs font-bold px-6 py-2 rounded-lg">Apply</button>
+            </div>
+        </div>` : ''}
+        
+        <div class="mt-6 glass-panel p-5 rounded-xl flex justify-between items-center shadow-lg border border-white/5">
+            <div><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Total Referrals</p><h4 class="text-3xl font-bold text-white">${currentUser.referral_count}</h4></div>
+            <div class="text-right"><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Bonus Earned</p><h4 class="text-3xl font-bold text-[#FFD700]">${currentUser.referral_count * bonus}</h4></div>
+        </div>`;
+}
+
+async function submitRef() {
+    const code = document.getElementById('ref-code-input').value;
+    if(!code) return Swal.fire('Error', 'Enter Code', 'warning');
+    
+    if(appSettings.anti_cheat_enabled && localStorage.getItem('device_ref_used')) {
+        return Swal.fire('Blocked', 'Device used!', 'error');
+    }
+
+    Swal.showLoading();
+    const { data: res } = await supabase.rpc('submit_referral_code', { p_user_id: currentUser.id, p_referrer_id: parseInt(code) });
+    Swal.close();
+    
+    if(res && res.success) {
+        if(appSettings.anti_cheat_enabled) localStorage.setItem('device_ref_used', 'true');
+        currentUser.referred_by = parseInt(code); Swal.fire('Success', 'Applied!', 'success'); router('refer');
+    } else Swal.fire('Error', res?.message || 'Invalid Code', 'error');
+}
+
+window.copyLink = () => {
+    const copyText = document.getElementById("ref-link");
+    copyText.select();
+    document.execCommand("copy");
+    Swal.fire({ icon: 'success', title: 'Copied!', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
+};
+
+// START APP
+initApp();
+    </script>
+</body>
+</html>
