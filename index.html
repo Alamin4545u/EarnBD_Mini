@@ -52,12 +52,10 @@
         .loader { border: 4px solid #333; border-top: 4px solid #FFD700; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .custom-input { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px; border-radius: 12px; transition: 0.3s; }
+        .custom-input { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px; border-radius: 12px; transition: 0.3s; margin-bottom: 10px; }
         .custom-input:focus { border-color: #FFD700; }
-        
-        button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); pointer-events: none; }
-        
-        div:where(.swal2-container) div:where(.swal2-popup) { background: #1a1a1a !important; border: 1px solid #FFD700; color: #fff; border-radius: 16px; }
+        select.custom-input { color: #aaa; }
+        select.custom-input option { background: #1a1a1a; color: white; }
     </style>
 </head>
 <body>
@@ -74,8 +72,31 @@
         </div>
     </div>
 
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="hidden fixed inset-0 z-40 bg-[#0f0f0f] flex flex-col items-center justify-center p-6">
+        <div class="mb-8 text-center">
+            <h1 class="text-4xl font-bold gold-text">EARN PRO</h1>
+            <p class="text-gray-400 text-sm">Sign In to Continue</p>
+        </div>
+        <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border border-[#FFD700]/20">
+            <div class="flex mb-6 bg-white/5 rounded-lg p-1">
+                <button onclick="toggleAuth('login')" id="tab-login" class="flex-1 py-2 rounded-md text-sm font-bold bg-[#FFD700] text-black">Login</button>
+                <button onclick="toggleAuth('signup')" id="tab-signup" class="flex-1 py-2 rounded-md text-sm font-bold text-gray-400">Register</button>
+            </div>
+            <div id="auth-form" class="space-y-2">
+                <input type="number" id="auth-phone" placeholder="Phone Number" class="custom-input">
+                <input type="password" id="auth-pass" placeholder="Password" class="custom-input">
+                <div id="signup-fields" class="hidden space-y-2">
+                    <input type="text" id="auth-name" placeholder="Full Name" class="custom-input">
+                    <input type="number" id="auth-ref" placeholder="Referral Code (Optional)" class="custom-input">
+                </div>
+                <button onclick="submitAuth()" class="w-full py-3 rounded-xl gold-gradient text-black font-bold mt-2 shadow-lg active:scale-95 transition">Submit</button>
+            </div>
+        </div>
+    </div>
+
     <!-- HEADER -->
-    <header class="glass-panel border-b-0 rounded-b-3xl p-4 z-40 shrink-0">
+    <header class="glass-panel border-b-0 rounded-b-3xl p-4 z-40 shrink-0 hidden" id="app-header">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <img id="user-photo" src="https://ui-avatars.com/api/?name=U&background=random" class="w-11 h-11 rounded-full border-2 border-[#FFD700] object-cover p-0.5">
@@ -97,7 +118,7 @@
     <div id="main-app" class="hidden"></div>
 
     <!-- NAVBAR -->
-    <nav class="glass-panel rounded-t-3xl pb-4 pt-3 z-50 shrink-0 h-20">
+    <nav class="glass-panel rounded-t-3xl pb-4 pt-3 z-50 shrink-0 h-20 hidden" id="app-nav">
         <div class="nav-container">
             <div onclick="router('home')" class="nav-item active" id="btn-home"><i class="fas fa-home text-xl"></i><span>Home</span></div>
             <div onclick="router('tasks')" class="nav-item" id="btn-tasks"><i class="fas fa-list-check text-xl"></i><span>Tasks</span></div>
@@ -110,4 +131,4 @@
     <!-- JAVASCRIPT LINK -->
     <script src="script.js"></script>
 </body>
-                                                                                 </html>
+</html>
