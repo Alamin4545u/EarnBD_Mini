@@ -26,16 +26,16 @@ function getDeviceFingerprint() {
 // 2. INITIALIZATION
 async function initApp() {
     try {
-        // Load Admin Settings
+        // Load Settings
         const { data: sData } = await supabase.from('settings').select('*').single();
         appSettings = sData || {};
 
-        // Load Ads Dynamically
+        // Load Ads
         if (appSettings.monetag_interstitial_id) loadScript(appSettings.monetag_interstitial_id, (n) => adFuncs.interstitial = n);
         if (appSettings.monetag_rewarded_id) loadScript(appSettings.monetag_rewarded_id, (n) => adFuncs.rewarded = n);
         if (appSettings.monetag_popup_id) loadScript(appSettings.monetag_popup_id, (n) => adFuncs.popup = n);
 
-        // Check Login Session
+        // Check Login
         const storedUser = localStorage.getItem('user_id');
         if (storedUser) {
             await fetchUser(storedUser);
@@ -43,7 +43,7 @@ async function initApp() {
             showAuth();
         }
 
-        // Handle Referral Link
+        // Check Referral
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         if (refCode) {
@@ -52,13 +52,12 @@ async function initApp() {
         }
 
     } catch (err) {
-        console.error(err);
         document.getElementById('loading-screen').classList.add('hidden');
         document.getElementById('error-box').classList.remove('hidden');
     }
 }
 
-// 3. AUTHENTICATION (Login / Register)
+// 3. AUTHENTICATION
 function showAuth() {
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('auth-screen').classList.remove('hidden');
@@ -86,17 +85,15 @@ async function submitAuth() {
     const pass = document.getElementById('auth-pass').value.trim();
     
     if (!phoneInput || !pass) return Swal.fire('Error', 'Please fill all fields', 'warning');
-    if (phoneInput.length !== 11) return Swal.fire('Error', 'Phone number must be 11 digits', 'warning');
+    if (phoneInput.length !== 11) return Swal.fire('Error', 'Phone must be 11 digits', 'warning');
 
-    const phone = parseInt(phoneInput); // Convert to Number
+    const phone = parseInt(phoneInput);
     Swal.showLoading();
 
     try {
         if (authMode === 'login') {
-            // LOGIN LOGIC
             const { data } = await supabase.from('users').select('*').eq('id', phone).eq('password', pass).single();
             Swal.close();
-            
             if (data) {
                 localStorage.setItem('user_id', data.id);
                 await fetchUser(data.id);
@@ -104,17 +101,14 @@ async function submitAuth() {
                 Swal.fire('Error', 'Invalid Phone or Password', 'error');
             }
         } else {
-            // REGISTER LOGIC
             const name = document.getElementById('auth-name').value.trim();
             const refInput = document.getElementById('auth-ref').value.trim();
             const deviceId = getDeviceFingerprint(); 
             
-            if (!name) { Swal.close(); return Swal.fire('Error', 'Enter your full name', 'warning'); }
+            if (!name) { Swal.close(); return Swal.fire('Error', 'Enter Name', 'warning'); }
 
-            // Handle NaN for referral
             const refID = (refInput && !isNaN(refInput)) ? parseInt(refInput) : null;
 
-            // Call RPC
             const { data: res, error } = await supabase.rpc('handle_new_user', {
                 p_phone: phone, 
                 p_pass: pass, 
@@ -124,28 +118,24 @@ async function submitAuth() {
             });
 
             Swal.close();
-
-            if (error) {
-                return Swal.fire('System Error', error.message, 'error');
-            }
+            if (error) return Swal.fire('Error', error.message, 'error');
 
             if (res && res.success) {
                 localStorage.setItem('user_id', phone);
                 fetchUser(phone);
-                Swal.fire({ icon: 'success', title: 'Welcome!', text: 'Account created successfully', timer: 1500, showConfirmButton: false });
+                Swal.fire({ icon: 'success', title: 'Welcome', text: 'Account created!', timer: 1500, showConfirmButton: false });
             } else {
-                Swal.fire('Registration Failed', res?.message || 'Unknown error', 'error');
+                Swal.fire('Failed', res?.message || 'Error', 'error');
             }
         }
     } catch (e) {
         Swal.close();
-        console.error(e);
-        Swal.fire('Error', 'Network Error. Check your connection.', 'error');
+        Swal.fire('Error', 'Connection Error', 'error');
     }
 }
 
 async function fetchUser(uid) {
-    const { data, error } = await supabase.from('users').select('*').eq('id', uid).single();
+    const { data } = await supabase.from('users').select('*').eq('id', uid).single();
     if (data) {
         currentUser = data;
         updateUI();
@@ -156,71 +146,65 @@ async function fetchUser(uid) {
         document.getElementById('main-app').classList.remove('hidden');
         router('home');
     } else {
-        // Session Expired or User Deleted
         localStorage.removeItem('user_id');
         location.reload();
     }
 }
 
-// 4. TASK LOGIC (TIMESTAMP FIX - NO ERROR ON BACK)
-let pendingTaskId = null;
-let pendingTaskReward = 0;
-
-// Visibility Listener (Checks time spent when user returns to app)
-document.addEventListener("visibilitychange", () => {
+// 4. TASK LOGIC (POINT ADDING FIX)
+// আমরা লোকাল স্টোরেজ ব্যবহার করছি যাতে পেজ রিলোড হলেও টাস্ক হারিয়ে না যায়
+document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible") {
         const startTime = localStorage.getItem('task_start_time');
+        const pendingId = localStorage.getItem('pending_task_id');
+        const pendingReward = localStorage.getItem('pending_task_reward');
         
-        if (startTime && pendingTaskId) {
+        if (startTime && pendingId) {
             const timeSpent = Date.now() - parseInt(startTime);
-            const requiredTime = 10000; // 10 Seconds
+            const requiredTime = 10000; // ১০ সেকেন্ড
 
             if (timeSpent >= requiredTime) {
-                // Success: Time met
-                claimReward(pendingTaskId, pendingTaskReward);
+                // ১০ সেকেন্ড পূর্ণ হয়েছে -> পয়েন্ট দাও
+                await claimReward(pendingId, pendingReward);
             } else {
-                // Fail: Returned too early
+                // ১০ সেকেন্ড হয়নি
                 Swal.fire({
                     icon: 'warning',
                     title: 'Too Fast!',
-                    text: `You must stay for 10 seconds. You returned in ${(timeSpent/1000).toFixed(1)}s`,
+                    text: `Wait 10 seconds. You returned in ${(timeSpent/1000).toFixed(1)}s`,
                     confirmButtonColor: '#FFD700'
                 });
             }
             
-            // Clean up
+            // টাস্ক ক্লিয়ার
             localStorage.removeItem('task_start_time');
-            pendingTaskId = null;
+            localStorage.removeItem('pending_task_id');
+            localStorage.removeItem('pending_task_reward');
         }
     }
 });
 
 window.handleTask = async (tid, rew, type, link) => {
-    pendingTaskId = tid;
-    pendingTaskReward = rew;
-
     if (type === 'direct_ad') {
         const url = (link && link !== 'null') ? link : appSettings.monetag_direct_link;
-        if (!url) return Swal.fire('Error', 'Ad Link Not Configured', 'error');
+        if (!url) return Swal.fire('Error', 'Link Not Set', 'error');
 
-        // 1. Set Start Time
+        // ডাটা সেভ (যাতে ব্যাক করলে পাওয়া যায়)
         localStorage.setItem('task_start_time', Date.now());
+        localStorage.setItem('pending_task_id', tid);
+        localStorage.setItem('pending_task_reward', rew);
 
-        // 2. Open Ad
         window.open(url, '_blank');
         
-        // 3. Show Helper Alert
         Swal.fire({
-            title: 'Checking...',
-            text: 'Please stay on the ad page for 10 seconds.',
+            title: 'Checking Task...',
+            text: 'Stay on the page for 10 seconds to get reward.',
             showConfirmButton: false,
             allowOutsideClick: false
         });
 
     } else {
-        // Normal Links (Telegram/Youtube)
         if(link && link !== 'null') window.open(link, '_blank');
-        // Simple timeout for non-ad tasks
         setTimeout(() => claimReward(tid, rew), 5000);
     }
 };
@@ -229,46 +213,54 @@ async function claimReward(tid, rew) {
     Swal.showLoading();
     
     try {
-        // Ensure reward is a Number
-        const finalReward = parseFloat(rew);
+        // ১. ডাটা টাইপ কনভার্সন (সবচেয়ে জরুরি)
+        const taskId = parseInt(tid);
+        const rewardAmount = parseFloat(rew);
+        const limit = parseInt(appSettings.daily_task_limit || 15);
 
+        // ২. ডাটাবেজে রিকোয়েস্ট পাঠানো
         const { data: res, error } = await supabase.rpc('claim_task', { 
             p_user_id: currentUser.id, 
-            p_task_id: tid, 
-            p_reward: finalReward, 
-            p_limit: appSettings.daily_task_limit 
+            p_task_id: taskId, 
+            p_reward: rewardAmount, 
+            p_limit: limit 
         });
         
         Swal.close();
         
+        // ৩. এরর হ্যান্ডলিং
         if (error) {
-            console.error("Task Logic Error:", error);
-            // Don't show scary error to user, just a warning
-            return Swal.fire('Notice', 'Could not claim reward. Try again.', 'warning');
+            console.error("Task Error:", error);
+            // ইউজারকে টেকনিক্যাল এরর না দেখিয়ে ওয়ার্নিং দেওয়া
+            return Swal.fire('Notice', 'Could not add points. Try again.', 'warning');
         }
 
+        // ৪. সফল হলে
         if (res && res.success) {
-            currentUser.balance += finalReward; 
+            currentUser.balance += rewardAmount; 
             updateUI();
+            
             Swal.fire({ 
                 icon: 'success', 
                 title: 'Points Added!', 
-                text: `You earned +${finalReward} points!`,
+                text: `You earned +${rewardAmount} points!`,
                 confirmButtonColor: '#FFD700',
                 timer: 2000,
                 showConfirmButton: false
             });
-            router('tasks'); // Refresh tasks list
+            
+            router('tasks'); // টাস্ক লিস্ট আপডেট
         } else {
-            Swal.fire('Limit Reached', res?.message || 'Daily limit over', 'warning');
+            Swal.fire('Limit Reached', res?.message, 'warning');
         }
+
     } catch (e) {
         Swal.close();
         console.error(e);
     }
 }
 
-// 5. WITHDRAW LOGIC (TYPE MISMATCH FIX)
+// 5. WITHDRAW LOGIC (FIXED)
 function renderWallet(c) {
     const bdt = (currentUser.balance * appSettings.conversion_rate).toFixed(2);
     
@@ -310,20 +302,18 @@ async function processWithdraw() {
 
     if (!num || !amtVal) return Swal.fire('Error', 'Please fill all fields', 'warning');
     
-    // CRITICAL FIX: Convert to Numbers for SQL Numeric Type
+    // টাইপ কনভার্সন (SQL এর সাথে মিল রাখার জন্য)
     const amt = parseFloat(amtVal);
     const pts = parseFloat((amt / appSettings.conversion_rate).toFixed(2));
 
-    // Frontend Validation
     if (amt < appSettings.min_withdraw_amount) {
-        return Swal.fire('Error', `Minimum withdraw amount is ${appSettings.min_withdraw_amount} BDT`, 'warning');
+        return Swal.fire('Error', `Minimum withdraw amount is ${appSettings.min_withdraw_amount} Taka`, 'warning');
     }
     
     if (currentUser.balance < pts) {
-        return Swal.fire('Error', `Insufficient Balance! You need ${pts} points.`, 'error');
+        return Swal.fire('Error', 'Insufficient Balance!', 'error');
     }
 
-    // Disable Button
     btn.disabled = true;
     btn.innerText = "Processing...";
     
@@ -336,13 +326,12 @@ async function processWithdraw() {
             p_points_needed: pts 
         });
 
-        // Re-enable Button
         btn.disabled = false;
         btn.innerText = "WITHDRAW REQUEST";
 
         if (error) {
-            console.error("DB Error:", error);
-            return Swal.fire('System Error', 'Database error occurred. Contact admin.', 'error');
+            console.error(error);
+            return Swal.fire('System Error', 'Database error. Contact admin.', 'error');
         }
 
         if (res && res.success) {
@@ -350,8 +339,8 @@ async function processWithdraw() {
             updateUI();
             Swal.fire({
                 icon: 'success',
-                title: 'Success!',
-                text: 'Withdrawal request submitted successfully.',
+                title: 'Success',
+                text: 'Withdrawal request submitted successfully!',
                 confirmButtonColor: '#FFD700'
             });
             router('history');
@@ -362,12 +351,11 @@ async function processWithdraw() {
     } catch (err) {
         btn.disabled = false;
         btn.innerText = "WITHDRAW REQUEST";
-        console.error("App Error:", err);
-        Swal.fire('Error', 'Network Error. Check internet connection.', 'error');
+        Swal.fire('Error', 'Network Error', 'error');
     }
 }
 
-// 6. HELPER FUNCTIONS
+// 6. HELPER & ROUTING
 function loadScript(zoneId, cb) {
     const s = document.createElement('script');
     s.src = '//libtl.com/sdk.js';
@@ -400,7 +388,7 @@ function router(page) {
     else if (page === 'refer') renderRefer(c);
 }
 
-// 7. PAGES UI (Home, Tasks, Refer, History)
+// 7. PAGES UI
 function renderHome(c) {
     c.innerHTML = `
         <div class="glass-panel p-6 rounded-3xl text-center relative overflow-hidden mt-2 border-t border-white/10">
@@ -482,7 +470,7 @@ function renderRefer(c) {
     c.innerHTML = `
         <div class="glass-panel p-6 rounded-2xl text-center mt-4 border border-[#FFD700]/30">
             <h2 class="text-2xl font-bold text-white">Invite & Earn</h2>
-            <p class="text-xs text-gray-400 mt-2 px-4">Share your link and earn bonus points!</p>
+            <p class="text-xs text-gray-400 mt-2 px-4">Refer friends using your phone number!</p>
         </div>
         <div class="glass-panel p-3 rounded-xl mt-6 flex items-center gap-3 bg-black/30 border border-white/10">
             <input type="text" value="${link}" readonly class="bg-transparent text-xs w-full text-gray-300 outline-none font-mono" id="ref-link">
