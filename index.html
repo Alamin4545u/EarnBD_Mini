@@ -6,31 +6,37 @@
     <title>Premium Rewards</title>
 
     <!-- ====================================================================================
-         SECTION 1: LIBRARIES & DEPENDENCIES
+         SECTION 1: EXTERNAL LIBRARIES (লাইব্রেরি ইমপোর্ট)
     ===================================================================================== -->
     
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (UI Styling) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Supabase Client -->
+    <!-- Supabase Client (Database Connection) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
-    <!-- Telegram Web App SDK -->
+    <!-- Telegram Web App SDK (Telegram Integration) -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Icons (UI Icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- SweetAlert2 -->
+    <!-- SweetAlert2 (Popups & Alerts) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <!-- 
+       NOTE: Monetag SDK will be injected dynamically via JavaScript 
+       based on the Admin Panel Settings to ensure flexibility.
+    -->
+
     <!-- ====================================================================================
-         SECTION 2: ADVANCED CSS STYLES
+         SECTION 2: ADVANCED CSS STYLES (ডিজাইন ও এনিমেশন)
     ===================================================================================== -->
     <style>
+        /* Import Premium Font */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
         
-        /* Basic Reset */
+        /* Global Reset */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -39,22 +45,25 @@
             outline: none;
         }
 
+        /* Body Styling (Scroll Locked) */
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #0f0f0f;
+            background-color: #0f0f0f; /* Deep Dark Background */
             color: #ffffff;
             height: 100vh;
             width: 100vw;
-            overflow: hidden; /* Body Scroll Locked */
+            overflow: hidden; /* Prevents body scrolling */
             display: flex;
             flex-direction: column;
-            user-select: none;
+            user-select: none; /* Prevents text copying */
         }
 
-        /* Gold Theme Utilities */
+        /* Golden Gradient Utilities */
         .gold-gradient {
             background: linear-gradient(135deg, #FFD700 0%, #FDB931 50%, #d4af37 100%);
             color: #000;
+            border: none;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
         }
         
         .gold-text {
@@ -67,32 +76,36 @@
             border: 1px solid rgba(255, 215, 0, 0.3);
         }
 
-        /* Glassmorphism Panel */
+        /* Glassmorphism Panel Effect */
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
-        /* Scrollable Content Area */
+        /* Scrollable Main Content Area */
         #main-app {
             flex: 1;
             overflow-y: auto;
             padding: 16px;
-            padding-bottom: 100px;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
+            padding-bottom: 100px; /* Space for bottom nav */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE */
+            scroll-behavior: smooth;
         }
-        #main-app::-webkit-scrollbar { display: none; }
+        #main-app::-webkit-scrollbar { 
+            display: none; /* Chrome/Safari */
+        }
 
-        /* Bottom Navigation */
+        /* Bottom Navigation Bar */
         .nav-container {
             display: flex;
             justify-content: space-around;
             align-items: center;
             height: 100%;
+            width: 100%;
         }
 
         .nav-item {
@@ -101,16 +114,21 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            color: #6b7280;
+            gap: 5px;
+            color: #6b7280; /* Inactive Color */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             padding: 5px;
+            position: relative;
         }
 
         .nav-item.active {
             color: #FFD700;
-            transform: scale(1.05);
+        }
+
+        .nav-item i {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
         }
 
         .nav-item.active i {
@@ -118,21 +136,45 @@
             text-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
         }
 
-        /* Loader */
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Active Indicator Dot */
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            width: 4px;
+            height: 4px;
+            background-color: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #FFD700;
+        }
+
+        /* Loading Spinner */
         .loader-container {
-            position: fixed; inset: 0; z-index: 9999;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
             background-color: #0f0f0f;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .loader {
             border: 4px solid #333;
             border-top: 4px solid #FFD700;
             border-radius: 50%;
-            width: 50px; height: 50px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
         }
 
         @keyframes spin { 
@@ -140,78 +182,103 @@
             100% { transform: rotate(360deg); } 
         }
 
-        /* Custom Input */
+        /* Custom Input Fields */
         .custom-input {
             width: 100%;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            padding: 14px;
-            border-radius: 12px;
             outline: none;
-            transition: 0.3s;
+            padding: 14px 16px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-size: 14px;
         }
+
         .custom-input:focus {
             border-color: #FFD700;
             background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.1);
         }
 
-        /* Disabled State */
+        /* Button Disabled State */
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             filter: grayscale(100%);
+            transform: none !important;
         }
 
-        /* Popup Style */
+        /* SweetAlert Customization */
         div:where(.swal2-container) div:where(.swal2-popup) {
             background: #1a1a1a !important;
             border: 1px solid #FFD700;
             color: white;
-            border-radius: 16px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
+        
+        div:where(.swal2-icon).swal2-warning {
+            border-color: #FFD700 !important;
+            color: #FFD700 !important;
+        }
+        
+        div:where(.swal2-icon).swal2-error {
+            border-color: #f27474 !important;
+        }
+
+        /* Helper Classes */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <!-- ====================================================================================
-         SECTION 3: LOADING SCREEN
+         SECTION 3: LOADING & ERROR SCREENS
     ===================================================================================== -->
     <div id="loading-screen" class="loader-container">
         <div class="loader"></div>
         <h2 class="text-2xl font-bold gold-text tracking-[4px]">PREMIUM</h2>
         <p class="text-xs text-gray-500 mt-2 tracking-widest">INITIALIZING SYSTEM...</p>
         
-        <!-- Error Box -->
+        <!-- Error Retry Box -->
         <div id="error-box" class="hidden mt-8 px-6 w-full max-w-sm animate-pulse">
-            <div class="bg-red-500/10 border border-red-500/50 rounded-xl p-4 text-center">
-                <p id="error-msg" class="text-red-400 text-xs mb-3 font-mono">Connection Error</p>
-                <button onclick="location.reload()" class="bg-red-500 text-white px-6 py-2 rounded-full text-xs font-bold hover:bg-red-600">
-                    RETRY
+            <div class="bg-red-500/10 border border-red-500/50 rounded-xl p-4 text-center backdrop-blur-sm">
+                <i class="fas fa-wifi text-red-500 text-3xl mb-3"></i>
+                <h4 class="text-white font-bold mb-1">Connection Failed</h4>
+                <p id="error-msg" class="text-gray-400 text-xs mb-4">Unable to connect to server.</p>
+                <button onclick="location.reload()" class="w-full bg-red-500 text-white py-2.5 rounded-lg text-xs font-bold shadow-lg hover:bg-red-600 transition">
+                    RETRY CONNECTION
                 </button>
             </div>
         </div>
     </div>
 
     <!-- ====================================================================================
-         SECTION 4: HEADER (Fixed)
+         SECTION 4: FIXED HEADER
     ===================================================================================== -->
     <header class="glass-panel border-b-0 rounded-b-3xl p-5 z-40 shrink-0 relative">
         <div class="flex justify-between items-center">
+            <!-- User Profile -->
             <div class="flex items-center gap-3">
                 <div class="relative">
-                    <img id="user-photo" src="https://ui-avatars.com/api/?name=U&background=random" class="w-12 h-12 rounded-full border-2 border-[#FFD700] object-cover p-0.5 shadow-[0_0_10px_#FFD700]">
-                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-[#0f0f0f] rounded-full animate-pulse"></div>
+                    <img id="user-photo" src="https://ui-avatars.com/api/?name=U&background=random" class="w-12 h-12 rounded-full border-2 border-[#FFD700] object-cover p-0.5 shadow-[0_0_15px_#FFD700]">
+                    <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-[#0f0f0f] rounded-full animate-pulse"></div>
                 </div>
                 <div>
-                    <h3 id="user-name" class="font-bold text-lg leading-tight text-white">...</h3>
-                    <div class="flex items-center gap-1 mt-1">
-                        <span class="bg-[#FFD700]/10 text-[#FFD700] text-[9px] px-2 py-0.5 rounded-full border border-[#FFD700]/20 font-bold uppercase tracking-wider">VIP MEMBER</span>
+                    <h3 id="user-name" class="font-bold text-lg leading-tight text-white tracking-wide">Loading...</h3>
+                    <div class="flex items-center gap-1 mt-0.5">
+                        <span class="bg-[#FFD700]/10 text-[#FFD700] text-[9px] px-2 py-0.5 rounded-full border border-[#FFD700]/20 font-bold uppercase tracking-wider shadow-sm">
+                            VIP MEMBER
+                        </span>
                     </div>
                 </div>
             </div>
+            
+            <!-- Balance Display -->
             <div class="text-right">
-                <p class="text-[9px] text-gray-400 uppercase tracking-[1px] mb-1 font-semibold">Balance</p>
+                <p class="text-[9px] text-gray-400 uppercase mb-1 font-semibold tracking-wider">Balance</p>
                 <div class="flex items-center justify-end gap-1.5 bg-[#FFD700]/10 px-3 py-1.5 rounded-lg border border-[#FFD700]/20 shadow-inner">
                     <i class="fas fa-coins text-[#FFD700] text-sm drop-shadow-md"></i>
                     <span id="user-balance" class="text-xl font-bold text-white tracking-wide">0</span>
@@ -221,55 +288,80 @@
     </header>
 
     <!-- ====================================================================================
-         SECTION 5: MAIN CONTENT
+         SECTION 5: SCROLLABLE CONTENT AREA
     ===================================================================================== -->
-    <div id="main-app" class="hidden">
-        <!-- Dynamic Content -->
+    <div id="main-app" class="hidden fade-in">
+        <!-- Dynamic Pages (Home, Tasks, Wallet, etc.) injected here -->
     </div>
 
     <!-- ====================================================================================
-         SECTION 6: NAVIGATION (Fixed)
+         SECTION 6: FIXED BOTTOM NAVIGATION
     ===================================================================================== -->
     <nav class="glass-panel rounded-t-3xl pb-4 pt-3 z-50 shrink-0 h-20">
         <div class="nav-container">
-            <div onclick="router('home')" class="nav-item active" id="btn-home"><i class="fas fa-home"></i><span>Home</span></div>
-            <div onclick="router('tasks')" class="nav-item" id="btn-tasks"><i class="fas fa-list-check"></i><span>Tasks</span></div>
-            <div onclick="router('wallet')" class="nav-item" id="btn-wallet"><i class="fas fa-wallet"></i><span>Wallet</span></div>
-            <div onclick="router('history')" class="nav-item" id="btn-history"><i class="fas fa-history"></i><span>History</span></div>
-            <div onclick="router('refer')" class="nav-item" id="btn-refer"><i class="fas fa-users"></i><span>Refer</span></div>
+            <div onclick="router('home')" class="nav-item active" id="btn-home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </div>
+            <div onclick="router('tasks')" class="nav-item" id="btn-tasks">
+                <i class="fas fa-list-check"></i>
+                <span>Tasks</span>
+            </div>
+            <div onclick="router('wallet')" class="nav-item" id="btn-wallet">
+                <i class="fas fa-wallet"></i>
+                <span>Wallet</span>
+            </div>
+            <div onclick="router('history')" class="nav-item" id="btn-history">
+                <i class="fas fa-history"></i>
+                <span>History</span>
+            </div>
+            <div onclick="router('refer')" class="nav-item" id="btn-refer">
+                <i class="fas fa-users"></i>
+                <span>Refer</span>
+            </div>
         </div>
     </nav>
 
     <!-- ====================================================================================
-         SECTION 7: JAVASCRIPT LOGIC
+         SECTION 7: JAVASCRIPT LOGIC (CORE FUNCTIONALITY)
     ===================================================================================== -->
     <script>
-        // -------------------------------------------------------
-        // CONFIGURATION
-        // -------------------------------------------------------
+        // ******************************************************************
+        // 1. CONFIGURATION & STATE MANAGEMENT
+        // ******************************************************************
         const SUPABASE_URL = 'https://wnmwvbeydsrehtsnkfoc.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndubXd2YmV5ZHNyZWh0c25rZm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMDg4MzIsImV4cCI6MjA3OTg4NDgzMn0.4vSObxBEr8r11-dqkp9y6bVroMVoSTEnIOTF8Vo8sxk';
         
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const tg = window.Telegram.WebApp;
         
+        // Application State
         let currentUser = null;
         let appSettings = {};
-        let adFuncs = { interstitial: null, rewarded: null, popup: null };
         
-        // TIMER & SECURITY
+        // Monetag Ad Functions (Stored Dynamically)
+        let adFuncs = { 
+            interstitial: null, 
+            rewarded: null, 
+            popup: null 
+        };
+        
+        // Task Timer & Security Variables
         let adStartTime = 0;
         let pendingTask = null;
-        const MIN_AD_DURATION = 10000; // 10 Seconds
+        const MIN_AD_DURATION = 10000; // 10 Seconds Mandatory View Time
 
-        // -------------------------------------------------------
-        // INITIALIZATION
-        // -------------------------------------------------------
+        // ******************************************************************
+        // 2. APP INITIALIZATION LOGIC
+        // ******************************************************************
         async function initApp() {
-            tg.expand();
-            tg.setHeaderColor('#0f0f0f');
+            tg.expand(); // Force Full Screen
+            tg.setHeaderColor('#0f0f0f'); // Set Header Color
             
             const tgUser = tg.initDataUnsafe?.user;
+
+            // TEST MODE: Uncomment to test in browser without Telegram
+            // const tgUser = { id: 123456789, first_name: "Tester", username: "test_user", photo_url: "" };
 
             if (!tgUser) {
                 showError("Please open this app inside Telegram.");
@@ -277,52 +369,71 @@
             }
 
             try {
-                // 1. Load Settings
+                // A. Load Settings from Database
                 const { data: sData, error: sError } = await supabase.from('settings').select('*').single();
                 
-                if (sError || !sData) {
-                    console.error("Settings Error:", sError);
+                if (sError) {
+                    console.error("Settings Load Error:", sError);
+                    // Fallback Settings to prevent crash
                     appSettings = {
-                        conversion_rate: 0.05, min_withdraw_amount: 50, daily_task_limit: 10, 
-                        anti_cheat_enabled: true, bot_username: 'MyBot_bot', referral_bonus: 50
+                        conversion_rate: 0.05,
+                        min_withdraw_amount: 50,
+                        bot_username: 'MyBot_bot',
+                        daily_task_limit: 10,
+                        anti_cheat_enabled: true,
+                        referral_bonus: 50
                     };
                 } else {
                     appSettings = sData;
                 }
 
-                // 2. Load Monetag Scripts Dynamically
+                // B. Load Monetag Ads Dynamically based on Admin Settings
                 if (appSettings.monetag_interstitial_id) loadScript(appSettings.monetag_interstitial_id, (n) => adFuncs.interstitial = n);
                 if (appSettings.monetag_rewarded_id) loadScript(appSettings.monetag_rewarded_id, (n) => adFuncs.rewarded = n);
                 if (appSettings.monetag_popup_id) loadScript(appSettings.monetag_popup_id, (n) => adFuncs.popup = n);
 
-                // 3. User Auth
+                // C. User Authentication & Registration
                 let { data: user, error: uError } = await supabase.from('users').select('*').eq('id', tgUser.id).single();
 
                 if (!user) {
                     const startParam = tg.initDataUnsafe?.start_param;
-                    let refId = (startParam && startParam != tgUser.id) ? parseInt(startParam) : null;
+                    let refId = null;
+
+                    // Validate Referral ID
+                    if (startParam && startParam != tgUser.id) {
+                        refId = parseInt(startParam);
+                        if (isNaN(refId)) refId = null;
+                    }
                     
+                    // Anti-Cheat: Block Duplicate Device
                     if (appSettings.anti_cheat_enabled && refId && localStorage.getItem('device_ref_used')) {
-                        refId = null;
+                        refId = null; // Block invalid referral
                     }
 
+                    // Create User
                     const { data: newUser, error: cError } = await supabase.from('users').insert([{
-                        id: tgUser.id, first_name: tgUser.first_name, username: tgUser.username,
-                        photo_url: tgUser.photo_url, referred_by: refId, balance: 0
+                        id: tgUser.id,
+                        first_name: tgUser.first_name || 'User',
+                        username: tgUser.username,
+                        photo_url: tgUser.photo_url,
+                        referred_by: refId,
+                        balance: 0
                     }]).select().single();
 
-                    if (cError) throw new Error("Registration Failed");
+                    if (cError) throw new Error("Registration Failed. Please Restart.");
                     user = newUser;
 
+                    // Process Referral Bonus via RPC
                     if (refId) {
                         await supabase.rpc('increment_referral', { referrer_id: refId });
-                        localStorage.setItem('device_ref_used', 'true');
+                        localStorage.setItem('device_ref_used', 'true'); // Mark device as used
                     }
                 }
 
                 currentUser = user;
                 updateUI();
                 
+                // Show App Content
                 setTimeout(() => {
                     document.getElementById('loading-screen').classList.add('hidden');
                     document.getElementById('main-app').classList.remove('hidden');
@@ -334,9 +445,11 @@
             }
         }
 
-        // -------------------------------------------------------
-        // UTILS
-        // -------------------------------------------------------
+        // ******************************************************************
+        // 3. HELPER FUNCTIONS
+        // ******************************************************************
+        
+        // Dynamic Script Loader
         function loadScript(zoneId, cb) {
             const s = document.createElement('script');
             s.src = '//libtl.com/sdk.js';
@@ -344,29 +457,55 @@
             s.setAttribute('data-zone', zoneId);
             s.setAttribute('data-sdk', fname);
             s.onload = () => cb(fname);
+            s.onerror = () => console.error("Ad Script Failed:", zoneId);
             document.head.appendChild(s);
         }
 
+        // Error Display
         function showError(msg) {
             document.getElementById('error-msg').innerText = msg;
             document.getElementById('error-box').classList.remove('hidden');
             document.querySelector('.loader').style.display = 'none';
         }
 
+        // UI Update
         function updateUI() {
             if(!currentUser) return;
             document.getElementById('user-name').innerText = currentUser.first_name;
             document.getElementById('user-balance').innerText = Math.floor(currentUser.balance);
             if(currentUser.photo_url) document.getElementById('user-photo').src = currentUser.photo_url;
         }
+        
+        function updateHeaderUI() {
+            if (!currentUser) return;
+            document.getElementById('user-balance').innerText = Math.floor(currentUser.balance);
+            document.getElementById('user-name').innerText = currentUser.first_name || 'User';
+            if (currentUser.photo_url) {
+                document.getElementById('user-photo').src = currentUser.photo_url;
+            }
+        }
 
+        // ******************************************************************
+        // 4. ROUTING SYSTEM (NAVIGATION)
+        // ******************************************************************
         function router(page) {
+            // Reset Buttons
             document.querySelectorAll('.nav-item').forEach(b => {
                 b.classList.remove('active', 'text-[#FFD700]');
                 b.classList.add('text-gray-500');
             });
-            document.getElementById(`btn-${page}`).classList.add('active', 'text-[#FFD700]');
+            
+            // Set Active
+            const btn = document.getElementById(`btn-${page}`);
+            if(btn) {
+                btn.classList.add('active', 'text-[#FFD700]');
+                btn.classList.remove('text-gray-500');
+            }
+
             const c = document.getElementById('main-app');
+            c.classList.remove('fade-in');
+            void c.offsetWidth; // Trigger Reflow for Animation
+            c.classList.add('fade-in');
             
             if (page === 'home') renderHome(c);
             else if (page === 'tasks') renderTasks(c);
@@ -375,49 +514,54 @@
             else if (page === 'refer') renderRefer(c);
         }
 
-        // -------------------------------------------------------
-        // HOME
-        // -------------------------------------------------------
+        // ******************************************************************
+        // 5. PAGE: HOME
+        // ******************************************************************
         function renderHome(c) {
             const bdt = (currentUser.balance * appSettings.conversion_rate).toFixed(2);
             
+            // In-App Interstitial (Background Logic)
             if(adFuncs.interstitial && window[adFuncs.interstitial]) {
                 window[adFuncs.interstitial]({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
             }
 
+            // HTML Structure (\u09F3 for Taka Symbol)
             c.innerHTML = `
                 <div class="glass-panel p-6 rounded-3xl text-center relative overflow-hidden mt-2 shadow-2xl border-t border-white/10">
                     <div class="absolute -top-10 -left-10 w-40 h-40 bg-[#FFD700] rounded-full blur-[80px] opacity-20"></div>
+                    
                     <p class="text-gray-400 text-xs uppercase tracking-[3px] mb-2 font-bold">Total Earnings</p>
                     <h1 class="text-6xl font-bold text-white mb-2 drop-shadow-xl">${currentUser.balance}</h1>
+                    
                     <div class="inline-block bg-white/5 border border-white/10 rounded-full px-5 py-1.5 mt-1 backdrop-blur-md">
                         <p class="text-xs text-[#FFD700] font-bold tracking-wide">≈ \u09F3 ${bdt} BDT</p>
                     </div>
+                    
                     <button onclick="router('tasks')" class="mt-8 w-full py-4 rounded-2xl gold-gradient text-black font-bold shadow-[0_0_20px_rgba(255,215,0,0.3)] active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-wider">
                         <i class="fas fa-play"></i> Start Earning
                     </button>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4 mt-6">
-                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
+                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5 hover:border-[#FFD700]/30 transition">
                         <i class="fas fa-users text-3xl mb-2 text-blue-400 drop-shadow"></i>
                         <span class="text-2xl font-bold text-white">${currentUser.referral_count}</span>
-                        <span class="text-[10px] text-gray-400 uppercase mt-1 tracking-wide">Refers</span>
+                        <span class="text-[10px] text-gray-400 uppercase mt-1 tracking-wide">Total Refers</span>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
+                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5 hover:border-[#FFD700]/30 transition">
                         <i class="fas fa-check-circle text-3xl mb-2 text-green-400 drop-shadow"></i>
                         <span class="text-2xl font-bold text-white">Active</span>
-                        <span class="text-[10px] text-gray-400 uppercase mt-1 tracking-wide">Status</span>
+                        <span class="text-[10px] text-gray-400 uppercase mt-1 tracking-wide">Account Status</span>
                     </div>
                 </div>
                 
-                ${appSettings.home_banner_url ? `<div class="mt-6 mb-4 rounded-2xl overflow-hidden shadow-lg border border-[#FFD700]/30 w-full h-40"><img src="${appSettings.home_banner_url}" class="w-full h-full object-cover"></div>` : ''}
+                ${appSettings.home_banner_url ? `<div class="mt-6 mb-4 rounded-2xl overflow-hidden shadow-lg border border-[#FFD700]/30 w-full h-40"><img src="${appSettings.home_banner_url}" class="w-full h-full object-cover hover:scale-105 transition duration-500"></div>` : ''}
             `;
         }
 
-        // -------------------------------------------------------
-        // TASKS
-        // -------------------------------------------------------
+        // ******************************************************************
+        // 6. PAGE: TASKS (Complex Logic)
+        // ******************************************************************
         async function renderTasks(c) {
             c.innerHTML = `<div class="flex justify-center mt-20"><div class="loader"></div></div>`;
             
@@ -433,14 +577,18 @@
 
             let html = `
                 <div class="flex justify-between items-center mb-5 mt-2 px-1">
-                    <h2 class="text-lg font-bold text-white">Task List</h2>
-                    <span class="text-[10px] bg-white/10 px-3 py-1 rounded-lg text-gray-300 border border-white/10">Limit: ${limit}</span>
+                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-list-ul text-[#FFD700]"></i> Task List
+                    </h2>
+                    <span class="text-[10px] bg-white/10 px-3 py-1 rounded-lg text-gray-300 border border-white/10 font-mono">
+                        Limit: ${limit}
+                    </span>
                 </div>
             `;
 
             if (locked) {
                 html += `
-                    <div class="bg-red-500/10 border border-red-500/50 p-4 rounded-xl mb-6 text-center text-xs text-red-400 shadow-lg">
+                    <div class="bg-red-500/10 border border-red-500/50 p-4 rounded-xl mb-6 text-center text-xs text-red-400 shadow-lg animate-pulse">
                         <i class="fas fa-lock text-xl mb-2 block"></i>
                         Invite <b>${appSettings.min_referrals_req - currentUser.referral_count}</b> more friends to unlock tasks.
                     </div>`;
@@ -460,7 +608,7 @@
                 const btnClass = disabled ? 'bg-white/5 text-gray-500 cursor-not-allowed' : 'gold-gradient text-black hover:opacity-90 active:scale-95';
 
                 html += `
-                    <div class="glass-panel p-4 rounded-2xl flex justify-between items-center ${disabled?'opacity-60 grayscale':''}">
+                    <div class="glass-panel p-4 rounded-2xl flex justify-between items-center ${disabled?'opacity-60 grayscale':''} hover:bg-white/5 transition">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-[#FFD700] border border-white/10 shadow-lg">
                                 <i class="fas fa-${icon} text-xl"></i>
@@ -484,16 +632,28 @@
             c.innerHTML = html + `</div>`;
         }
 
-        // --- AD & TIMER LOGIC ---
+        // ******************************************************************
+        // 7. AD & TIMER LOGIC (The Engine)
+        // ******************************************************************
+        
+        // Visibility Change Listener (Fixes timer when user leaves app)
         document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible" && adStartTime > 0 && pendingTask) {
                 const duration = Date.now() - adStartTime;
+                
                 if (duration >= MIN_AD_DURATION) {
                     claimReward(pendingTask.id, pendingTask.reward);
                 } else {
-                    Swal.fire({ icon: 'warning', title: 'Too Fast!', text: `Wait 10s. Returned in ${(duration/1000).toFixed(1)}s`, confirmButtonColor: '#FFD700' });
+                    Swal.fire({ 
+                        icon: 'warning', 
+                        title: 'Too Fast!', 
+                        text: `You must wait 10 seconds. You returned in ${(duration/1000).toFixed(1)}s`, 
+                        confirmButtonColor: '#FFD700',
+                        background: '#1a1a1a', color: '#fff'
+                    });
                 }
-                adStartTime = 0; pendingTask = null;
+                adStartTime = 0; 
+                pendingTask = null;
             }
         });
 
@@ -501,28 +661,37 @@
             pendingTask = { id: tid, reward: rew };
             adStartTime = Date.now();
 
+            // 1. Direct Link (Web)
             if (type === 'direct_ad') {
                 const url = (link && link !== 'null') ? link : appSettings.monetag_direct_link;
                 if(url) { 
                     window.open(url, '_blank'); 
-                    setTimeout(() => { if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial](); }, 1000); 
+                    // Fallback Interstitial on Back
+                    setTimeout(() => { 
+                        if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial](); 
+                    }, 1000); 
                 } else {
-                    Swal.fire('Error', 'No Link', 'error');
+                    Swal.fire('Error', 'No Link Configured', 'error');
                 }
             } 
+            // 2. Telegram (Popup)
             else if (type === 'telegram') {
                 if(link) window.open(link, '_blank');
                 if(adFuncs.popup && window[adFuncs.popup]) window[adFuncs.popup]('pop');
             } 
+            // 3. Video (Rewarded)
             else if (type === 'video') {
                 if(adFuncs.rewarded && window[adFuncs.rewarded]) {
                     window[adFuncs.rewarded]().then(() => { 
                         claimReward(tid, rew); 
                         adStartTime = 0; 
                         pendingTask = null; 
+                    }).catch((e) => {
+                         console.log("Ad Closed/Failed");
                     });
                 }
             } 
+            // 4. Default
             else {
                 if(link && link !== 'null') window.open(link, '_blank');
                 if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial]();
@@ -530,24 +699,33 @@
         };
 
         async function claimReward(tid, rew) {
-            Swal.showLoading();
+            Swal.fire({title: 'Verifying...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background:'#1a1a1a', color:'#fff', showConfirmButton: false});
+            
             const { data: res } = await supabase.rpc('claim_task', { 
                 p_user_id: currentUser.id, 
                 p_task_id: tid, 
                 p_reward: rew, 
                 p_limit: appSettings.daily_task_limit 
             });
+
             Swal.close();
+
             if (res && res.success) {
-                currentUser.balance += rew; updateUI();
-                Swal.fire({ icon: 'success', title: `+${rew}`, toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
+                currentUser.balance += rew; 
+                updateHeaderUI();
+                Swal.fire({ 
+                    icon: 'success', title: `+${rew} Points`, toast: true, position: 'top-end', 
+                    showConfirmButton: false, timer: 1500, background: '#1a1a1a', color: '#fff' 
+                });
                 router('tasks');
             } else {
-                Swal.fire({ icon: 'error', title: 'Oops', text: res?.message });
+                Swal.fire({ icon: 'error', title: 'Oops', text: res?.message || "Limit Reached" });
             }
         }
 
-        // --- WALLET PAGE ---
+        // ******************************************************************
+        // 8. WALLET PAGE (Secure RPC Withdrawal)
+        // ******************************************************************
         function renderWallet(c) {
             const bdt = (currentUser.balance * appSettings.conversion_rate).toFixed(2);
             c.innerHTML = `
@@ -555,15 +733,37 @@
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-green-500/20 rounded-full blur-[60px]"></div>
                     <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Available Funds</p>
                     <h1 class="text-5xl font-bold gold-text my-3">\u09F3 ${bdt}</h1>
-                    <div class="inline-block bg-white/5 px-4 py-1.5 rounded-full border border-white/10"><p class="text-[10px] text-gray-400">Min: \u09F3 ${appSettings.min_withdraw_amount}</p></div>
-                </div>
-                <div class="space-y-6">
-                    <div><label class="text-xs text-gray-400 ml-1 font-bold uppercase">Method</label><div class="mt-2 glass-panel p-4 rounded-xl border border-[#FFD700] flex items-center justify-between bg-[#FFD700]/5"><div class="flex items-center gap-3"><img src="https://freelogopng.com/images/all_img/1656234745bkash-app-logo-png.png" class="h-8 object-contain"><span class="font-bold text-sm text-white">Bkash Personal</span></div><i class="fas fa-check-circle text-[#FFD700] text-xl"></i></div></div>
-                    <div class="space-y-3">
-                        <div><label class="text-xs text-gray-400 ml-1 font-bold">Number</label><input type="number" id="w-num" placeholder="017xxxxxxxx" class="custom-input"></div>
-                        <div><label class="text-xs text-gray-400 ml-1 font-bold">Amount</label><input type="number" id="w-amt" placeholder="Min ${appSettings.min_withdraw_amount}" class="custom-input"></div>
+                    <div class="inline-block bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
+                        <p class="text-[10px] text-gray-400">Min: \u09F3 ${appSettings.min_withdraw_amount}</p>
                     </div>
-                    <button id="w-btn" onclick="processWithdraw()" class="w-full py-4 rounded-xl gold-gradient text-black font-bold mt-4 shadow-lg active:scale-95 transition-transform text-sm uppercase tracking-wide flex items-center justify-center gap-2">Submit Request</button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="text-xs text-gray-400 ml-1 font-bold uppercase">Payment Method</label>
+                        <div class="mt-2 glass-panel p-4 rounded-xl border border-[#FFD700] flex items-center justify-between bg-[#FFD700]/5 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
+                            <div class="flex items-center gap-3">
+                                <img src="https://freelogopng.com/images/all_img/1656234745bkash-app-logo-png.png" class="h-8 object-contain">
+                                <span class="font-bold text-sm text-white">Bkash Personal</span>
+                            </div>
+                            <i class="fas fa-check-circle text-[#FFD700] text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-gray-400 ml-1 font-bold">Bkash Number</label>
+                            <input type="number" id="w-num" placeholder="017xxxxxxxx" class="custom-input">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-400 ml-1 font-bold">Amount (BDT)</label>
+                            <input type="number" id="w-amt" placeholder="Min ${appSettings.min_withdraw_amount}" class="custom-input">
+                        </div>
+                    </div>
+                    
+                    <button id="w-btn" onclick="processWithdraw()" class="w-full py-4 rounded-xl gold-gradient text-black font-bold mt-4 shadow-lg active:scale-95 transition-transform text-sm uppercase tracking-wide flex items-center justify-center gap-2">
+                        Submit Request
+                    </button>
                 </div>`;
         }
 
@@ -578,10 +778,13 @@
             const pts = amt / appSettings.conversion_rate;
             if (currentUser.balance < pts) return Swal.fire('Error', 'Low Balance', 'error');
 
-            btn.disabled = true; btn.innerText = "Processing...";
+            // Disable Button Immediately
+            btn.disabled = true; 
+            btn.innerText = "Processing...";
+
             if(adFuncs.interstitial && window[adFuncs.interstitial]) await window[adFuncs.interstitial]().catch(()=>{});
 
-            // Secure RPC Call
+            // Use Secure RPC Function
             const { data: res } = await supabase.rpc('process_withdrawal', { 
                 p_user_id: currentUser.id, 
                 p_method: 'Bkash', 
@@ -602,11 +805,18 @@
             }
         }
 
-        // --- HISTORY PAGE ---
+        // ******************************************************************
+        // 9. HISTORY PAGE
+        // ******************************************************************
         async function renderHistory(c) {
             c.innerHTML = `<div class="w-full h-full flex justify-center items-center mt-20"><div class="loader"></div></div>`;
-            const { data: w } = await supabase.from('withdrawals').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
-            let html = `<div class="my-4 px-1"><h2 class="text-lg font-bold mb-4 ml-1 text-white">Transaction History</h2>`;
+            
+            const { data: w } = await supabase.from('withdrawals')
+                .select('*')
+                .eq('user_id', currentUser.id)
+                .order('created_at', { ascending: false });
+            
+            let html = `<div class="my-4 px-1"><h2 class="text-lg font-bold mb-4 ml-1 text-white flex items-center gap-2"><i class="fas fa-history text-[#FFD700]"></i> Transaction History</h2>`;
             
             if (!w || w.length === 0) {
                 html += `<div class="text-center text-gray-500 text-sm mt-20">No transactions found.</div>`;
@@ -615,14 +825,14 @@
                 w.forEach(i => {
                     let col = i.status==='paid'?'text-green-400':(i.status==='rejected'?'text-red-400':'text-yellow-400');
                     html += `
-                        <div class="glass-panel p-4 rounded-xl flex justify-between items-center border-l-4 ${i.status==='paid'?'border-green-500/50':'border-yellow-500/50'}">
+                        <div class="glass-panel p-4 rounded-xl flex justify-between items-center border-l-4 ${i.status==='paid'?'border-green-500/50':'border-yellow-500/50'} shadow-md">
                             <div class="flex items-center gap-4">
                                 <div>
                                     <h4 class="font-bold text-sm text-white">\u09F3 ${i.amount_bdt}</h4>
                                     <p class="text-[10px] text-gray-400 font-mono">${new Date(i.created_at).toLocaleDateString()}</p>
                                 </div>
                             </div>
-                            <span class="text-[10px] font-bold ${col} uppercase bg-white/5 px-2 py-1 rounded">${i.status}</span>
+                            <span class="text-[10px] font-bold ${col} uppercase bg-white/5 px-2 py-1 rounded border border-white/5">${i.status}</span>
                         </div>`;
                 });
                 html += `</div>`;
@@ -630,7 +840,9 @@
             c.innerHTML = html;
         }
 
-        // --- REFER PAGE ---
+        // ******************************************************************
+        // 10. REFERRAL PAGE
+        // ******************************************************************
         function renderRefer(c) {
             const link = `https://t.me/${appSettings.bot_username || 'MyBot_bot'}?start=${currentUser.id}`;
             const showInput = currentUser.referred_by === null;
@@ -641,6 +853,7 @@
                     <h2 class="text-2xl font-bold text-white">Invite & Earn</h2>
                     <p class="text-xs text-gray-400 mt-2 px-4">Get <b class="text-[#FFD700]">${bonus} points</b> per referral!</p>
                 </div>
+                
                 <div class="glass-panel p-3 rounded-xl mt-6 flex items-center gap-3 bg-black/30 border border-white/10">
                     <input type="text" value="${link}" readonly class="bg-transparent text-xs w-full text-gray-300 outline-none font-mono" id="ref-link">
                     <button onclick="copyLink()" class="p-2.5 bg-[#FFD700] rounded-lg text-black font-bold text-xs"><i class="fas fa-copy"></i></button>
@@ -651,7 +864,7 @@
                     <p class="text-xs text-gray-300 mb-3 font-bold">Enter Referral Code</p>
                     <div class="flex gap-2">
                         <input type="number" id="ref-code-input" placeholder="ID" class="custom-input">
-                        <button onclick="submitRef()" class="gold-gradient text-black text-xs font-bold px-6 py-2 rounded-lg">Apply</button>
+                        <button onclick="submitRef()" class="gold-gradient text-black text-xs font-bold px-6 py-2 rounded-lg hover:opacity-90">Apply</button>
                     </div>
                 </div>` : ''}
                 
@@ -688,6 +901,7 @@
 
         // START APP
         initApp();
+
     </script>
 </body>
 </html>
