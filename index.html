@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Premium Rewards</title>
 
-    <!-- LIBRARIES -->
+    <!-- লাইব্রেরি -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- STYLES -->
+    <!-- ডিজাইন -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; outline: none; }
+        
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #0f0f0f;
@@ -26,14 +27,17 @@
             display: flex; flex-direction: column;
             user-select: none;
         }
+
         .gold-gradient { background: linear-gradient(135deg, #FFD700 0%, #FDB931 50%, #d4af37 100%); color: #000; }
         .gold-text { background: linear-gradient(to right, #FFD700, #FDB931); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
+
         #main-app {
             flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px;
             scrollbar-width: none;
@@ -42,30 +46,34 @@
         
         .nav-container { display: flex; justify-content: space-around; align-items: center; height: 100%; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #6b7280; transition: 0.3s; cursor: pointer; }
-        .nav-item.active { color: #FFD700; }
-        .nav-item.active i { transform: translateY(-5px); text-shadow: 0 0 15px rgba(255, 215, 0, 0.6); }
+        .nav-item.active { color: #FFD700; transform: scale(1.1); }
+        .nav-item.active i { transform: translateY(-5px); text-shadow: 0 0 10px rgba(255, 215, 0, 0.6); }
+        
+        .custom-input { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px; border-radius: 12px; transition: 0.3s; }
+        .custom-input:focus { border-color: #FFD700; }
+        
+        button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); pointer-events: none; }
         
         .loader { border: 4px solid #333; border-top: 4px solid #FFD700; border-radius: 50%; width: 45px; height: 45px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .custom-input { width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: white; padding: 12px; border-radius: 12px; outline: none; transition: 0.3s; }
-        .custom-input:focus { border-color: #FFD700; }
-        button:disabled { opacity: 0.6; cursor: not-allowed; filter: grayscale(100%); pointer-events: none; }
-        div:where(.swal2-container) div:where(.swal2-popup) { background: #1a1a1a !important; border: 1px solid #FFD700; color: white; border-radius: 16px; }
+        div:where(.swal2-container) div:where(.swal2-popup) { background: #1a1a1a !important; border: 1px solid #FFD700; color: #fff; border-radius: 16px; }
     </style>
 </head>
 <body>
 
+    <!-- লোডিং স্ক্রিন -->
     <div id="loading-screen" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0f0f0f]">
         <div class="loader mb-4"></div>
-        <h2 class="text-2xl font-bold gold-text tracking-widest">PREMIUM</h2>
-        <p class="text-xs text-gray-500 mt-2">LOADING...</p>
+        <h2 class="text-xl font-bold gold-text tracking-widest">PREMIUM</h2>
+        <p class="text-xs text-gray-500 mt-2">LOADING DATA...</p>
         <div id="error-box" class="hidden mt-6 text-center">
             <p id="error-msg" class="text-red-500 text-xs mb-2">Connection Error</p>
             <button onclick="location.reload()" class="bg-white/10 px-4 py-2 rounded text-xs text-white border border-white/20">Retry</button>
         </div>
     </div>
 
+    <!-- হেডার -->
     <header class="glass-panel border-b-0 rounded-b-3xl p-4 z-40 shrink-0">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -84,422 +92,21 @@
         </div>
     </header>
 
+    <!-- মেইন কন্টেন্ট -->
     <div id="main-app" class="hidden"></div>
 
+    <!-- বটম নেভিগেশন -->
     <nav class="glass-panel rounded-t-3xl pb-4 pt-3 z-50 shrink-0 h-20">
         <div class="nav-container">
-            <div onclick="router('home')" class="nav-item active" id="btn-home"><i class="fas fa-home"></i><span>Home</span></div>
-            <div onclick="router('tasks')" class="nav-item" id="btn-tasks"><i class="fas fa-list-check"></i><span>Tasks</span></div>
-            <div onclick="router('wallet')" class="nav-item" id="btn-wallet"><i class="fas fa-wallet"></i><span>Wallet</span></div>
-            <div onclick="router('history')" class="nav-item" id="btn-history"><i class="fas fa-history"></i><span>History</span></div>
-            <div onclick="router('refer')" class="nav-item" id="btn-refer"><i class="fas fa-users"></i><span>Refer</span></div>
+            <div onclick="router('home')" class="nav-item active" id="btn-home"><i class="fas fa-home text-xl"></i><span class="text-[10px]">Home</span></div>
+            <div onclick="router('tasks')" class="nav-item" id="btn-tasks"><i class="fas fa-list-check text-xl"></i><span class="text-[10px]">Tasks</span></div>
+            <div onclick="router('wallet')" class="nav-item" id="btn-wallet"><i class="fas fa-wallet text-xl"></i><span class="text-[10px]">Wallet</span></div>
+            <div onclick="router('history')" class="nav-item" id="btn-history"><i class="fas fa-history text-xl"></i><span class="text-[10px]">History</span></div>
+            <div onclick="router('refer')" class="nav-item" id="btn-refer"><i class="fas fa-users text-xl"></i><span class="text-[10px]">Refer</span></div>
         </div>
     </nav>
 
-    <script>
-        // CONFIG
-        const SUPABASE_URL = 'https://wnmwvbeydsrehtsnkfoc.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndubXd2YmV5ZHNyZWh0c25rZm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMDg4MzIsImV4cCI6MjA3OTg4NDgzMn0.4vSObxBEr8r11-dqkp9y6bVroMVoSTEnIOTF8Vo8sxk';
-        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const tg = window.Telegram.WebApp;
-        
-        let user = null, settings = {}, adFuncs = {}, adStart = 0, pending = null;
-        const MIN_AD_DURATION = 10000; // 10s
-
-        // INIT APP
-        async function initApp() {
-            tg.expand();
-            tg.setHeaderColor('#0f0f0f');
-            
-            const tgUser = tg.initDataUnsafe?.user;
-            if (!tgUser) return showError("Please open inside Telegram.");
-
-            try {
-                // Settings Load
-                const { data: sData, error: sError } = await sb.from('settings').select('*').single();
-                settings = sData || { 
-                    conversion_rate: 0.05, min_withdraw_amount: 50, daily_task_limit: 10, 
-                    anti_cheat_enabled: true, bot_username: 'MyBot_bot', referral_bonus: 50
-                };
-
-                // Monetag Load
-                if (settings.monetag_interstitial_id) loadScript(settings.monetag_interstitial_id, (n) => adFuncs.interstitial = n);
-                if (settings.monetag_rewarded_id) loadScript(settings.monetag_rewarded_id, (n) => adFuncs.rewarded = n);
-                if (settings.monetag_popup_id) loadScript(settings.monetag_popup_id, (n) => adFuncs.popup = n);
-
-                // User Check
-                let { data: dbUser } = await sb.from('users').select('*').eq('id', tgUser.id).single();
-                if (!dbUser) {
-                    const startParam = tg.initDataUnsafe?.start_param;
-                    let refId = (startParam && startParam != tgUser.id) ? parseInt(startParam) : null;
-                    if (settings.anti_cheat_enabled && refId && localStorage.getItem('device_ref_used')) refId = null;
-
-                    const { data: newUser, error: cError } = await sb.from('users').insert([{
-                        id: tgUser.id, first_name: tgUser.first_name, username: tgUser.username,
-                        photo_url: tgUser.photo_url, referred_by: refId, balance: 0
-                    }]).select().single();
-
-                    if (cError) throw new Error("Registration Failed");
-                    dbUser = newUser;
-
-                    if (refId) {
-                        await sb.rpc('increment_referral', { p_referrer_id: refId });
-                        localStorage.setItem('device_ref_used', 'true');
-                    }
-                }
-                user = dbUser;
-                updateUI();
-                
-                setTimeout(() => {
-                    document.getElementById('loading-screen').classList.add('hidden');
-                    document.getElementById('main-app').classList.remove('hidden');
-                    router('home');
-                }, 1000);
-            } catch (err) { showError(err.message); }
-        }
-
-        function loadScript(zoneId, cb) {
-            const s = document.createElement('script');
-            s.src = '//libtl.com/sdk.js';
-            const fname = 'show_' + zoneId;
-            s.setAttribute('data-zone', zoneId);
-            s.setAttribute('data-sdk', fname);
-            s.onload = () => cb(fname);
-            document.head.appendChild(s);
-        }
-
-        function showError(msg) {
-            document.getElementById('error-msg').innerText = msg;
-            document.getElementById('error-box').classList.remove('hidden');
-            document.querySelector('.loader').style.display = 'none';
-        }
-
-        function updateUI() {
-            if(!user) return;
-            document.getElementById('user-name').innerText = user.first_name;
-            document.getElementById('user-balance').innerText = Math.floor(user.balance);
-            if(user.photo_url) document.getElementById('user-photo').src = user.photo_url;
-        }
-
-        function router(page) {
-            document.querySelectorAll('.nav-item').forEach(b => {
-                b.classList.remove('active', 'text-[#FFD700]');
-                b.classList.add('text-gray-500');
-            });
-            document.getElementById(`btn-${page}`).classList.add('active', 'text-[#FFD700]');
-            const c = document.getElementById('main-app');
-            
-            if (page === 'home') renderHome(c);
-            else if (page === 'tasks') renderTasks(c);
-            else if (page === 'wallet') renderWallet(c);
-            else if (page === 'history') renderHistory(c);
-            else if (page === 'refer') renderRefer(c);
-        }
-
-        // --- HOME PAGE ---
-        function renderHome(c) {
-            const bdt = (user.balance * settings.conversion_rate).toFixed(2);
-            if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial]({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
-
-            c.innerHTML = `
-                <div class="glass-panel p-6 rounded-3xl text-center relative overflow-hidden mt-2 shadow-2xl border-t border-white/10">
-                    <div class="absolute -top-10 -left-10 w-40 h-40 bg-[#FFD700] rounded-full blur-[80px] opacity-20"></div>
-                    <p class="text-gray-400 text-xs uppercase tracking-[3px] mb-2 font-bold">Total Earnings</p>
-                    <h1 class="text-6xl font-bold text-white mb-2">${user.balance}</h1>
-                    <div class="inline-block bg-white/5 border border-white/10 rounded-full px-5 py-1.5 mt-1">
-                        <p class="text-xs text-[#FFD700] font-bold tracking-wide">≈ \u09F3 ${bdt} BDT</p>
-                    </div>
-                    <button onclick="router('tasks')" class="mt-8 w-full py-4 rounded-2xl gold-gradient text-black font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-wider">
-                        <i class="fas fa-play"></i> Start Earning
-                    </button>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4 mt-6">
-                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
-                        <i class="fas fa-users text-3xl mb-2 text-blue-400"></i>
-                        <span class="text-2xl font-bold">${user.referral_count}</span>
-                        <span class="text-[10px] text-gray-400 uppercase mt-1">Refers</span>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center border border-white/5">
-                        <i class="fas fa-check-circle text-3xl mb-2 text-green-400"></i>
-                        <span class="text-2xl font-bold">Active</span>
-                        <span class="text-[10px] text-gray-400 uppercase mt-1">Status</span>
-                    </div>
-                </div>
-                ${settings.home_banner_url ? `<div class="mt-6 mb-4 rounded-2xl overflow-hidden shadow-lg border border-[#FFD700]/30 w-full h-40"><img src="${settings.home_banner_url}" class="w-full h-full object-cover"></div>` : ''}
-            `;
-        }
-
-        // --- TASKS PAGE ---
-        async function renderTasks(c) {
-            c.innerHTML = `<div class="flex justify-center mt-20"><div class="loader"></div></div>`;
-            
-            const { data: tasks } = await sb.from('tasks').select('*').eq('is_active', true).order('id');
-            const today = new Date().toISOString().split('T')[0];
-            const { data: logs } = await sb.from('task_logs').select('task_id').eq('user_id', user.id).eq('created_at', today);
-
-            const counts = {};
-            if (logs) logs.forEach(l => counts[l.task_id] = (counts[l.task_id] || 0) + 1);
-            
-            const locked = settings.referral_lock && (user.referral_count < settings.min_referrals_req);
-            const limit = settings.daily_task_limit || 10;
-
-            let html = `
-                <div class="flex justify-between items-center mb-5 mt-2 px-1">
-                    <h2 class="text-lg font-bold text-white">Task List</h2>
-                    <span class="text-[10px] bg-white/10 px-3 py-1 rounded-lg text-gray-300 border border-white/10">Limit: ${limit}</span>
-                </div>
-            `;
-
-            if (locked) {
-                html += `
-                    <div class="bg-red-500/10 border border-red-500/50 p-4 rounded-xl mb-6 text-center text-xs text-red-400">
-                        <i class="fas fa-lock text-xl mb-2 block"></i>
-                        Invite <b>${settings.min_referrals_req - user.referral_count}</b> more friends to unlock.
-                    </div>`;
-            }
-
-            html += `<div class="space-y-4 pb-10">`;
-            
-            tasks.forEach(t => {
-                let icon = 'star', btn = 'Claim', bCol = 'bg-gray-500/20';
-                
-                if (t.task_type === 'direct_ad') { icon = 'globe'; btn = 'Visit'; bCol = 'bg-blue-500/20 text-blue-400'; }
-                else if (t.task_type === 'telegram') { icon = 'paper-plane'; btn = 'Join'; bCol = 'bg-cyan-500/20 text-cyan-400'; }
-                else if (t.task_type === 'video') { icon = 'play-circle'; btn = 'Watch'; bCol = 'bg-purple-500/20 text-purple-400'; }
-
-                const cnt = counts[t.id] || 0;
-                const disabled = locked || cnt >= limit;
-                const btnClass = disabled ? 'bg-white/5 text-gray-500 cursor-not-allowed' : 'gold-gradient text-black hover:opacity-90 active:scale-95';
-
-                html += `
-                    <div class="glass-panel p-4 rounded-2xl flex justify-between items-center ${disabled?'opacity-60 grayscale':''}">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-[#FFD700] border border-white/10 shadow-lg"><i class="fas fa-${icon} text-xl"></i></div>
-                            <div>
-                                <h4 class="font-bold text-sm text-white line-clamp-1 mb-1">${t.title}</h4>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-[9px] ${bCol} px-1.5 py-0.5 rounded font-bold tracking-wider">TASK</span>
-                                    <span class="text-[10px] text-[#FFD700] font-bold border border-[#FFD700]/20 px-1.5 py-0.5 rounded">+${t.reward}</span>
-                                    <span class="text-[10px] text-gray-500 font-mono pl-2 border-l border-white/10">${cnt}/${limit}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="handleTask(${t.id}, ${t.reward}, '${t.task_type}', '${t.link || ''}')" 
-                            ${disabled?'disabled':''} 
-                            class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${btnClass}">
-                            ${cnt >= limit ? 'Done' : btn}
-                        </button>
-                    </div>`;
-            });
-            c.innerHTML = html + `</div>`;
-        }
-
-        // --- AD & TIMER LOGIC ---
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible" && adStartTime > 0 && pendingTask) {
-                const duration = Date.now() - adStartTime;
-                
-                if (duration >= MIN_AD_DURATION) {
-                    claimReward(pendingTask.id, pendingTask.reward);
-                } else {
-                    Swal.fire({ icon: 'warning', title: 'Too Fast!', text: `Wait 10s. Returned in ${(duration/1000).toFixed(1)}s`, confirmButtonColor: '#FFD700' });
-                }
-                adStartTime = 0; pendingTask = null;
-            }
-        });
-
-        window.handleTask = async (tid, rew, type, link) => {
-            pendingTask = { id: tid, reward: rew };
-            adStartTime = Date.now();
-
-            if (type === 'direct_ad') {
-                const url = (link && link !== 'null') ? link : settings.monetag_direct_link;
-                if(url) { 
-                    window.open(url, '_blank'); 
-                    setTimeout(() => { if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial](); }, 1000); 
-                } else {
-                    Swal.fire('Error', 'No Link', 'error');
-                }
-            } 
-            else if (type === 'telegram') {
-                if(link) window.open(link, '_blank');
-                if(adFuncs.popup && window[adFuncs.popup]) window[adFuncs.popup]('pop');
-            } 
-            else if (type === 'video') {
-                if(adFuncs.rewarded && window[adFuncs.rewarded]) {
-                    window[adFuncs.rewarded]().then(() => { 
-                        claimReward(tid, rew); 
-                        adStartTime = 0; 
-                        pendingTask = null; 
-                    });
-                }
-            } 
-            else {
-                if(link && link !== 'null') window.open(link, '_blank');
-                if(adFuncs.interstitial && window[adFuncs.interstitial]) window[adFuncs.interstitial]();
-            }
-        };
-
-        async function claimReward(tid, rew) {
-            Swal.fire({title: 'Verifying...', allowOutsideClick: false, didOpen: () => Swal.showLoading(), background:'#1a1a1a', color:'#fff', showConfirmButton: false});
-            
-            const { data: res } = await sb.rpc('claim_task', { 
-                p_user_id: user.id, 
-                p_task_id: tid, 
-                p_reward: rew, 
-                p_limit: settings.daily_task_limit 
-            });
-
-            Swal.close();
-
-            if (res && res.success) {
-                user.balance += rew; 
-                updateUI();
-                Swal.fire({ icon: 'success', title: `+${rew} Points`, toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
-                router('tasks');
-            } else {
-                Swal.fire({ icon: 'error', title: 'Oops', text: res?.message });
-            }
-        }
-
-        // --- WALLET PAGE ---
-        function renderWallet(c) {
-            const bdt = (user.balance * settings.conversion_rate).toFixed(2);
-            c.innerHTML = `
-                <div class="glass-panel p-6 rounded-2xl text-center mb-6 mt-4 relative overflow-hidden shadow-2xl">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-green-500/20 rounded-full blur-[60px]"></div>
-                    <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Available Funds</p>
-                    <h1 class="text-5xl font-bold gold-text my-3">\u09F3 ${bdt}</h1>
-                    <div class="inline-block bg-white/5 px-4 py-1.5 rounded-full border border-white/10"><p class="text-[10px] text-gray-400">Min: \u09F3 ${settings.min_withdraw_amount}</p></div>
-                </div>
-                <div class="space-y-6">
-                    <div><label class="text-xs text-gray-400 ml-1 font-bold uppercase">Method</label><div class="mt-2 glass-panel p-4 rounded-xl border border-[#FFD700] flex items-center justify-between bg-[#FFD700]/5"><div class="flex items-center gap-3"><img src="https://freelogopng.com/images/all_img/1656234745bkash-app-logo-png.png" class="h-8 object-contain"><span class="font-bold text-sm text-white">Bkash Personal</span></div><i class="fas fa-check-circle text-[#FFD700] text-xl"></i></div></div>
-                    <div class="space-y-3">
-                        <div><label class="text-xs text-gray-400 ml-1 font-bold">Number</label><input type="number" id="w-num" placeholder="017xxxxxxxx" class="custom-input"></div>
-                        <div><label class="text-xs text-gray-400 ml-1 font-bold">Amount</label><input type="number" id="w-amt" placeholder="Min ${settings.min_withdraw_amount}" class="custom-input"></div>
-                    </div>
-                    <button id="w-btn" onclick="processWithdraw()" class="w-full py-4 rounded-xl gold-gradient text-black font-bold mt-4 shadow-lg active:scale-95 transition-transform text-sm uppercase tracking-wide flex items-center justify-center gap-2">Submit Request</button>
-                </div>`;
-        }
-
-        async function processWithdraw() {
-            const btn = document.getElementById('w-btn');
-            const num = document.getElementById('w-num').value;
-            const amt = parseInt(document.getElementById('w-amt').value);
-            
-            if (!num || !amt) return Swal.fire('Error', 'Fill all fields', 'warning');
-            if (amt < settings.min_withdraw_amount) return Swal.fire('Error', `Min \u09F3${settings.min_withdraw_amount}`, 'warning');
-            const pts = amt / settings.conversion_rate;
-            if (user.balance < pts) return Swal.fire('Error', 'Low Balance', 'error');
-
-            btn.disabled = true; btn.innerText = "Processing...";
-            if(adFuncs.interstitial && window[adFuncs.interstitial]) await window[adFuncs.interstitial]().catch(()=>{});
-
-            const { data: res } = await sb.rpc('process_withdrawal', { 
-                p_user_id: user.id, 
-                p_method: 'Bkash', 
-                p_number: num, 
-                p_amount_bdt: amt, 
-                p_points_needed: pts 
-            });
-
-            if (res && res.success) {
-                user.balance -= pts; updateUI();
-                Swal.fire('Success', 'Request Sent!', 'success'); 
-                router('history');
-            } else {
-                Swal.fire('Error', res?.message || 'Failed', 'error');
-                btn.disabled = false; btn.innerText = "Submit Request";
-            }
-        }
-
-        // --- HISTORY PAGE ---
-        async function renderHistory(c) {
-            c.innerHTML = `<div class="w-full h-full flex justify-center items-center mt-20"><div class="loader"></div></div>`;
-            const { data: w } = await sb.from('withdrawals').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-            let html = `<div class="my-4 px-1"><h2 class="text-lg font-bold mb-4 ml-1 text-white">Transaction History</h2>`;
-            
-            if (!w || w.length === 0) {
-                html += `<div class="text-center text-gray-500 text-sm mt-20">No transactions found.</div>`;
-            } else {
-                html += `<div class="space-y-3 pb-20">`;
-                w.forEach(i => {
-                    let col = i.status==='paid'?'text-green-400':(i.status==='rejected'?'text-red-400':'text-yellow-400');
-                    html += `
-                        <div class="glass-panel p-4 rounded-xl flex justify-between items-center border-l-4 ${i.status==='paid'?'border-green-500/50':'border-yellow-500/50'}">
-                            <div class="flex items-center gap-4">
-                                <div>
-                                    <h4 class="font-bold text-sm text-white">\u09F3 ${i.amount_bdt}</h4>
-                                    <p class="text-[10px] text-gray-400 font-mono">${new Date(i.created_at).toLocaleDateString()}</p>
-                                </div>
-                            </div>
-                            <span class="text-[10px] font-bold ${col} uppercase bg-white/5 px-2 py-1 rounded">${i.status}</span>
-                        </div>`;
-                });
-                html += `</div>`;
-            }
-            c.innerHTML = html;
-        }
-
-        // --- REFER PAGE ---
-        function renderRefer(c) {
-            const link = `https://t.me/${settings.bot_username || 'MyBot_bot'}?start=${user.id}`;
-            const showInput = !user.referred_by;
-            const bonus = settings.referral_bonus || 50;
-
-            c.innerHTML = `
-                <div class="glass-panel p-6 rounded-2xl text-center mt-4 border border-[#FFD700]/30 shadow-2xl">
-                    <h2 class="text-2xl font-bold text-white">Invite & Earn</h2>
-                    <p class="text-xs text-gray-400 mt-2 px-4">Get <b class="text-[#FFD700]">${bonus} points</b> per referral!</p>
-                </div>
-                <div class="glass-panel p-3 rounded-xl mt-6 flex items-center gap-3 bg-black/30 border border-white/10">
-                    <input type="text" value="${link}" readonly class="bg-transparent text-xs w-full text-gray-300 outline-none font-mono" id="ref-link">
-                    <button onclick="copyLink()" class="p-2.5 bg-[#FFD700] rounded-lg text-black font-bold text-xs"><i class="fas fa-copy"></i></button>
-                </div>
-                
-                ${showInput ? `
-                <div class="glass-panel p-5 rounded-xl mt-5 border border-[#FFD700]/20 bg-[#FFD700]/5">
-                    <p class="text-xs text-gray-300 mb-3 font-bold">Enter Referral Code</p>
-                    <div class="flex gap-2">
-                        <input type="number" id="ref-code-input" placeholder="ID" class="custom-input">
-                        <button onclick="submitRef()" class="gold-gradient text-black text-xs font-bold px-6 py-2 rounded-lg">Apply</button>
-                    </div>
-                </div>` : ''}
-                
-                <div class="mt-6 glass-panel p-5 rounded-xl flex justify-between items-center shadow-lg border border-white/5">
-                    <div><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Total Referrals</p><h4 class="text-3xl font-bold text-white">${user.referral_count}</h4></div>
-                    <div class="text-right"><p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Bonus Earned</p><h4 class="text-3xl font-bold text-[#FFD700]">${user.referral_count * bonus}</h4></div>
-                </div>`;
-        }
-
-        async function submitRef() {
-            const code = document.getElementById('ref-code-input').value;
-            if(!code) return Swal.fire('Error', 'Enter Code', 'warning');
-            
-            if(settings.anti_cheat_enabled && localStorage.getItem('device_ref_used')) {
-                return Swal.fire('Blocked', 'Device used!', 'error');
-            }
-
-            Swal.showLoading();
-            const { data: res } = await sb.rpc('submit_referral_code', { p_user_id: user.id, p_referrer_id: parseInt(code) });
-            Swal.close();
-            
-            if(res && res.success) {
-                if(settings.anti_cheat_enabled) localStorage.setItem('device_ref_used', 'true');
-                user.referred_by = parseInt(code); Swal.fire('Success', 'Applied!', 'success'); router('refer');
-            } else Swal.fire('Error', res?.message || 'Invalid Code', 'error');
-        }
-
-        window.copyLink = () => {
-            const copyText = document.getElementById("ref-link");
-            copyText.select();
-            document.execCommand("copy");
-            Swal.fire({ icon: 'success', title: 'Copied!', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
-        };
-
-        // START APP
-        initApp();
-    </script>
+    <!-- জাভাস্ক্রিপ্ট ফাইল লিংক -->
+    <script src="script.js"></script>
 </body>
 </html>
