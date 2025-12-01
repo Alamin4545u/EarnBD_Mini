@@ -1,319 +1,401 @@
-// ================ script.js - Full Updated 2025 (Clean & Working) ================
-
+// 1. CONFIGURATION
 const SUPABASE_URL = 'https://wnmwvbeydsrehtsnkfoc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndubXd2YmV5ZHNyZWh0c25rZm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMDg4MzIsImV4cCI6MjA3OTg4NDgzMn0.4vSObxBEr8r11-dqkp9y6bVroMVoSTEnIOTF8Vo8sxk';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// Variables
 let currentUser = null;
-let settings = {};
-let adsReady = { rewarded: false };
-const VIEW_TIME = 15000; // 15 seconds
+let appSettings = {};
+let adFuncs = { interstitial: null, rewarded: null, popup: null };
+const REQUIRED_TIME = 15000; // 15 Seconds Fix
 
-// ==================== DEVICE ID ====================
-function getDeviceID() {
-    let id = localStorage.getItem('device_id');
-    if (!id) {
-        id = 'DEV_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-        localStorage.setItem('device_id', id);
-    }
-    return id;
+// Device ID
+function getDeviceFingerprint() {
+    const nav = navigator;
+    return 'DEV-' + (nav.userAgent.replace(/\D+/g, '') + screen.width).substring(0, 15);
 }
 
-// ==================== LOAD MONETAG ADS (Working 2025) ====================
-async function loadAds() {
-    if (!settings.monetag_rewarded_id) return;
-
-    const zone = settings.monetag_rewarded_id;
-    if (window[`show_${zone}`]) {
-        adsReady.rewarded = true;
-        return;
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://libtl.com/sdk.js';
-    script.setAttribute('data-zone', zone);
-    script.setAttribute('data-sdk', `show_${zone}`);
-    script.async = true;
-
-    script.onload = () => {
-        setTimeout(() => {
-            adsReady.rewarded = true;
-        }, 2000);
-    };
-    document.head.appendChild(script);
-}
-
-// ==================== INIT ====================
-async function init() {
+// 2. INITIALIZATION
+async function initApp() {
     try {
-        const { data } = await supabase.from('settings').select('*').single();
-        settings = data;
+        const { data: s } = await supabase.from('settings').select('*').single();
+        appSettings = s || {};
 
-        await loadAds();
+        // Load Monetag Ads
+        if(appSettings.monetag_interstitial_id) loadAdScript(appSettings.monetag_interstitial_id, 'interstitial');
+        if(appSettings.monetag_rewarded_id) loadAdScript(appSettings.monetag_rewarded_id, 'rewarded');
+        if(appSettings.monetag_popup_id) loadAdScript(appSettings.monetag_popup_id, 'popup');
 
-        const userId = localStorage.getItem('user_id');
-        if (userId) {
-            await loadUser(userId);
-        } else {
-            showScreen('auth-screen');
-        }
+        const uid = localStorage.getItem('user_id');
+        if (uid) await fetchUser(uid);
+        else showAuth();
 
         // Referral
-        const urlParams = new URLSearchParams(location.search);
+        const urlParams = new URLSearchParams(window.location.search);
         const ref = urlParams.get('ref');
         if (ref) {
-            document.getElementById('auth-ref').value = ref;
             toggleAuth('signup');
+            document.getElementById('auth-ref').value = ref;
         }
 
     } catch (e) {
-        showScreen('error-box');
+        console.error(e);
+        document.getElementById('loading-screen').classList.add('hidden');
+        document.getElementById('error-box').classList.remove('hidden');
     }
 }
 
-// ==================== AUTH ====================
-let authMode = 'login';
+// 3. AUTH SYSTEM
+function showAuth() {
+    document.getElementById('loading-screen').classList.add('hidden');
+    document.getElementById('auth-screen').classList.remove('hidden');
+}
+
 function toggleAuth(mode) {
-    authMode = mode;
-    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-    document.getElementById('tab-signup').classList.toggle('active', mode === 'signup');
-    document.getElementById('signup-fields').classList.toggle('hidden', mode === 'login');
-}
-
-async function authSubmit() {
-    const phone = document.getElementById('auth-phone').value.trim();
-    const pass = document.getElementById('auth-pass').value.trim();
-
-    if (phone.length !== 11 || !pass) {
-        return Swal.fire('Error', 'Enter valid 11-digit phone & password', 'warning');
-    }
-
-    Swal.showLoading();
-
-    if (authMode === 'login') {
-        const { data } = await supabase.from('users').select('*').eq('id', phone).eq('password', pass).single();
-        Swal.close();
-        if (data) {
-            localStorage.setItem('user_id', phone);
-            await loadUser(phone);
-        } else {
-            Swal.fire('Failed', 'Wrong phone or password', 'error');
-        }
+    const loginTab = document.getElementById('tab-login');
+    const signupTab = document.getElementById('tab-signup');
+    const extra = document.getElementById('signup-fields');
+    
+    if(mode === 'login') {
+        loginTab.className = "flex-1 py-2 rounded-md text-sm font-bold bg-[#FFD700] text-black";
+        signupTab.className = "flex-1 py-2 rounded-md text-sm font-bold text-gray-400";
+        extra.classList.add('hidden');
+        document.getElementById('auth-btn').setAttribute('onclick', "handleLogin()");
     } else {
-        const name = document.getElementById('auth-name').value.trim();
-        const ref = document.getElementById('auth-ref').value.trim() || null;
-
-        if (!name) return Swal.fire('Error', 'Name required', 'warning');
-
-        const { data, error } = await supabase.rpc('register_user', {
-            p_phone: parseInt(phone),
-            p_name: name,
-            p_pass: pass,
-            p_referrer: ref ? parseInt(ref) : null,
-            p_device: getDeviceID()
-        });
-
-        Swal.close();
-        if (error || !data.success) {
-            Swal.fire('Error', data?.message || 'Try again', 'error');
-        } else {
-            localStorage.setItem('user_id', phone);
-            await loadUser(phone);
-            Swal.fire('Welcome!', 'Account created + 10 points bonus', 'success');
-        }
+        signupTab.className = "flex-1 py-2 rounded-md text-sm font-bold bg-[#FFD700] text-black";
+        loginTab.className = "flex-1 py-2 rounded-md text-sm font-bold text-gray-400";
+        extra.classList.remove('hidden');
+        document.getElementById('auth-btn').setAttribute('onclick', "handleRegister()");
     }
 }
 
-// ==================== LOAD USER ====================
-async function loadUser(id) {
-    const { data } = await supabase.from('users').select('*').eq('id', id).single();
-    if (!data) {
+async function handleLogin() {
+    const phone = document.getElementById('auth-phone').value;
+    const pass = document.getElementById('auth-pass').value;
+    
+    if(!phone || !pass) return Swal.fire('Error', 'Fill all fields', 'warning');
+    
+    Swal.showLoading();
+    const { data } = await supabase.from('users').select('*').eq('id', phone).eq('password', pass).single();
+    Swal.close();
+
+    if(data) {
+        localStorage.setItem('user_id', data.id);
+        await fetchUser(data.id);
+    } else {
+        Swal.fire('Error', 'Invalid credentials', 'error');
+    }
+}
+
+async function handleRegister() {
+    const phone = document.getElementById('auth-phone').value;
+    const pass = document.getElementById('auth-pass').value;
+    const name = document.getElementById('auth-name').value;
+    const ref = document.getElementById('auth-ref').value;
+    
+    if(!phone || !pass || !name) return Swal.fire('Error', 'Fill all fields', 'warning');
+    
+    Swal.showLoading();
+    const { data: res, error } = await supabase.rpc('handle_new_user', {
+        p_phone: parseInt(phone),
+        p_pass: pass,
+        p_name: name,
+        p_referrer: ref ? parseInt(ref) : null,
+        p_device_id: getDeviceFingerprint()
+    });
+    Swal.close();
+
+    if(res && res.success) {
+        localStorage.setItem('user_id', phone);
+        await fetchUser(phone);
+    } else {
+        Swal.fire('Failed', res?.message || error?.message, 'error');
+    }
+}
+
+async function fetchUser(uid) {
+    const { data } = await supabase.from('users').select('*').eq('id', uid).single();
+    if(data) {
+        currentUser = data;
+        updateUI();
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('app-header').classList.remove('hidden');
+        document.getElementById('app-nav').classList.remove('hidden');
+        router('home');
+    } else {
         localStorage.removeItem('user_id');
-        return location.reload();
+        location.reload();
     }
-    currentUser = data;
-    updateHeader();
-    showScreen('main-app');
-    router('home');
 }
 
-// ==================== 15 SEC TIMER (Perfect Working) ====================
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState !== 'visible') return;
+// 4. AD & TASK LOGIC (15 Second Fix)
+// ------------------------------------
 
-    const start = localStorage.getItem('task_start_time');
-    const taskId = localStorage.getItem('pending_task_id');
-    const reward = localStorage.getItem('pending_reward');
+// ব্যাক করলে চেক করবে
+document.addEventListener("visibilitychange", async () => {
+    if (document.visibilityState === "visible") {
+        const start = localStorage.getItem('task_start');
+        const tid = localStorage.getItem('task_id');
+        const rew = localStorage.getItem('task_rew');
 
-    if (start && taskId && reward) {
-        const time = Date.now() - parseInt(start);
-        if (time >= VIEW_TIME) {
-            claimTaskReward(taskId, reward);
-        } else {
-            Swal.fire('Failed', 'You must stay 15 seconds!', 'warning');
+        if(start && tid) {
+            const diff = Date.now() - parseInt(start);
+            
+            if(diff >= REQUIRED_TIME) {
+                await addPoints(tid, rew);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Task Failed',
+                    text: `You stayed only ${(diff/1000).toFixed(1)}s. Required 15s.`,
+                    confirmButtonColor: '#FFD700'
+                });
+            }
+            // Clear
+            localStorage.removeItem('task_start');
+            localStorage.removeItem('task_id');
+            localStorage.removeItem('task_rew');
         }
-        localStorage.removeItem('task_start_time');
-        localStorage.removeItem('pending_task_id');
-        localStorage.removeItem('pending_reward');
     }
 });
 
-// ==================== TASK HANDLER (All Types Working) ====================
-window.doTask = async (id, reward, type, link) => {
-    const url = link && link !== 'null' ? link : settings.direct_link;
+window.handleTask = (tid, rew, type, link) => {
+    // A. Direct Link / Website
+    if(type === 'direct_ad' || type === 'offer_wheel') {
+        const url = (link && link !== 'null') ? link : appSettings.monetag_direct_link;
+        if(!url) return Swal.fire('Error', 'No Link Found', 'error');
 
-    // Type 1: Offer Wheel / Direct Link
-    if (type === 'offer_wheel' || type === 'direct_ad') {
-        if (!url) return Swal.fire('Error', 'Link not set', 'error');
-
-        localStorage.setItem('task_start_time', Date.now());
-        localStorage.setItem('pending_task_id', id);
-        localStorage.setItem('pending_reward', reward);
+        localStorage.setItem('task_start', Date.now());
+        localStorage.setItem('task_id', tid);
+        localStorage.setItem('task_rew', rew);
 
         window.open(url, '_blank');
-
+        
         Swal.fire({
-            title: 'Stay 15 Seconds!',
-            text: 'Don\'t close or switch tab',
-            timer: 3000,
+            title: 'Wait 15 Seconds',
+            text: 'Do not close the page immediately.',
+            timer: 2000,
             showConfirmButton: false
         });
     }
-
-    // Type 2: Rewarded Video Ad
-    else if (type === 'rewarded_ads' || type === 'video') {
-        if (!adsReady.rewarded) {
-            return Swal.fire('Loading...', 'Ad is loading, wait 10 sec & try again', 'info');
-        }
-
-        const zone = settings.monetag_rewarded_id;
-
-        Swal.fire({ title: 'Loading Ad...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-        try {
-            window[`show_${zone}`]({
-                onReward: () => {
-                    Swal.close();
-                    claimTaskReward(id, reward);
-                },
-                onClose: () => {
-                    Swal.close();
-                    Swal.fire('Cancelled', 'Watch full ad to earn!', 'error');
-                },
-                onError: () => {
-                    Swal.close();
-                    Swal.fire('Error', 'Ad failed', 'error');
-                }
+    // B. Rewarded Video (15s enforced by ad network usually)
+    else if(type === 'video' || type === 'rewarded_ads') {
+        if(adFuncs.rewarded && window[adFuncs.rewarded]) {
+            Swal.showLoading();
+            window[adFuncs.rewarded]().then(() => {
+                Swal.close();
+                addPoints(tid, rew);
+            }).catch(e => {
+                Swal.close();
+                Swal.fire('Failed', 'You closed the ad early!', 'error');
             });
-        } catch (e) {
-            Swal.close();
-            Swal.fire('Error', 'Ad failed', 'error');
+        } else {
+            Swal.fire('Loading', 'Ad not ready yet. Try in 5s.', 'warning');
         }
     }
-
-    // Type 3: Simple Tasks (Telegram, etc)
+    // C. Others
     else {
-        if (url) window.open(url, '_blank');
-        setTimeout(() => claimTaskReward(id, reward), 4000);
+        if(link) window.open(link, '_blank');
+        setTimeout(() => addPoints(tid, rew), 5000);
     }
 };
 
-// ==================== CLAIM REWARD (Safe) ====================
-async function claimTaskReward(taskId, reward) {
-    Swal.fire({ title: 'Adding Points...', didOpen: () => Swal.showLoading() });
-
-    const { data, error } = await supabase.rpc('claim_task_reward', {
-        p_user_id: currentUser.id,
-        p_task_id: parseInt(taskId),
-        p_reward: parseFloat(reward)
+async function addPoints(tid, rew) {
+    Swal.fire({title: 'Adding Points...', didOpen: () => Swal.showLoading()});
+    
+    const { data: res, error } = await supabase.rpc('claim_task', {
+        p_user_id: parseInt(currentUser.id),
+        p_task_id: parseInt(tid),
+        p_reward: parseFloat(rew),
+        p_limit: parseInt(appSettings.daily_task_limit)
     });
 
     Swal.close();
 
-    if (error || !data?.success) {
-        return Swal.fire('Failed', data?.message || 'Limit reached', 'warning');
+    if(res && res.success) {
+        currentUser.balance += parseFloat(rew);
+        updateUI();
+        Swal.fire({icon: 'success', title: `+${rew} Points`, timer: 1500, showConfirmButton: false});
+        router('tasks');
+    } else {
+        Swal.fire('Failed', res?.message || error?.message, 'warning');
     }
-
-    currentUser.balance += parseFloat(reward);
-    updateHeader();
-    Swal.fire('Success', `+${reward} Points Added!`, 'success');
-    router('tasks');
 }
 
-// ==================== WITHDRAW ====================
-async function withdraw() {
+// 5. WITHDRAW LOGIC
+async function processWithdraw() {
+    const num = document.getElementById('w-num').value;
+    const amtVal = document.getElementById('w-amt').value;
     const method = document.getElementById('w-method').value;
-    const num = document.getElementById('w-num').value.trim();
-    const amt = parseFloat(document.getElementById('w-amt').value);
 
-    if (!num || amt < settings.min_withdraw) {
-        return Swal.fire('Error', `Minimum ৳${settings.min_withdraw}`, 'warning');
-    }
+    if(!num || !amtVal) return Swal.fire('Error', 'Fill all fields', 'warning');
 
-    const points = parseFloat((amt / settings.rate).toFixed(2));
-    if (currentUser.balance < points) {
-        return Swal.fire('Error', 'Low balance', 'error');
-    }
+    const amt = parseFloat(amtVal);
+    const pts = amt / appSettings.conversion_rate;
 
-    const btn = document.getElementById('withdraw-btn');
-    btn.disabled = true;
-    btn.innerText = 'Processing...';
+    if(amt < appSettings.min_withdraw_amount) return Swal.fire('Error', `Min withdraw ${appSettings.min_withdraw_amount} BDT`, 'error');
+    if(currentUser.balance < pts) return Swal.fire('Error', `Need ${pts} points`, 'error');
 
-    const { data, error } = await supabase.rpc('request_withdraw', {
-        p_user_id: currentUser.id,
+    document.getElementById('w-btn').innerText = "Processing...";
+    
+    const { data: res, error } = await supabase.rpc('process_withdrawal', {
+        p_user_id: parseInt(currentUser.id),
         p_method: method,
         p_number: num,
-        p_amount: amt,
-        p_points: points
+        p_amount_bdt: amt,
+        p_points_needed: pts
     });
 
-    btn.disabled = false;
-    btn.innerText = 'WITHDRAW';
+    document.getElementById('w-btn').innerText = "WITHDRAW";
 
-    if (error || !data.success) {
-        Swal.fire('Failed', data?.message || 'Error', 'error');
-    } else {
-        currentUser.balance -= points;
-        updateHeader();
-        Swal.fire('Success', 'Request sent!', 'success');
+    if(res && res.success) {
+        currentUser.balance -= pts;
+        updateUI();
+        Swal.fire('Success', 'Withdrawal Pending!', 'success');
         router('history');
+    } else {
+        Swal.fire('Failed', res?.message || error?.message, 'error');
     }
 }
 
-// ==================== UI & ROUTER ====================
-function updateHeader() {
-    document.getElementById('user-name').innerText = currentUser.first_name || 'User';
+// 6. UI & HELPERS
+function loadAdScript(zoneId, type) {
+    const s = document.createElement('script');
+    s.src = '//libtl.com/sdk.js';
+    const funcName = 'show_' + zoneId;
+    s.setAttribute('data-zone', zoneId);
+    s.setAttribute('data-sdk', funcName);
+    s.onload = () => adFuncs[type] = window[funcName];
+    document.head.appendChild(s);
+}
+
+function updateUI() {
+    if(!currentUser) return;
+    document.getElementById('user-name').innerText = currentUser.first_name;
     document.getElementById('user-balance').innerText = Math.floor(currentUser.balance);
     document.getElementById('user-photo').src = `https://ui-avatars.com/api/?name=${currentUser.first_name}&background=random`;
 }
 
-function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById('loading-screen').classList.add('hidden');
-    document.getElementById(id).classList.remove('hidden');
-}
-
 function router(page) {
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    document.getElementById('nav-' + page).classList.add('active');
-
-    const c = document.getElementById('page-content');
-    c.innerHTML = '<div class="loader"></div>';
-
-    if (page === 'home') renderHome(c);
-    if (page === 'tasks') renderTasks(c);
-    if (page === 'wallet') renderWallet(c);
-    if (page === 'history') renderHistory(c);
-    if (page === 'refer') renderRefer(c);
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'text-[#FFD700]'));
+    document.getElementById('btn-'+page).classList.add('active', 'text-[#FFD700]');
+    
+    const c = document.getElementById('main-app');
+    if(page === 'home') renderHome(c);
+    else if(page === 'tasks') renderTasks(c);
+    else if(page === 'wallet') renderWallet(c);
+    else if(page === 'history') renderHistory(c);
+    else if(page === 'refer') renderRefer(c);
 }
 
-// Render functions (shortened for space – same as before but clean)
-async function renderHome(c) { /* same as your old one */ } }
-async function renderTasks(c) { /* load tasks + lock system */ }
-function renderWallet(c) { /* same */ }
-async function renderHistory(c) { /* same */ }
-function renderRefer(c) { /* same */ }
+// -- Page Renders --
+function renderHome(c) {
+    c.innerHTML = `
+    <div class="glass-panel p-6 rounded-3xl text-center mt-2 border-t border-white/10">
+        <h1 class="text-6xl font-bold text-white mb-2">${Math.floor(currentUser.balance)}</h1>
+        <p class="text-xs text-[#FFD700] tracking-widest uppercase">Available Points</p>
+        <button onclick="router('tasks')" class="mt-6 w-full py-4 rounded-2xl gold-gradient text-black font-bold uppercase shadow-lg">Start Earning</button>
+    </div>
+    <div class="grid grid-cols-2 gap-4 mt-6">
+        <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-2xl font-bold">${currentUser.referral_count}</span>
+            <span class="text-[10px] text-gray-400 uppercase mt-1">Refers</span>
+        </div>
+        <div class="glass-panel p-5 rounded-2xl flex flex-col items-center justify-center">
+            <span class="text-2xl font-bold text-green-400">Active</span>
+            <span class="text-[10px] text-gray-400 uppercase mt-1">Status</span>
+        </div>
+    </div>`;
+}
 
-// ==================== START ====================
-init();
+async function renderTasks(c) {
+    c.innerHTML = `<div class="flex justify-center mt-20"><div class="loader"></div></div>`;
+    const { data: tasks } = await supabase.from('tasks').select('*').eq('is_active', true).order('id');
+    const { data: logs } = await supabase.from('task_logs').select('task_id').eq('user_id', currentUser.id).eq('created_at', new Date().toISOString().split('T')[0]);
+    
+    const counts = {};
+    if(logs) logs.forEach(l => counts[l.task_id] = (counts[l.task_id] || 0) + 1);
+    const limit = appSettings.daily_task_limit;
+
+    let html = `<div class="space-y-4 mt-2 pb-20">`;
+    tasks.forEach(t => {
+        const done = (counts[t.id] || 0);
+        const isFinished = done >= limit;
+        let icon = t.task_type === 'video' ? 'play-circle' : 'globe';
+        
+        html += `
+        <div class="glass-panel p-4 rounded-2xl flex justify-between items-center ${isFinished ? 'opacity-50 grayscale' : ''}">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-[#FFD700] text-xl"><i class="fas fa-${icon}"></i></div>
+                <div>
+                    <h4 class="font-bold text-white">${t.title}</h4>
+                    <span class="text-xs text-[#FFD700] font-bold">+${t.reward} • ${done}/${limit}</span>
+                </div>
+            </div>
+            <button onclick="handleTask(${t.id}, ${t.reward}, '${t.task_type}', '${t.link}')" 
+                ${isFinished ? 'disabled' : ''} 
+                class="px-6 py-2 rounded-xl text-xs font-bold gold-gradient text-black">
+                ${isFinished ? 'Done' : 'Visit'}
+            </button>
+        </div>`;
+    });
+    c.innerHTML = html + `</div>`;
+}
+
+function renderWallet(c) {
+    const bdt = (currentUser.balance * appSettings.conversion_rate).toFixed(2);
+    let opts = '';
+    appSettings.payment_methods.forEach(m => opts += `<option value="${m}">${m}</option>`);
+
+    c.innerHTML = `
+    <div class="glass-panel p-6 rounded-2xl text-center mt-4">
+        <h1 class="text-4xl font-bold text-white">\u09F3 ${bdt}</h1>
+        <p class="text-xs text-gray-400 mt-1">Min Withdraw: \u09F3 ${appSettings.min_withdraw_amount}</p>
+    </div>
+    <div class="space-y-4 mt-6">
+        <select id="w-method" class="custom-input">${opts}</select>
+        <input type="number" id="w-num" placeholder="Account Number" class="custom-input">
+        <input type="number" id="w-amt" placeholder="Amount" class="custom-input">
+        <button id="w-btn" onclick="processWithdraw()" class="w-full py-4 rounded-xl gold-gradient text-black font-bold">WITHDRAW</button>
+    </div>`;
+}
+
+function renderRefer(c) {
+    const link = `${location.origin}${location.pathname}?ref=${currentUser.id}`;
+    c.innerHTML = `
+    <div class="glass-panel p-6 rounded-2xl text-center mt-4 border border-[#FFD700]/30">
+        <h2 class="text-2xl font-bold text-white">Invite & Earn</h2>
+        <p class="text-xs text-gray-400 mt-2">Get ${appSettings.referral_bonus} points per refer!</p>
+    </div>
+    <div class="glass-panel p-3 rounded-xl mt-6 flex items-center gap-2 bg-black/30">
+        <input type="text" value="${link}" readonly class="bg-transparent text-xs w-full text-gray-300 outline-none" id="ref-link">
+        <button onclick="copyLink()" class="p-2 bg-[#FFD700] rounded text-black"><i class="fas fa-copy"></i></button>
+    </div>`;
+}
+
+function renderHistory(c) {
+    c.innerHTML = `<div class="text-center mt-10"><div class="loader"></div></div>`;
+    supabase.from('withdrawals').select('*').eq('user_id', currentUser.id).order('created_at', {ascending:false})
+    .then(({data}) => {
+        let html = `<div class="space-y-3 mt-4">`;
+        if(data.length === 0) html = `<div class="text-center text-gray-500 mt-20">No history</div>`;
+        else data.forEach(i => {
+            html += `<div class="glass-panel p-4 rounded-xl flex justify-between items-center">
+                <div><h4 class="font-bold text-white">\u09F3 ${i.amount_bdt}</h4><p class="text-[10px] text-gray-400">${i.method}</p></div>
+                <span class="text-[10px] font-bold px-2 py-1 rounded bg-white/10 ${i.status==='paid'?'text-green-400':'text-yellow-400'}">${i.status}</span>
+            </div>`;
+        });
+        c.innerHTML = html + `</div>`;
+    });
+}
+
+function copyLink() {
+    const copyText = document.getElementById("ref-link");
+    copyText.select();
+    document.execCommand("copy");
+    Swal.fire({icon: 'success', title: 'Copied', toast: true, position: 'top', showConfirmButton: false, timer: 1000});
+}
+
+initApp();
