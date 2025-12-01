@@ -4,11 +4,14 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Global Variables
+// Variables
 let currentUser = null;
 let appSettings = {};
 let adFuncs = { interstitial: null, rewarded: null, popup: null };
 let authMode = 'login';
+
+// 15 Seconds Timer Config
+const REQUIRED_VIEW_TIME = 15000; 
 
 // Device ID Generator (Anti-Cheat)
 function getDeviceFingerprint() {
@@ -26,7 +29,6 @@ function getDeviceFingerprint() {
 // 2. INITIALIZATION
 async function initApp() {
     try {
-        // Load Settings
         const { data: sData } = await supabase.from('settings').select('*').single();
         appSettings = sData || {};
 
@@ -35,7 +37,6 @@ async function initApp() {
         if (appSettings.monetag_rewarded_id) loadScript(appSettings.monetag_rewarded_id, (n) => adFuncs.rewarded = n);
         if (appSettings.monetag_popup_id) loadScript(appSettings.monetag_popup_id, (n) => adFuncs.popup = n);
 
-        // Check Login
         const storedUser = localStorage.getItem('user_id');
         if (storedUser) {
             await fetchUser(storedUser);
@@ -43,7 +44,6 @@ async function initApp() {
             showAuth();
         }
 
-        // Check Referral
         const urlParams = new URLSearchParams(window.location.search);
         const refCode = urlParams.get('ref');
         if (refCode) {
@@ -106,7 +106,6 @@ async function submitAuth() {
             const deviceId = getDeviceFingerprint(); 
             
             if (!name) { Swal.close(); return Swal.fire('Error', 'Enter Name', 'warning'); }
-
             const refID = (refInput && !isNaN(refInput)) ? parseInt(refInput) : null;
 
             const { data: res, error } = await supabase.rpc('handle_new_user', {
@@ -151,8 +150,11 @@ async function fetchUser(uid) {
     }
 }
 
-// 4. TASK LOGIC (POINT ADDING FIX)
-// আমরা লোকাল স্টোরেজ ব্যবহার করছি যাতে পেজ রিলোড হলেও টাস্ক হারিয়ে না যায়
+// ===============================================
+// 4. TASK LOGIC (15 SECONDS TIMER SYSTEM)
+// ===============================================
+
+// Visibility Listener (ব্যাক করলে পয়েন্ট চেক করবে)
 document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible") {
         const startTime = localStorage.getItem('task_start_time');
@@ -161,22 +163,21 @@ document.addEventListener("visibilitychange", async () => {
         
         if (startTime && pendingId) {
             const timeSpent = Date.now() - parseInt(startTime);
-            const requiredTime = 10000; // ১০ সেকেন্ড
-
-            if (timeSpent >= requiredTime) {
-                // ১০ সেকেন্ড পূর্ণ হয়েছে -> পয়েন্ট দাও
+            
+            // 15 সেকেন্ড চেক
+            if (timeSpent >= REQUIRED_VIEW_TIME) {
                 await claimReward(pendingId, pendingReward);
             } else {
-                // ১০ সেকেন্ড হয়নি
+                const remaining = Math.ceil((REQUIRED_VIEW_TIME - timeSpent) / 1000);
                 Swal.fire({
                     icon: 'warning',
-                    title: 'Too Fast!',
-                    text: `Wait 10 seconds. You returned in ${(timeSpent/1000).toFixed(1)}s`,
+                    title: 'Task Failed!',
+                    text: `You must stay for 15 seconds. You returned too early.`,
                     confirmButtonColor: '#FFD700'
                 });
             }
             
-            // টাস্ক ক্লিয়ার
+            // টাস্ক ডাটা ক্লিয়ার
             localStorage.removeItem('task_start_time');
             localStorage.removeItem('pending_task_id');
             localStorage.removeItem('pending_task_reward');
@@ -184,12 +185,14 @@ document.addEventListener("visibilitychange", async () => {
     }
 });
 
+// মেইন টাস্ক হ্যান্ডলার
 window.handleTask = async (tid, rew, type, link) => {
-    if (type === 'direct_ad') {
+    // A. Offer Wheel / Direct Link Task
+    if (type === 'offer_wheel' || type === 'direct_ad') {
         const url = (link && link !== 'null') ? link : appSettings.monetag_direct_link;
         if (!url) return Swal.fire('Error', 'Link Not Set', 'error');
 
-        // ডাটা সেভ (যাতে ব্যাক করলে পাওয়া যায়)
+        // স্টার্ট টাইম সেভ করা
         localStorage.setItem('task_start_time', Date.now());
         localStorage.setItem('pending_task_id', tid);
         localStorage.setItem('pending_task_reward', rew);
@@ -197,28 +200,53 @@ window.handleTask = async (tid, rew, type, link) => {
         window.open(url, '_blank');
         
         Swal.fire({
-            title: 'Checking Task...',
-            text: 'Stay on the page for 10 seconds to get reward.',
+            title: 'Task Started',
+            text: 'Stay on the page for 15 seconds to claim reward.',
             showConfirmButton: false,
-            allowOutsideClick: false
+            allowOutsideClick: false,
+            timer: 2000
         });
-
-    } else {
+    } 
+    // B. Rewarded Interstitial Ad Task
+    else if (type === 'rewarded_ads' || type === 'video') {
+        if (adFuncs.rewarded && window[adFuncs.rewarded]) {
+            Swal.fire({ title: 'Loading Ad...', showConfirmButton: false, didOpen: () => Swal.showLoading() });
+            
+            try {
+                // অ্যাড লোড এবং শো করা
+                window[adFuncs.rewarded]().then(() => {
+                    // অ্যাড সম্পূর্ণ দেখলে পয়েন্ট অ্যাড হবে
+                    Swal.close();
+                    claimReward(tid, rew);
+                }).catch((e) => {
+                    Swal.close();
+                    // যদি অ্যাড ক্লোজ করে দেয় বা ফেইল হয়
+                    Swal.fire('Failed', 'You must watch the full ad!', 'error');
+                });
+            } catch (err) {
+                Swal.close();
+                Swal.fire('Error', 'Ad failed to load. Try again later.', 'error');
+            }
+        } else {
+            Swal.fire('Not Ready', 'Ad is loading... wait a few seconds.', 'warning');
+        }
+    } 
+    // C. Other Tasks (Telegram etc)
+    else {
         if(link && link !== 'null') window.open(link, '_blank');
+        // ফলব্যাক টাইমার (অন্য টাস্কের জন্য)
         setTimeout(() => claimReward(tid, rew), 5000);
     }
 };
 
 async function claimReward(tid, rew) {
-    Swal.showLoading();
+    Swal.fire({ title: 'Adding Points...', showConfirmButton: false, didOpen: () => Swal.showLoading() });
     
     try {
-        // ১. ডাটা টাইপ কনভার্সন (সবচেয়ে জরুরি)
         const taskId = parseInt(tid);
         const rewardAmount = parseFloat(rew);
         const limit = parseInt(appSettings.daily_task_limit || 15);
 
-        // ২. ডাটাবেজে রিকোয়েস্ট পাঠানো
         const { data: res, error } = await supabase.rpc('claim_task', { 
             p_user_id: currentUser.id, 
             p_task_id: taskId, 
@@ -228,14 +256,11 @@ async function claimReward(tid, rew) {
         
         Swal.close();
         
-        // ৩. এরর হ্যান্ডলিং
         if (error) {
             console.error("Task Error:", error);
-            // ইউজারকে টেকনিক্যাল এরর না দেখিয়ে ওয়ার্নিং দেওয়া
-            return Swal.fire('Notice', 'Could not add points. Try again.', 'warning');
+            return Swal.fire('Notice', 'System issue. Try again.', 'warning');
         }
 
-        // ৪. সফল হলে
         if (res && res.success) {
             currentUser.balance += rewardAmount; 
             updateUI();
@@ -243,13 +268,13 @@ async function claimReward(tid, rew) {
             Swal.fire({ 
                 icon: 'success', 
                 title: 'Points Added!', 
-                text: `You earned +${rewardAmount} points!`,
+                text: `+${rewardAmount} Points`,
                 confirmButtonColor: '#FFD700',
                 timer: 2000,
                 showConfirmButton: false
             });
             
-            router('tasks'); // টাস্ক লিস্ট আপডেট
+            router('tasks');
         } else {
             Swal.fire('Limit Reached', res?.message, 'warning');
         }
@@ -302,7 +327,6 @@ async function processWithdraw() {
 
     if (!num || !amtVal) return Swal.fire('Error', 'Please fill all fields', 'warning');
     
-    // টাইপ কনভার্সন (SQL এর সাথে মিল রাখার জন্য)
     const amt = parseFloat(amtVal);
     const pts = parseFloat((amt / appSettings.conversion_rate).toFixed(2));
 
@@ -330,7 +354,6 @@ async function processWithdraw() {
         btn.innerText = "WITHDRAW REQUEST";
 
         if (error) {
-            console.error(error);
             return Swal.fire('System Error', 'Database error. Contact admin.', 'error');
         }
 
@@ -388,7 +411,7 @@ function router(page) {
     else if (page === 'refer') renderRefer(c);
 }
 
-// 7. PAGES UI
+// 7. UI PAGES
 function renderHome(c) {
     c.innerHTML = `
         <div class="glass-panel p-6 rounded-3xl text-center relative overflow-hidden mt-2 border-t border-white/10">
@@ -437,8 +460,9 @@ async function renderTasks(c) {
         const locked = isLocked || finished;
 
         let icon = 'star';
-        if(t.task_type === 'video') icon = 'play-circle';
-        if(t.task_type === 'direct_ad') icon = 'globe';
+        // আইকন সিলেকশন (অ্যাডমিন প্যানেলে task_type যা দিবেন সে অনুযায়ী)
+        if(t.task_type === 'video' || t.task_type === 'rewarded_ads') icon = 'play-circle';
+        if(t.task_type === 'offer_wheel' || t.task_type === 'direct_ad') icon = 'globe';
 
         html += `
             <div class="glass-panel p-4 rounded-2xl flex justify-between items-center ${locked?'opacity-50 grayscale':''}">
