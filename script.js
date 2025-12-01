@@ -1,10 +1,8 @@
 // 1. CONFIGURATION
 const SUPABASE_URL = 'https://wnmwvbeydsrehtsnkfoc.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndubXd2YmV5ZHNyZWh0c25rZm9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQzMDg4MzIsImV4cCI6MjA3OTg4NDgzMn0.4vSObxBEr8r11-dqkp9y6bVroMVoSTEnIOTF8Vo8sxk';
-
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Variables
 let currentUser = null;
 let appSettings = {};
 let adFuncs = { interstitial: null, rewarded: null, popup: null };
@@ -14,73 +12,32 @@ const REQUIRED_TIME = 15000;
 // Device ID
 function getDeviceFingerprint() { return 'DEV-' + navigator.userAgent.replace(/\D+/g, '').substring(0, 12); }
 
-// 2. INITIALIZATION (LOADING FIX)
+// 2. INIT
 async function initApp() {
     try {
-        // সেটিংস লোড করা
-        const { data: s, error } = await supabase.from('settings').select('*').single();
-        
-        if (error || !s) {
-            // যদি সেটিংস না পায়, ডিফল্ট ভ্যালু সেট করবে (যাতে অ্যাপ না আটকায়)
-            console.error("Settings Error:", error);
-            appSettings = {
-                conversion_rate: 1,
-                min_withdraw_amount: 20,
-                daily_task_limit: 15,
-                monetag_direct_link: 'https://google.com',
-                payment_methods: ["Bkash Personal"]
-            };
-        } else {
-            appSettings = s;
-        }
+        const { data: s } = await supabase.from('settings').select('*').single();
+        // আপনার ডিফল্ট অ্যাডস এখানে সেট করা হলো
+        appSettings = s || {
+            monetag_direct_link: 'https://otieu.com/4/10252788',
+            monetag_interstitial_id: '10197154'
+        };
 
-        // Ads Script Load
         if(appSettings.monetag_interstitial_id) loadAdScript(appSettings.monetag_interstitial_id, 'interstitial');
         if(appSettings.monetag_rewarded_id) loadAdScript(appSettings.monetag_rewarded_id, 'rewarded');
-
-        // ইউজার চেক
+        
         const uid = localStorage.getItem('user_id');
-        if (uid) {
-            await fetchUser(uid);
-        } else {
-            showAuth(); // সরাসরি লগইন পেজে পাঠাবে
-        }
+        if (uid) await fetchUser(uid);
+        else showAuth();
 
-        // রেফারেল লিংক চেক
         const params = new URLSearchParams(window.location.search);
         if (params.get('ref')) { toggleAuth('signup'); document.getElementById('auth-ref').value = params.get('ref'); }
-
     } catch (e) {
-        console.error("Init Error:", e);
-        // লোডিং সরিয়ে এরর দেখাবে
         document.getElementById('loading-screen').classList.add('hidden');
         document.getElementById('error-box').classList.remove('hidden');
-        document.getElementById('error-box').innerHTML = `<p class="text-red-500 mb-2">Error: ${e.message}</p><button onclick="location.reload()" class="bg-white/10 px-4 py-2 rounded">Retry</button>`;
     }
 }
 
-// 3. USER FETCH (LOOP FIX)
-async function fetchUser(uid) {
-    const { data, error } = await supabase.from('users').select('*').eq('id', uid).single();
-    
-    if (data) {
-        currentUser = data;
-        updateUI();
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('loading-screen').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        document.getElementById('app-header').classList.remove('hidden');
-        document.getElementById('app-nav').classList.remove('hidden');
-        router('home');
-    } else {
-        // যদি ইউজার ডাটাবেজে না থাকে (Delete হয়ে থাকে), তাহলে লোকাল ডাটা মুছে লগইন পেজে পাঠাবে
-        // রিলোড দিবে না
-        localStorage.removeItem('user_id');
-        showAuth();
-    }
-}
-
-// 4. AUTH SYSTEM
+// 3. AUTH
 function showAuth() {
     document.getElementById('loading-screen').classList.add('hidden');
     document.getElementById('auth-screen').classList.remove('hidden');
@@ -144,7 +101,23 @@ async function submitAuth() {
     }
 }
 
-// 5. TASK LOGIC
+async function fetchUser(uid) {
+    const { data } = await supabase.from('users').select('*').eq('id', uid).single();
+    if(data) {
+        currentUser = data;
+        updateUI();
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('app-header').classList.remove('hidden');
+        document.getElementById('app-nav').classList.remove('hidden');
+        router('home');
+    } else {
+        localStorage.removeItem('user_id');
+        location.reload();
+    }
+}
+
+// 4. TASK LOGIC
 document.addEventListener("visibilitychange", async () => {
     if (document.visibilityState === "visible") {
         const start = localStorage.getItem('t_start');
@@ -164,6 +137,7 @@ document.addEventListener("visibilitychange", async () => {
 });
 
 window.handleTask = (tid, rew, type, link) => {
+    // A. Direct Link
     if(type === 'direct_ad' || type === 'offer_wheel') {
         const url = (link && link !== 'null') ? link : appSettings.monetag_direct_link;
         
@@ -174,6 +148,7 @@ window.handleTask = (tid, rew, type, link) => {
         window.open(url, '_blank');
         Swal.fire({title: 'Wait 15s', text: 'Do not close tab', timer: 3000, showConfirmButton: false});
     }
+    // B. Video Ad
     else if(type === 'video') {
         if(adFuncs.rewarded) {
             adFuncs.rewarded().then(() => addPoints(tid, rew)).catch(() => Swal.fire('Failed', 'Watch full ad', 'error'));
@@ -205,7 +180,7 @@ async function addPoints(tid, rew) {
     }
 }
 
-// 6. WITHDRAW
+// 5. WITHDRAW
 async function processWithdraw() {
     const num = document.getElementById('w-num').value;
     const amtVal = document.getElementById('w-amt').value;
@@ -238,7 +213,7 @@ async function processWithdraw() {
     }
 }
 
-// 7. UI HELPERS
+// 6. UI
 function loadAdScript(zoneId, type) {
     const s = document.createElement('script');
     s.src = '//libtl.com/sdk.js'; s.dataset.zone = zoneId; s.dataset.sdk = 'show_' + zoneId;
@@ -265,15 +240,14 @@ function router(page) {
     else if(page === 'refer') renderRefer(c);
 }
 
-// 8. RENDERERS
+// RENDERERS
 function renderHome(c) {
     c.innerHTML = `
     <div class="glass-panel p-6 rounded-3xl text-center mt-4 border-t border-white/10">
         <h1 class="text-5xl font-bold text-white mb-2">${Math.floor(currentUser.balance)}</h1>
         <p class="text-xs text-[#FFD700] tracking-widest">POINTS</p>
         <button onclick="router('tasks')" class="mt-6 w-full py-3 rounded-xl gold-gradient text-black font-bold">START WORK</button>
-    </div>
-    ${appSettings.home_banner_url ? `<img src="${appSettings.home_banner_url}" class="w-full h-32 object-cover rounded-xl mt-4 border border-white/10">` : ''}`;
+    </div>`;
 }
 
 async function renderTasks(c) {
@@ -288,9 +262,14 @@ async function renderTasks(c) {
     tasks.forEach(t => {
         const done = counts[t.id] || 0;
         const disabled = done >= limit;
+        let icon = t.task_type === 'video' ? 'play-circle' : 'globe';
+        
         html += `
         <div class="glass-panel p-4 rounded-xl flex justify-between items-center ${disabled ? 'opacity-50' : ''}">
-            <div><h4 class="font-bold text-white">${t.title}</h4><span class="text-xs text-[#FFD700]">+${t.reward} • ${done}/${limit}</span></div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-[#FFD700]"><i class="fas fa-${icon}"></i></div>
+                <div><h4 class="font-bold text-white">${t.title}</h4><span class="text-xs text-[#FFD700]">+${t.reward} • ${done}/${limit}</span></div>
+            </div>
             <button onclick="handleTask(${t.id}, ${t.reward}, '${t.task_type}', '${t.link}')" ${disabled?'disabled':''} class="px-5 py-2 rounded-lg bg-[#FFD700] text-black font-bold text-xs">${disabled ? 'Done' : 'Start'}</button>
         </div>`;
     });
@@ -298,9 +277,7 @@ async function renderTasks(c) {
 }
 
 function renderWallet(c) {
-    let opts = ''; 
-    if(appSettings.payment_methods) appSettings.payment_methods.forEach(m => opts += `<option value="${m}">${m}</option>`);
-    
+    let opts = ''; appSettings.payment_methods.forEach(m => opts += `<option value="${m}">${m}</option>`);
     c.innerHTML = `
     <div class="glass-panel p-6 rounded-2xl text-center mt-4">
         <h1 class="text-4xl font-bold text-white">\u09F3 ${(currentUser.balance * appSettings.conversion_rate).toFixed(2)}</h1>
@@ -314,12 +291,28 @@ function renderWallet(c) {
     </div>`;
 }
 
+// REFER HISTORY FIXED
 async function renderRefer(c) {
     const link = `${location.origin}${location.pathname}?ref=${currentUser.id}`;
-    const { data: refers } = await supabase.from('users').select('first_name, created_at').eq('referred_by', currentUser.id);
     
-    let hist = '';
-    if(refers) refers.forEach(u => hist += `<div class="flex justify-between p-2 bg-white/5 rounded mb-1"><span class="text-xs">${u.first_name}</span><span class="text-[10px] text-gray-400">${new Date(u.created_at).toLocaleDateString()}</span></div>`);
+    // Fetch Refer List
+    const { data: refers } = await supabase.from('users').select('first_name, created_at, id').eq('referred_by', currentUser.id).order('created_at', {ascending: false});
+
+    let historyHtml = '';
+    if(refers && refers.length > 0) {
+        refers.forEach(u => {
+            historyHtml += `
+            <div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/5 mb-2">
+                <div>
+                    <p class="text-sm font-bold text-white">${u.first_name}</p>
+                    <p class="text-[10px] text-gray-500">${u.id}</p>
+                </div>
+                <p class="text-[10px] text-gray-400">${new Date(u.created_at).toLocaleDateString()}</p>
+            </div>`;
+        });
+    } else {
+        historyHtml = `<div class="text-center text-gray-500 text-xs py-4">No referrals yet</div>`;
+    }
 
     c.innerHTML = `
     <div class="glass-panel p-6 rounded-2xl text-center mt-4 border border-[#FFD700]/30">
@@ -330,7 +323,13 @@ async function renderRefer(c) {
         <input type="text" value="${link}" readonly class="bg-transparent text-xs w-full text-white" id="ref-link">
         <button onclick="navigator.clipboard.writeText('${link}'); Swal.fire('Copied', '', 'success')" class="p-2 bg-[#FFD700] rounded text-black"><i class="fas fa-copy"></i></button>
     </div>
-    <div class="mt-4"><h3 class="text-sm font-bold mb-2">My Referrals (${refers?refers.length:0})</h3>${hist}</div>`;
+    
+    <div class="mt-6">
+        <h3 class="text-sm font-bold text-gray-400 mb-3 uppercase tracking-wider">Referral History (${refers ? refers.length : 0})</h3>
+        <div class="overflow-y-auto max-h-60 space-y-2">
+            ${historyHtml}
+        </div>
+    </div>`;
 }
 
 function renderHistory(c) {
@@ -338,7 +337,7 @@ function renderHistory(c) {
     supabase.from('withdrawals').select('*').eq('user_id', currentUser.id).order('created_at', {ascending:false})
     .then(({data}) => {
         let html = `<div class="space-y-3 mt-4">`;
-        if(!data || data.length === 0) html = `<div class="text-center text-gray-500 mt-20">Empty</div>`;
+        if(data.length === 0) html = `<div class="text-center text-gray-500 mt-20">Empty</div>`;
         else data.forEach(i => {
             html += `<div class="glass-panel p-4 rounded-xl flex justify-between items-center">
                 <div><h4 class="font-bold text-white">\u09F3 ${i.amount_bdt}</h4><p class="text-[10px] text-gray-400">${i.method}</p></div>
