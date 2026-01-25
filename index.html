@@ -3,210 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monetag Pro Ultra</title>
-    <!-- Telegram Web App SDK -->
+    <title>Monetag Pro Booster</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --primary-color: #0088cc;
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #38bdf8;
+            --primary: #0088cc;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #38bdf8;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: white;
+            font-family: sans-serif;
             margin: 0;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            overflow: hidden;
+            text-align: center;
         }
 
         .container {
             width: 90%;
-            max-width: 400px;
-            background: var(--card-bg);
-            padding: 25px;
+            background: var(--card);
+            padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        h1 {
-            font-size: 22px;
-            margin-bottom: 5px;
-            color: var(--accent-color);
-        }
-
-        .status-badge {
-            background: rgba(56, 189, 248, 0.2);
-            color: var(--accent-color);
-            padding: 5px 15px;
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
             border-radius: 50px;
-            font-size: 12px;
+            cursor: pointer;
             font-weight: bold;
-            display: inline-block;
-            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
+            margin-top: 20px;
         }
 
-        /* Progress Circle */
-        .timer-container {
-            position: relative;
-            width: 150px;
-            height: 150px;
+        .btn:active { transform: scale(0.95); }
+
+        #timer-box { display: none; }
+
+        .loader {
+            width: 100px;
+            height: 100px;
+            border: 5px solid #334155;
+            border-top: 5px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
             margin: 20px auto;
         }
 
-        .circle-svg {
-            transform: rotate(-90deg);
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .circle-bg {
-            fill: none;
-            stroke: #334155;
-            stroke-width: 8;
-        }
-
-        .circle-progress {
-            fill: none;
-            stroke: var(--accent-color);
-            stroke-width: 8;
-            stroke-linecap: round;
-            stroke-dasharray: 440;
-            stroke-dashoffset: 440;
-            transition: stroke-dashoffset 1s linear;
-        }
-
-        .timer-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 32px;
-            font-weight: bold;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-card {
-            background: rgba(15, 23, 42, 0.5);
-            padding: 15px;
-            border-radius: 12px;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #94a3b8;
-            text-transform: uppercase;
-        }
-
-        .footer-note {
-            margin-top: 20px;
-            font-size: 10px;
-            color: #64748b;
-        }
-
-        /* Ads Overlay Loading */
-        #ads-container {
-            display: none;
-        }
+        #status { color: var(--accent); font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Monetag Pro Booster</h1>
-        <div class="status-badge" id="status">ADS SYSTEM ACTIVE</div>
-
-        <div class="timer-container">
-            <svg class="circle-svg" width="150" height="150">
-                <circle class="circle-bg" cx="75" cy="75" r="70"></circle>
-                <circle class="circle-progress" id="progress" cx="75" cy="75" r="70"></circle>
-            </svg>
-            <div class="timer-text" id="seconds">18</div>
+        <h1>Monetag Ads System</h1>
+        
+        <!-- শুরুতে এই বাটনটি দেখাবে -->
+        <div id="start-screen">
+            <p>Click the button below to start loading ads</p>
+            <button class="btn" onclick="startAds()">START ADS</button>
         </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-value" id="count">0</span>
-                <span class="stat-label">Total Impressions</span>
-            </div>
+        <!-- স্টার্ট করার পর টাইমার দেখাবে -->
+        <div id="timer-box">
+            <div id="status">INITIALIZING ADS...</div>
+            <div class="loader"></div>
+            <h2 id="timer">18</h2>
+            <p>Next Refresh</p>
+            <p>Total Impressions: <span id="count">0</span></p>
         </div>
-
-        <p class="footer-note">Educational Purpose Only • Auto Refresh v2.1</p>
     </div>
 
-    <!-- Monetag Script -->
-    <div id="ads-container">
-        <script src='//libtl.com/sdk.js' data-zone='10517819' data-sdk='show_10517819'></script>
-    </div>
+    <!-- Monetag Script - Make sure the Zone ID is correct -->
+    <script src='//libtl.com/sdk.js' data-zone='10517819' data-sdk='show_10517819'></script>
 
     <script>
-        // Initialize Telegram WebApp
         const tele = window.Telegram.WebApp;
-        tele.expand(); // Full screen mode
+        tele.expand();
 
-        let timeLeft = 18;
-        const totalTime = 18;
-        const timerText = document.getElementById('seconds');
-        const progressCircle = document.getElementById('progress');
-        const countDisplay = document.getElementById('count');
-        const fullDash = 440;
+        let count = localStorage.getItem('imp_count') || 0;
+        document.getElementById('count').innerText = count;
 
-        // Load and Update Impression Count
-        let impressions = localStorage.getItem('imp_count') || 0;
-        countDisplay.innerText = impressions;
+        function startAds() {
+            // স্ক্রিন চেঞ্জ করা
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('timer-box').style.display = 'block';
+            
+            // ভাইব্রেশন (Telegram Premium feel)
+            if (tele.HapticFeedback) tele.HapticFeedback.impactOccurred('medium');
 
-        function updateTimer() {
-            const offset = fullDash - (timeLeft / totalTime) * fullDash;
-            progressCircle.style.strokeDashoffset = offset;
-            timerText.innerText = timeLeft;
+            let timeLeft = 18;
+            const timerDisplay = document.getElementById('timer');
 
-            if (timeLeft <= 0) {
-                // Haptic feedback for premium feel
-                if (tele.HapticFeedback) {
-                    tele.HapticFeedback.notificationOccurred('success');
+            const countdown = setInterval(() => {
+                timeLeft--;
+                timerDisplay.innerText = timeLeft;
+
+                if (timeLeft <= 5) {
+                    document.getElementById('status').innerText = "PREPARING NEXT AD...";
                 }
-                
-                // Increment Count
-                impressions++;
-                localStorage.setItem('imp_count', impressions);
-                
-                // Refresh Page to trigger new ad
-                location.reload();
-            }
-            timeLeft--;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    count++;
+                    localStorage.setItem('imp_count', count);
+                    location.reload(); // পেজ রিফ্রেশ দিলে অ্যাড লোড হবে
+                }
+            }, 1000);
         }
 
-        // Start Countdown
-        setInterval(updateTimer, 1000);
-
-        // Monetag error handling - attempt to force show
+        // অটো-স্টার্ট চেক (যদি আগে একবার স্টার্ট করা হয়ে থাকে)
         window.onload = () => {
-            console.log("Ads loading triggered...");
-            // Simulate count update after 2 seconds to assume ad loaded
-            setTimeout(() => {
-                document.getElementById('status').innerText = "AD LOADED / REFRESHING";
-                document.getElementById('status').style.color = "#4ade80";
-            }, 2000);
+            console.log("App Ready");
         };
     </script>
 </body>
