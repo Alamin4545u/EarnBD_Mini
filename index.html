@@ -3,50 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monetag High-CPM Pro</title>
+    <title>Monetag Auto-Loop Pro</title>
     
     <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --gold: #ffd700; --bg: #0a0e17; --blue: #0088cc; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 90%; max-width: 400px; background: #161b22; border-radius: 30px; padding: 40px 20px; text-align: center; border: 2px solid #30363d; box-shadow: 0 0 30px rgba(0,0,0,0.8); }
-        .premium-label { background: linear-gradient(90deg, #ffd700, #ff8c00); color: black; padding: 5px 15px; border-radius: 50px; font-size: 12px; font-weight: bold; margin-bottom: 20px; display: inline-block; }
-        #timer { font-size: 64px; font-weight: 900; color: var(--gold); margin: 20px 0; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
-        .status { color: #8b949e; font-size: 14px; margin-bottom: 25px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-card { background: #0d1117; padding: 15px; border-radius: 15px; border: 1px solid #30363d; }
-        .stat-val { font-size: 20px; font-weight: bold; color: var(--blue); display: block; }
-        .stat-label { font-size: 10px; color: #8b949e; text-transform: uppercase; }
-        .btn-start { background: var(--blue); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 18px; box-shadow: 0 5px 15px rgba(0,136,204,0.4); }
+        :root { --gold: #ffd700; --bg: #0d1117; --blue: #58a6ff; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .container { width: 85%; max-width: 380px; background: #161b22; border-radius: 25px; padding: 35px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
+        .status-bar { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 12px; color: #8b949e; }
+        .dot { width: 8px; height: 8px; background: #238636; border-radius: 50%; animation: blink 1s infinite; }
+        @keyframes blink { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+        #timer { font-size: 72px; font-weight: 800; color: var(--gold); margin: 15px 0; }
+        .count-box { background: #0d1117; padding: 15px; border-radius: 15px; border: 1px solid #30363d; margin-top: 20px; }
+        #msg { color: var(--blue); font-size: 14px; min-height: 20px; }
+        .btn-main { background: #238636; color: white; border: none; padding: 15px 35px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container" id="app">
-        <div class="premium-label">REWARDED AD MODE ACTIVE</div>
-        <h1>High Income Bot</h1>
+    <div class="container">
+        <div class="status-bar"><span class="dot"></span> AUTO-LOOP SYSTEM ACTIVE</div>
         
-        <div id="start-screen">
-            <p class="status">Click start to trigger High CPM Rewarded Ads</p>
-            <button class="btn-start" onclick="startEngine()">START EARNING</button>
+        <div id="setup-screen">
+            <h2 style="color: var(--gold);">High CPM Bot</h2>
+            <p style="font-size: 14px; color: #8b949e;">Ads will loop every 18 seconds.</p>
+            <button class="btn-main" onclick="initLoop()">START ENGINE</button>
         </div>
 
-        <div id="work-screen" style="display: none;">
+        <div id="loop-screen" style="display: none;">
             <div id="timer">18</div>
-            <p class="status" id="msg">Waiting for next high-value ad...</p>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <span class="stat-val" id="imp-count">0</span>
-                    <span class="stat-label">Impressions</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-val">High</span>
-                    <span class="stat-label">CPM Rate</span>
-                </div>
+            <div id="msg">Initializing Ads...</div>
+            <div class="count-box">
+                <div style="font-size: 11px; color: #8b949e;">TOTAL IMPRESSIONS</div>
+                <div id="imp-count" style="font-size: 28px; font-weight: bold; color: #238636;">0</div>
             </div>
         </div>
     </div>
@@ -55,88 +47,77 @@
         const tele = window.Telegram.WebApp;
         tele.expand();
 
-        let count = localStorage.getItem('total_imp') || 0;
+        let count = localStorage.getItem('loop_count') || 0;
         document.getElementById('imp-count').innerText = count;
 
-        function startEngine() {
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('work-screen').style.display = 'block';
-            localStorage.setItem('bot_running', 'true');
-            runTimer();
+        function initLoop() {
+            localStorage.setItem('is_running', 'true');
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('loop-screen').style.display = 'block';
+            startTimer();
         }
 
-        function runTimer() {
+        function startTimer() {
             let timeLeft = 18;
             const timerEl = document.getElementById('timer');
             const msgEl = document.getElementById('msg');
 
-            const cd = setInterval(() => {
+            const loop = setInterval(() => {
                 timeLeft--;
                 timerEl.innerText = timeLeft;
 
                 if (timeLeft === 5) {
-                    msgEl.innerText = "🚨 Preparing Rewarded Ad...";
-                    msgEl.style.color = "#ffd700";
+                    msgEl.innerText = "🚀 Requesting High CPM Ad...";
+                    // In-App Interstitial কল (এটি সেশন রিসেট মোডে দেওয়া হয়েছে)
+                    show_10197154({
+                        type: 'inApp',
+                        inAppSettings: {
+                            frequency: 1, 
+                            capping: 0.0001, 
+                            interval: 0, 
+                            timeout: 0, 
+                            everyPage: true // এটি প্রতিবার রিফ্রেশে নতুন অ্যাড দিবে
+                        }
+                    });
                 }
 
                 if (timeLeft <= 0) {
-                    clearInterval(cd);
-                    triggerHighValueAd();
+                    clearInterval(loop);
+                    msgEl.innerText = "💰 Showing Rewarded Ad...";
+                    
+                    // Rewarded Interstitial কল
+                    if (typeof show_10197154 === 'function') {
+                        show_10197154().then(() => {
+                            completeStep();
+                        }).catch(() => {
+                            completeStep(); // অ্যাড না আসলেও রিফ্রেশ হবে যাতে লুপ না থামে
+                        });
+                    } else {
+                        completeStep();
+                    }
+
+                    // সেফটি রিলোড: যদি অ্যাড ওপেন হয়ে আটকে থাকে, তবে ৫ সেকেন্ড পর অটো রিফ্রেশ হবে
+                    setTimeout(completeStep, 5000);
                 }
             }, 1000);
         }
 
-        async function triggerHighValueAd() {
-            console.log("Triggering Rewarded Ad...");
+        function completeStep() {
+            // ইম্প্রেশন সেভ করা
+            let currentCount = parseInt(localStorage.getItem('loop_count') || 0);
+            localStorage.setItem('loop_count', currentCount + 1);
             
-            // ১. Rewarded Interstitial ট্রিগার (সবচেয়ে বেশি টাকা)
-            try {
-                if (typeof show_10197154 === 'function') {
-                    // Rewarded Call
-                    show_10197154().then(() => {
-                        processCompletion();
-                    }).catch(e => {
-                        // যদি Rewarded কাজ না করে তবে ইন-অ্যাপ ট্রাই করবে
-                        triggerInApp();
-                    });
-                } else {
-                    location.reload();
-                }
-            } catch (err) {
-                location.reload();
-            }
-        }
-
-        function triggerInApp() {
-            // ২. In-App Interstitial ট্রিগার (ব্যাকআপ হিসেবে)
-            show_10197154({
-                type: 'inApp',
-                inAppSettings: {
-                    frequency: 1, // প্রতিবার দেখাবে
-                    capping: 0.0001, // কোনো ক্যাপ বা বাধা নেই
-                    interval: 0,
-                    timeout: 0,
-                    everyPage: true // প্রতি রিফ্রেশে সেশন রিসেট হবে
-                }
-            });
-            setTimeout(processCompletion, 3000);
-        }
-
-        function processCompletion() {
-            count++;
-            localStorage.setItem('total_imp', count);
+            // ভাইব্রেশন
             if (tele.HapticFeedback) tele.HapticFeedback.notificationOccurred('success');
             
-            // সেশন রিসেট করতে পেজ রিফ্রেশ (Monetag-এর জন্য জরুরি)
-            setTimeout(() => {
-                location.reload();
-            }, 1000);
+            // হার্ড রিফ্রেশ (এটিই লুপ বজায় রাখবে)
+            location.reload();
         }
 
-        // অটো-রিস্টার্ট লজিক
+        // অটো-রিস্টার্ট চেক (পেজ রিফ্রেশ হওয়ার পর অটোমেটিক শুরু হবে)
         window.onload = () => {
-            if (localStorage.getItem('bot_running') === 'true') {
-                startEngine();
+            if (localStorage.getItem('is_running') === 'true') {
+                initLoop();
             }
         };
     </script>
