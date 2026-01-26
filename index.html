@@ -3,111 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monetag Reward Pro</title>
+    <title>Monetag Ultra-Pro V3</title>
     
-    <!-- Monetag SDK -->
+    <!-- Monetag SDK - High Priority Loading -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --accent: #ffd700; --bg: #0d1117; --green: #238636; --blue: #58a6ff; }
-        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 85%; max-width: 350px; background: #161b22; border-radius: 20px; padding: 40px 20px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
-        .badge { background: linear-gradient(90deg, #ffd700, #ff8c00); color: black; padding: 5px 15px; border-radius: 50px; font-size: 11px; font-weight: bold; margin-bottom: 20px; display: inline-block; }
-        #timer { font-size: 80px; font-weight: 800; color: var(--accent); margin: 10px 0; }
-        .status { color: var(--blue); font-size: 14px; margin-bottom: 25px; height: 20px; font-weight: 500; }
-        .stats-box { background: #0d1117; padding: 20px; border-radius: 15px; border: 1px solid #30363d; }
-        .imp-val { font-size: 36px; font-weight: bold; color: var(--green); display: block; }
-        .imp-label { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-start { background: var(--green); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 18px; box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4); }
+        :root {
+            --primary: #00f2ff;
+            --secondary: #7000ff;
+            --bg: #05070a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background: var(--bg);
+            background-image: radial-gradient(circle at top right, #1a1033, transparent),
+                              radial-gradient(circle at bottom left, #0a1a2e, transparent);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 88%;
+            max-width: 400px;
+            padding: 40px 25px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border-radius: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .app-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 16px;
+            background: rgba(0, 242, 255, 0.1);
+            border-radius: 50px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .status-pill .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        #timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 85px;
+            font-weight: 700;
+            margin: 20px 0;
+            color: white;
+            text-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .btn-start {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            border: none;
+            border-radius: 18px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3);
+            transition: 0.3s;
+        }
+
+        .btn-start:active { transform: scale(0.96); }
+
+        #log-msg {
+            font-size: 13px;
+            color: #666;
+            margin-top: 15px;
+            height: 20px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div id="setup-screen">
-            <div class="badge">PREMIUM REWARD MODE</div>
-            <h1 style="margin-bottom: 10px;">Max Earning</h1>
-            <p style="color: #8b949e; font-size: 14px; margin-bottom: 30px;">This bot triggers High-CPM Rewarded Interstitial ads automatically.</p>
-            <button class="btn-start" onclick="startRewardEngine()">START EARNING</button>
+        <div class="app-name">MONETAG ULTRA</div>
+        <div class="status-pill"><span class="dot"></span> TUNNEL ACTIVE</div>
+        
+        <div id="setup-view">
+            <p style="color: #aaa; margin-bottom: 30px;">Premium High-Value Rewarded Engine</p>
+            <button class="btn-start" onclick="igniteEngine()">IGNITE ENGINE</button>
         </div>
 
-        <div id="work-screen" style="display: none;">
-            <div id="timer">3</div>
-            <div class="status" id="status-msg">Preparing high-value ad...</div>
-            <div class="stats-box">
-                <span class="imp-val" id="count-display">0</span>
-                <span class="imp-label">Total Reward Impressions</span>
+        <div id="loop-view" style="display: none;">
+            <div id="timer">03</div>
+            <div id="log-msg">Synchronizing Ad-Server...</div>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-value" id="imp-total">0</span>
+                    <span class="stat-label">Verified Impressions</span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         const tele = window.Telegram.WebApp;
-        tele.expand(); // টেলিগ্রামে ফুল স্ক্রিন করবে
+        tele.expand();
+        tele.headerColor = "#05070a";
 
-        let impCount = localStorage.getItem('reward_imp_count') || 0;
-        document.getElementById('count-display').innerText = impCount;
+        let totalImp = localStorage.getItem('v3_imp_count') || 0;
+        document.getElementById('imp-total').innerText = totalImp;
 
-        function startRewardEngine() {
-            // ইঞ্জিন রানিং স্টেট সেভ করা
-            localStorage.setItem('engine_running', 'true');
-            document.getElementById('setup-screen').style.display = 'none';
-            document.getElementById('work-screen').style.display = 'block';
+        function igniteEngine() {
+            localStorage.setItem('v3_active', 'true');
+            document.getElementById('setup-view').style.display = 'none';
+            document.getElementById('loop-view').style.display = 'block';
             
-            let timeLeft = 3;
-            const timerEl = document.getElementById('timer');
-            const statusEl = document.getElementById('status-msg');
+            startCountdown();
+        }
 
-            const countdown = setInterval(() => {
+        function startCountdown() {
+            let timeLeft = 3;
+            const timerDisplay = document.getElementById('timer');
+            const logMsg = document.getElementById('log-msg');
+
+            const counter = setInterval(() => {
                 timeLeft--;
-                timerEl.innerText = timeLeft;
+                timerDisplay.innerText = timeLeft < 10 ? "0" + timeLeft : timeLeft;
+
+                if (timeLeft <= 1) {
+                    logMsg.innerText = "🚀 Requesting Reward Ad...";
+                    logMsg.style.color = "#00f2ff";
+                }
 
                 if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    statusEl.innerText = "🚀 Requesting Rewarded Ad...";
-                    statusEl.style.color = "#ffd700";
-                    callRewardAd();
+                    clearInterval(counter);
+                    executeAdSequence();
                 }
             }, 1000);
         }
 
-        function callRewardAd() {
-            // ১. শুধুমাত্র Rewarded Interstitial কল করা
+        async function executeAdSequence() {
+            // Force load the Rewarded format
             if (typeof show_10197154 === 'function') {
-                show_10197154().then(() => {
-                    // যদি ইউজার অ্যাড দেখা শেষ করে ক্লোজ করে
-                    saveAndNext();
-                }).catch((e) => {
-                    console.log("Ad error or blocked");
-                    setTimeout(saveAndNext, 3000); // এরর হলে ৩ সেকেন্ড পর রিলোড
-                });
+                try {
+                    show_10197154().then(() => {
+                        handleCompletion();
+                    }).catch(err => {
+                        console.error("Ad block or network error");
+                        setTimeout(handleCompletion, 3000);
+                    });
+                } catch (e) {
+                    setTimeout(handleCompletion, 3000);
+                }
             }
 
-            // ২. Force Reload Logic (অ্যাড ক্লোজ না করলেও ১৫ সেকেন্ড পর রিফ্রেশ হবে)
-            // এটি আপনার "অ্যাড ক্লোজ হয় না" সমস্যার সমাধান। 
-            // ১৫ সেকেন্ড রাখা হয়েছে যাতে Monetag ইম্প্রেশনটি কাউন্ট করার সময় পায়।
+            // Force Kill/Refresh - ১৫ সেকেন্ডের ডেডলাইন (Rewarded Ad এর জন্য আদর্শ)
+            // এটি নিশ্চিত করবে যে অ্যাড স্ক্রিনে আটকে থাকবে না এবং লুপ চলবে।
             setTimeout(() => {
-                saveAndNext();
+                handleCompletion();
             }, 15000); 
         }
 
-        function saveAndNext() {
-            // ইম্প্রেশন সংখ্যা বাড়ানো
-            let current = parseInt(localStorage.getItem('reward_imp_count') || 0);
-            localStorage.setItem('reward_imp_count', current + 1);
+        function handleCompletion() {
+            // Increment Count
+            let count = parseInt(localStorage.getItem('v3_imp_count') || 0);
+            localStorage.setItem('v3_imp_count', count + 1);
             
-            // টেলিগ্রাম ভাইব্রেশন
-            if (tele.HapticFeedback) tele.HapticFeedback.notificationOccurred('success');
-            
-            // পেজ রিফ্রেশ (এটি লুপ বজায় রাখবে এবং স্ক্রিন ক্লিন করবে)
+            // Premium Haptic Feedback
+            if (tele.HapticFeedback) {
+                tele.HapticFeedback.notificationOccurred('success');
+            }
+
+            // Hard Reload to clear DOM and start fresh session
             location.reload();
         }
 
-        // অটো-স্টার্ট লজিক (পেজ রিফ্রেশ হওয়ার পর অটোমেটিক শুরু হবে)
+        // Auto-Resume on reload
         window.onload = () => {
-            if (localStorage.getItem('engine_running') === 'true') {
-                startRewardEngine();
+            if (localStorage.getItem('v3_active') === 'true') {
+                igniteEngine();
             }
         };
     </script>
