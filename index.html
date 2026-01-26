@@ -3,57 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monetag Force Loop</title>
+    <title>Monetag Reward Pro</title>
     
     <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --accent: #ffd700; --bg: #0d1117; --green: #238636; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 85%; max-width: 350px; background: #161b22; border-radius: 20px; padding: 30px; text-align: center; border: 1px solid #30363d; }
-        #timer { font-size: 80px; font-weight: bold; color: var(--accent); }
-        .stats { margin-top: 20px; padding: 15px; background: #0d1117; border-radius: 12px; border: 1px solid #30363d; }
-        .imp-val { font-size: 32px; font-weight: bold; color: var(--green); }
-        .btn-start { background: var(--green); color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 18px; }
-        #status { color: #58a6ff; font-size: 14px; margin-top: 10px; }
+        :root { --accent: #ffd700; --bg: #0d1117; --green: #238636; --blue: #58a6ff; }
+        body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .container { width: 85%; max-width: 350px; background: #161b22; border-radius: 20px; padding: 40px 20px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 50px rgba(0,0,0,0.8); }
+        .badge { background: linear-gradient(90deg, #ffd700, #ff8c00); color: black; padding: 5px 15px; border-radius: 50px; font-size: 11px; font-weight: bold; margin-bottom: 20px; display: inline-block; }
+        #timer { font-size: 80px; font-weight: 800; color: var(--accent); margin: 10px 0; }
+        .status { color: var(--blue); font-size: 14px; margin-bottom: 25px; height: 20px; font-weight: 500; }
+        .stats-box { background: #0d1117; padding: 20px; border-radius: 15px; border: 1px solid #30363d; }
+        .imp-val { font-size: 36px; font-weight: bold; color: var(--green); display: block; }
+        .imp-label { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-start { background: var(--green); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 18px; box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4); }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div id="setup-screen">
-            <h1 style="color: var(--accent);">Force Auto Loop</h1>
-            <p style="color: #8b949e;">Ads will auto-refresh every 12 seconds.</p>
-            <button class="btn-start" onclick="startEngine()">START SYSTEM</button>
+            <div class="badge">PREMIUM REWARD MODE</div>
+            <h1 style="margin-bottom: 10px;">Max Earning</h1>
+            <p style="color: #8b949e; font-size: 14px; margin-bottom: 30px;">This bot triggers High-CPM Rewarded Interstitial ads automatically.</p>
+            <button class="btn-start" onclick="startRewardEngine()">START EARNING</button>
         </div>
 
         <div id="work-screen" style="display: none;">
             <div id="timer">3</div>
-            <div id="status">Ready to load...</div>
-            <div class="stats">
-                <div style="font-size: 10px; color: #8b949e;">IMPRESSIONS SAVED</div>
-                <div id="imp-count" class="imp-val">0</div>
+            <div class="status" id="status-msg">Preparing high-value ad...</div>
+            <div class="stats-box">
+                <span class="imp-val" id="count-display">0</span>
+                <span class="imp-label">Total Reward Impressions</span>
             </div>
         </div>
     </div>
 
     <script>
         const tele = window.Telegram.WebApp;
-        tele.expand();
+        tele.expand(); // টেলিগ্রামে ফুল স্ক্রিন করবে
 
-        let count = localStorage.getItem('force_loop_count') || 0;
-        document.getElementById('imp-count').innerText = count;
+        let impCount = localStorage.getItem('reward_imp_count') || 0;
+        document.getElementById('count-display').innerText = impCount;
 
-        function startEngine() {
-            localStorage.setItem('engine_active', 'true');
+        function startRewardEngine() {
+            // ইঞ্জিন রানিং স্টেট সেভ করা
+            localStorage.setItem('engine_running', 'true');
             document.getElementById('setup-screen').style.display = 'none';
             document.getElementById('work-screen').style.display = 'block';
             
-            let timeLeft = 3; 
+            let timeLeft = 3;
             const timerEl = document.getElementById('timer');
-            const statusEl = document.getElementById('status');
+            const statusEl = document.getElementById('status-msg');
 
             const countdown = setInterval(() => {
                 timeLeft--;
@@ -61,46 +65,49 @@
 
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
-                    statusEl.innerText = "🚀 Triggering Ad...";
-                    triggerAd();
+                    statusEl.innerText = "🚀 Requesting Rewarded Ad...";
+                    statusEl.style.color = "#ffd700";
+                    callRewardAd();
                 }
             }, 1000);
         }
 
-        function triggerAd() {
-            // ১. অ্যাড কল করা
+        function callRewardAd() {
+            // ১. শুধুমাত্র Rewarded Interstitial কল করা
             if (typeof show_10197154 === 'function') {
                 show_10197154().then(() => {
-                    // যদি ইউজার নিজে ক্লোজ করে তবে সাথে সাথে রিফ্রেশ
-                    forceReload();
-                }).catch(() => {
-                    // এরর হলে ৩ সেকেন্ড পর ট্রাই
-                    setTimeout(forceReload, 3000);
+                    // যদি ইউজার অ্যাড দেখা শেষ করে ক্লোজ করে
+                    saveAndNext();
+                }).catch((e) => {
+                    console.log("Ad error or blocked");
+                    setTimeout(saveAndNext, 3000); // এরর হলে ৩ সেকেন্ড পর রিলোড
                 });
             }
 
-            // ২. অতি গুরুত্বপূর্ণ: Force Reload (অ্যাড ক্লোজ না হলেও ১০ সেকেন্ড পর রিফ্রেশ হবেই)
-            // এটিই আপনার সমস্যার সমাধান করবে।
+            // ২. Force Reload Logic (অ্যাড ক্লোজ না করলেও ১৫ সেকেন্ড পর রিফ্রেশ হবে)
+            // এটি আপনার "অ্যাড ক্লোজ হয় না" সমস্যার সমাধান। 
+            // ১৫ সেকেন্ড রাখা হয়েছে যাতে Monetag ইম্প্রেশনটি কাউন্ট করার সময় পায়।
             setTimeout(() => {
-                console.log("Force reloading to clear ad...");
-                forceReload();
-            }, 10000); // ১০ সেকেন্ড সময় দেওয়া হয়েছে যাতে ইম্প্রেশন কাউন্ট হয়
+                saveAndNext();
+            }, 15000); 
         }
 
-        function forceReload() {
-            let current = parseInt(localStorage.getItem('force_loop_count') || 0);
-            localStorage.setItem('force_loop_count', current + 1);
+        function saveAndNext() {
+            // ইম্প্রেশন সংখ্যা বাড়ানো
+            let current = parseInt(localStorage.getItem('reward_imp_count') || 0);
+            localStorage.setItem('reward_imp_count', current + 1);
             
+            // টেলিগ্রাম ভাইব্রেশন
             if (tele.HapticFeedback) tele.HapticFeedback.notificationOccurred('success');
             
-            // রিফ্রেশ দিয়ে সব ক্লিন করে নতুন সেশন শুরু করা
+            // পেজ রিফ্রেশ (এটি লুপ বজায় রাখবে এবং স্ক্রিন ক্লিন করবে)
             location.reload();
         }
 
-        // অটো স্টার্ট
+        // অটো-স্টার্ট লজিক (পেজ রিফ্রেশ হওয়ার পর অটোমেটিক শুরু হবে)
         window.onload = () => {
-            if (localStorage.getItem('engine_active') === 'true') {
-                startEngine();
+            if (localStorage.getItem('engine_running') === 'true') {
+                startRewardEngine();
             }
         };
     </script>
