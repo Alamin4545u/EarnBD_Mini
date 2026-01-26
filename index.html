@@ -3,42 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monetag Auto-Loop Pro</title>
+    <title>Monetag Ultra-Fast Bot</title>
     
     <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --gold: #ffd700; --bg: #0d1117; --blue: #58a6ff; }
+        :root { --accent: #ffd700; --bg: #0d1117; --green: #238636; }
         body { background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
-        .container { width: 85%; max-width: 380px; background: #161b22; border-radius: 25px; padding: 35px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 40px rgba(0,0,0,0.6); }
-        .status-bar { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 20px; font-size: 12px; color: #8b949e; }
+        .container { width: 85%; max-width: 380px; background: #161b22; border-radius: 20px; padding: 30px; text-align: center; border: 1px solid #30363d; box-shadow: 0 10px 40px rgba(0,0,0,0.7); }
+        .status-header { font-size: 11px; color: #8b949e; letter-spacing: 1px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .dot { width: 8px; height: 8px; background: #238636; border-radius: 50%; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
-        #timer { font-size: 72px; font-weight: 800; color: var(--gold); margin: 15px 0; }
-        .count-box { background: #0d1117; padding: 15px; border-radius: 15px; border: 1px solid #30363d; margin-top: 20px; }
-        #msg { color: var(--blue); font-size: 14px; min-height: 20px; }
-        .btn-main { background: #238636; color: white; border: none; padding: 15px 35px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        #timer { font-size: 80px; font-weight: 800; color: var(--accent); margin: 10px 0; line-height: 1; }
+        #msg { color: #58a6ff; font-size: 14px; margin-bottom: 20px; font-weight: 500; height: 20px; }
+        .stats { background: #0d1117; padding: 15px; border-radius: 12px; border: 1px solid #30363d; }
+        .imp-val { font-size: 32px; font-weight: bold; color: var(--green); }
+        .btn-start { background: var(--green); color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 18px; margin-top: 10px; width: 100%; transition: 0.2s; }
+        .btn-start:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="status-bar"><span class="dot"></span> AUTO-LOOP SYSTEM ACTIVE</div>
+        <div class="status-header"><span class="dot"></span> AUTO-LOOP SYSTEM ACTIVE</div>
         
         <div id="setup-screen">
-            <h2 style="color: var(--gold);">High CPM Bot</h2>
-            <p style="font-size: 14px; color: #8b949e;">Ads will loop every 18 seconds.</p>
-            <button class="btn-main" onclick="initLoop()">START ENGINE</button>
+            <h1 style="color: var(--accent); margin-bottom: 5px;">Fast Earning</h1>
+            <p style="font-size: 13px; color: #8b949e; margin-bottom: 25px;">3s Timer • Max CPM • Auto Loop</p>
+            <button class="btn-start" onclick="startEngine()">START ENGINE</button>
         </div>
 
-        <div id="loop-screen" style="display: none;">
-            <div id="timer">18</div>
-            <div id="msg">Initializing Ads...</div>
-            <div class="count-box">
-                <div style="font-size: 11px; color: #8b949e;">TOTAL IMPRESSIONS</div>
-                <div id="imp-count" style="font-size: 28px; font-weight: bold; color: #238636;">0</div>
+        <div id="work-screen" style="display: none;">
+            <div id="timer">3</div>
+            <div id="msg">Initializing...</div>
+            <div class="stats">
+                <div style="font-size: 10px; color: #8b949e; text-transform: uppercase;">Total Impressions</div>
+                <div id="imp-count" class="imp-val">0</div>
             </div>
         </div>
     </div>
@@ -47,77 +49,74 @@
         const tele = window.Telegram.WebApp;
         tele.expand();
 
-        let count = localStorage.getItem('loop_count') || 0;
+        let count = localStorage.getItem('ultra_fast_count') || 0;
         document.getElementById('imp-count').innerText = count;
 
-        function initLoop() {
-            localStorage.setItem('is_running', 'true');
+        function startEngine() {
+            localStorage.setItem('bot_active', 'true');
             document.getElementById('setup-screen').style.display = 'none';
-            document.getElementById('loop-screen').style.display = 'block';
-            startTimer();
-        }
-
-        function startTimer() {
-            let timeLeft = 18;
+            document.getElementById('work-screen').style.display = 'block';
+            
+            let timeLeft = 3; // আপনার রিকোয়েস্ট অনুযায়ী ৩ সেকেন্ড
             const timerEl = document.getElementById('timer');
             const msgEl = document.getElementById('msg');
 
-            const loop = setInterval(() => {
+            const countdown = setInterval(() => {
                 timeLeft--;
                 timerEl.innerText = timeLeft;
 
-                if (timeLeft === 5) {
+                if (timeLeft <= 1) {
                     msgEl.innerText = "🚀 Requesting High CPM Ad...";
-                    // In-App Interstitial কল (এটি সেশন রিসেট মোডে দেওয়া হয়েছে)
-                    show_10197154({
-                        type: 'inApp',
-                        inAppSettings: {
-                            frequency: 1, 
-                            capping: 0.0001, 
-                            interval: 0, 
-                            timeout: 0, 
-                            everyPage: true // এটি প্রতিবার রিফ্রেশে নতুন অ্যাড দিবে
-                        }
-                    });
+                    msgEl.style.color = "#ffd700";
                 }
 
                 if (timeLeft <= 0) {
-                    clearInterval(loop);
-                    msgEl.innerText = "💰 Showing Rewarded Ad...";
-                    
-                    // Rewarded Interstitial কল
-                    if (typeof show_10197154 === 'function') {
-                        show_10197154().then(() => {
-                            completeStep();
-                        }).catch(() => {
-                            completeStep(); // অ্যাড না আসলেও রিফ্রেশ হবে যাতে লুপ না থামে
-                        });
-                    } else {
-                        completeStep();
-                    }
-
-                    // সেফটি রিলোড: যদি অ্যাড ওপেন হয়ে আটকে থাকে, তবে ৫ সেকেন্ড পর অটো রিফ্রেশ হবে
-                    setTimeout(completeStep, 5000);
+                    clearInterval(countdown);
+                    triggerAd();
                 }
             }, 1000);
         }
 
-        function completeStep() {
-            // ইম্প্রেশন সেভ করা
-            let currentCount = parseInt(localStorage.getItem('loop_count') || 0);
-            localStorage.setItem('loop_count', currentCount + 1);
+        function triggerAd() {
+            // ১. In-App Interstitial Trigger (High Frequency Settings)
+            show_10197154({
+                type: 'inApp',
+                inAppSettings: {
+                    frequency: 1,
+                    capping: 0.0001,
+                    interval: 0,
+                    timeout: 0,
+                    everyPage: true // এটি প্রতিবার রিফ্রেশে নতুন অ্যাড লোড করবে
+                }
+            });
+
+            // ২. Rewarded Call (সবচেয়ে বেশি ইনকামের জন্য)
+            if (typeof show_10197154 === 'function') {
+                show_10197154().then(() => {
+                    saveAndReload();
+                }).catch(() => {
+                    // অ্যাড লোড না হলেও ৫ সেকেন্ড পর রিফ্রেশ হয়ে যাবে যাতে লুপ না থামে
+                    setTimeout(saveAndReload, 5000); 
+                });
+            } else {
+                setTimeout(saveAndReload, 5000);
+            }
+        }
+
+        function saveAndReload() {
+            let current = parseInt(localStorage.getItem('ultra_fast_count') || 0);
+            localStorage.setItem('ultra_fast_count', current + 1);
             
-            // ভাইব্রেশন
             if (tele.HapticFeedback) tele.HapticFeedback.notificationOccurred('success');
             
-            // হার্ড রিফ্রেশ (এটিই লুপ বজায় রাখবে)
+            // লুপ বজায় রাখতে হার্ড রিফ্রেশ
             location.reload();
         }
 
-        // অটো-রিস্টার্ট চেক (পেজ রিফ্রেশ হওয়ার পর অটোমেটিক শুরু হবে)
+        // অটো-রিস্টার্ট চেক (রিফ্রেশ হওয়ার পর অটোমেটিক চলবে)
         window.onload = () => {
-            if (localStorage.getItem('is_running') === 'true') {
-                initLoop();
+            if (localStorage.getItem('bot_active') === 'true') {
+                startEngine();
             }
         };
     </script>
