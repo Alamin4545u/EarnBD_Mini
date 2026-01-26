@@ -3,91 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monetag Pro Booster</title>
+    <title>Premium Ad Impression</title>
+
+    <!-- Monetag Script (Placed at the very top for priority loading) -->
+    <script src='//libtl.com/sdk.js' data-zone='10517819' data-sdk='show_10517819'></script>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --primary: #0088cc;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --accent: #38bdf8;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: white;
-            font-family: sans-serif;
-            margin: 0;
-            display: flex;
-            align-items: center;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #050a12; 
+            color: #ffffff; 
+            font-family: 'Inter', sans-serif; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
             justify-content: center;
-            height: 100vh;
+            overflow: hidden;
+        }
+
+        .card {
+            width: 85%;
+            max-width: 380px;
+            background: #0f172a;
+            border-radius: 30px;
+            padding: 40px 20px;
             text-align: center;
+            border: 1px solid #1e293b;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            z-index: 10;
         }
 
-        .container {
-            width: 90%;
-            background: var(--card);
-            padding: 30px;
+        .premium-tag {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            padding: 4px 12px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: inline-block;
         }
 
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
-            margin-top: 20px;
+        #timer {
+            font-size: 60px;
+            font-weight: 800;
+            color: #3b82f6;
+            text-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            margin: 20px 0;
         }
 
-        .btn:active { transform: scale(0.95); }
+        .info { color: #64748b; font-size: 14px; margin-top: 10px; }
 
-        #timer-box { display: none; }
-
-        .loader {
-            width: 100px;
-            height: 100px;
-            border: 5px solid #334155;
-            border-top: 5px solid var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        /* এটি একটি অদৃশ্য লেয়ার যা অ্যাড ট্রিগার করতে সাহায্য করবে */
+        #ad-trigger {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            background: transparent;
         }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .counter-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+        }
 
-        #status { color: var(--accent); font-weight: bold; margin-bottom: 10px; }
+        .pulse {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Monetag Ads System</h1>
-        
-        <!-- শুরুতে এই বাটনটি দেখাবে -->
-        <div id="start-screen">
-            <p>Click the button below to start loading ads</p>
-            <button class="btn" onclick="startAds()">START ADS</button>
-        </div>
+    <!-- Invisible Layer to Force Ad Trigger -->
+    <div id="ad-trigger" onclick="startSystem()"></div>
 
-        <!-- স্টার্ট করার পর টাইমার দেখাবে -->
-        <div id="timer-box">
-            <div id="status">INITIALIZING ADS...</div>
-            <div class="loader"></div>
-            <h2 id="timer">18</h2>
-            <p>Next Refresh</p>
-            <p>Total Impressions: <span id="count">0</span></p>
+    <div class="card pulse" id="ui-card">
+        <span class="premium-tag">System Premium Active</span>
+        <h2 style="font-size: 20px;">Auto Ad Impression</h2>
+        
+        <div id="timer">18</div>
+        
+        <p class="info" id="status-text">TAP ANYWHERE TO START</p>
+
+        <div class="counter-box">
+            <div style="font-size: 12px; color: #94a3b8;">TOTAL IMPRESSIONS</div>
+            <div id="count" style="font-size: 24px; font-weight: bold; color: #10b981;">0</div>
         </div>
     </div>
-
-    <!-- Monetag Script - Make sure the Zone ID is correct -->
-    <script src='//libtl.com/sdk.js' data-zone='10517819' data-sdk='show_10517819'></script>
 
     <script>
         const tele = window.Telegram.WebApp;
@@ -96,38 +111,58 @@
         let count = localStorage.getItem('imp_count') || 0;
         document.getElementById('count').innerText = count;
 
-        function startAds() {
-            // স্ক্রিন চেঞ্জ করা
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('timer-box').style.display = 'block';
-            
-            // ভাইব্রেশন (Telegram Premium feel)
-            if (tele.HapticFeedback) tele.HapticFeedback.impactOccurred('medium');
+        let isRunning = false;
+
+        function startSystem() {
+            if (isRunning) return;
+            isRunning = true;
+
+            // ট্যাপ করার পর অদৃশ্য লেয়ারটি সরিয়ে দেয়া যাতে অ্যাড ক্লিকের বাধা না হয়
+            document.getElementById('ad-trigger').style.display = 'none';
+            document.getElementById('status-text').innerText = "AD LOADING...";
+            document.getElementById('status-text').style.color = "#10b981";
+
+            // Haptic feedback
+            if (tele.HapticFeedback) tele.HapticFeedback.impactOccurred('heavy');
+
+            // Force run Monetag script if available
+            try {
+                if (typeof show_10517819 === 'function') {
+                    show_10517819();
+                }
+            } catch (e) { console.error("Script error"); }
 
             let timeLeft = 18;
-            const timerDisplay = document.getElementById('timer');
+            const timerEl = document.getElementById('timer');
 
             const countdown = setInterval(() => {
                 timeLeft--;
-                timerDisplay.innerText = timeLeft;
-
-                if (timeLeft <= 5) {
-                    document.getElementById('status').innerText = "PREPARING NEXT AD...";
-                }
+                timerEl.innerText = timeLeft;
 
                 if (timeLeft <= 0) {
                     clearInterval(countdown);
                     count++;
                     localStorage.setItem('imp_count', count);
-                    location.reload(); // পেজ রিফ্রেশ দিলে অ্যাড লোড হবে
+                    
+                    // অটো রিফ্রেশ করার আগে ১ সেকেন্ড সময় দেয়া যাতে ইম্প্রেশন রেজিস্টার হয়
+                    setTimeout(() => {
+                        location.reload();
+                    }, 500);
                 }
             }, 1000);
         }
 
-        // অটো-স্টার্ট চেক (যদি আগে একবার স্টার্ট করা হয়ে থাকে)
+        // অটো স্টার্ট ট্রিক (যদি আগে একবার ক্লিক করা হয়ে থাকে)
         window.onload = () => {
-            console.log("App Ready");
+            if (localStorage.getItem('running') === 'true') {
+                startSystem();
+            }
         };
+
+        // প্রথমবার ক্লিক করলে রানিং স্টেট সেভ হবে
+        document.getElementById('ad-trigger').addEventListener('click', () => {
+            localStorage.setItem('running', 'true');
+        });
     </script>
 </body>
 </html>
