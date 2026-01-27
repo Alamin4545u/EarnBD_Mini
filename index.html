@@ -3,28 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monetag Ultra-Pro V3</title>
-    
-    <!-- Monetag SDK - High Priority Loading -->
+    <title>Reward Pro Max - Ultra Fast</title>
+
+    <!-- Monetag SDK - Priority Load -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
-    
+
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;600&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
-            --primary: #00f2ff;
-            --secondary: #7000ff;
-            --bg: #05070a;
-            --glass: rgba(255, 255, 255, 0.05);
+            --neon: #00ffcc;
+            --bg: #05080a;
+            --card: rgba(255, 255, 255, 0.03);
         }
 
         body {
-            background: var(--bg);
-            background-image: radial-gradient(circle at top right, #1a1033, transparent),
-                              radial-gradient(circle at bottom left, #0a1a2e, transparent);
-            color: white;
-            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: #ffffff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             display: flex;
             align-items: center;
@@ -33,138 +30,110 @@
             overflow: hidden;
         }
 
-        .container {
-            width: 88%;
-            max-width: 400px;
-            padding: 40px 25px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            border-radius: 35px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .app-container {
+            width: 90%;
+            max-width: 360px;
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px 20px;
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(0, 255, 204, 0.1);
         }
 
-        .app-name {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 22px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+        .header-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--neon);
+            text-transform: uppercase;
+            margin-bottom: 5px;
         }
 
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 16px;
-            background: rgba(0, 242, 255, 0.1);
-            border-radius: 50px;
+        .status-badge {
             font-size: 10px;
-            letter-spacing: 1.5px;
-            color: var(--primary);
-            border: 1px solid rgba(0, 242, 255, 0.3);
-            margin-bottom: 30px;
-        }
-
-        .status-pill .dot {
-            width: 6px;
-            height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 10px var(--primary);
-            animation: pulse 1.5s infinite;
+            background: rgba(0, 255, 204, 0.1);
+            padding: 5px 15px;
+            border-radius: 50px;
+            color: var(--neon);
+            border: 1px solid var(--neon);
+            display: inline-block;
+            margin-bottom: 25px;
         }
 
         #timer {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 85px;
-            font-weight: 700;
-            margin: 20px 0;
-            color: white;
-            text-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
+            font-size: 90px;
+            font-weight: 900;
+            margin: 10px 0;
+            background: linear-gradient(180deg, #fff, var(--neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
+        .stats-box {
             margin-top: 30px;
-        }
-
-        .stat-item {
-            background: rgba(255, 255, 255, 0.03);
             padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .stat-value {
-            font-size: 30px;
-            font-weight: 700;
-            color: var(--primary);
+        .count-val {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffffff;
             display: block;
         }
 
-        .stat-label {
+        .count-label {
             font-size: 11px;
-            color: #888;
+            color: #666;
             text-transform: uppercase;
-            margin-top: 5px;
         }
 
-        .btn-start {
+        .btn-ignite {
             width: 100%;
             padding: 18px;
-            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            background: var(--neon);
+            color: #000;
             border: none;
-            border-radius: 18px;
-            color: white;
-            font-weight: bold;
+            border-radius: 15px;
             font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3);
+            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.2);
             transition: 0.3s;
         }
 
-        .btn-start:active { transform: scale(0.96); }
+        .btn-ignite:active { transform: scale(0.95); }
 
-        #log-msg {
+        .loader-text {
             font-size: 13px;
-            color: #666;
+            color: #888;
             margin-top: 15px;
             height: 20px;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="app-name">MONETAG ULTRA</div>
-        <div class="status-pill"><span class="dot"></span> TUNNEL ACTIVE</div>
-        
-        <div id="setup-view">
-            <p style="color: #aaa; margin-bottom: 30px;">Premium High-Value Rewarded Engine</p>
-            <button class="btn-start" onclick="igniteEngine()">IGNITE ENGINE</button>
+    <div class="app-container">
+        <div class="header-title">Reward Engine</div>
+        <div class="status-badge" id="status-pill">SYSTEM READY</div>
+
+        <div id="start-screen">
+            <p style="color: #666; margin-bottom: 30px;">Premium High-CPM Reward Only Mode</p>
+            <button class="btn-ignite" onclick="startEngine()">IGNITE ENGINE</button>
         </div>
 
-        <div id="loop-view" style="display: none;">
+        <div id="active-screen" style="display: none;">
             <div id="timer">03</div>
-            <div id="log-msg">Synchronizing Ad-Server...</div>
+            <div class="loader-text" id="msg">Awaiting Ad-Server...</div>
             
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-value" id="imp-total">0</span>
-                    <span class="stat-label">Verified Impressions</span>
-                </div>
+            <div class="stats-box">
+                <span class="count-val" id="total-imp">0</span>
+                <span class="count-label">Verified Reward Impressions</span>
             </div>
         </div>
     </div>
@@ -172,80 +141,81 @@
     <script>
         const tele = window.Telegram.WebApp;
         tele.expand();
-        tele.headerColor = "#05070a";
+        tele.headerColor = "#05080a";
 
-        let totalImp = localStorage.getItem('v3_imp_count') || 0;
-        document.getElementById('imp-total').innerText = totalImp;
+        let totalCount = localStorage.getItem('premium_reward_count') || 0;
+        document.getElementById('total-imp').innerText = totalCount;
 
-        function igniteEngine() {
-            localStorage.setItem('v3_active', 'true');
-            document.getElementById('setup-view').style.display = 'none';
-            document.getElementById('loop-view').style.display = 'block';
+        function startEngine() {
+            localStorage.setItem('engine_running', 'true');
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('active-screen').style.display = 'block';
+            document.getElementById('status-pill').innerText = "LIVE TUNNEL ACTIVE";
             
-            startCountdown();
+            runTimer();
         }
 
-        function startCountdown() {
-            let timeLeft = 3;
-            const timerDisplay = document.getElementById('timer');
-            const logMsg = document.getElementById('log-msg');
+        function runTimer() {
+            let timeLeft = 3; // Ultra-fast 3-second timer
+            const timerEl = document.getElementById('timer');
+            const msgEl = document.getElementById('msg');
 
-            const counter = setInterval(() => {
+            const countdown = setInterval(() => {
                 timeLeft--;
-                timerDisplay.innerText = timeLeft < 10 ? "0" + timeLeft : timeLeft;
+                timerEl.innerText = timeLeft < 10 ? "0" + timeLeft : timeLeft;
 
                 if (timeLeft <= 1) {
-                    logMsg.innerText = "🚀 Requesting Reward Ad...";
-                    logMsg.style.color = "#00f2ff";
+                    msgEl.innerText = "⚡ Requesting Reward Ad...";
+                    msgEl.style.color = "#00ffcc";
                 }
 
                 if (timeLeft <= 0) {
-                    clearInterval(counter);
-                    executeAdSequence();
+                    clearInterval(countdown);
+                    showPremiumAd();
                 }
             }, 1000);
         }
 
-        async function executeAdSequence() {
-            // Force load the Rewarded format
+        async function showPremiumAd() {
+            // ১. শুধুমাত্র Reward Interstitial কল করা
             if (typeof show_10197154 === 'function') {
                 try {
                     show_10197154().then(() => {
-                        handleCompletion();
-                    }).catch(err => {
-                        console.error("Ad block or network error");
-                        setTimeout(handleCompletion, 3000);
+                        processNext();
+                    }).catch(e => {
+                        console.error("Ad Failed");
+                        setTimeout(processNext, 2000);
                     });
-                } catch (e) {
-                    setTimeout(handleCompletion, 3000);
+                } catch (err) {
+                    setTimeout(processNext, 2000);
                 }
             }
 
-            // Force Kill/Refresh - ১৫ সেকেন্ডের ডেডলাইন (Rewarded Ad এর জন্য আদর্শ)
-            // এটি নিশ্চিত করবে যে অ্যাড স্ক্রিনে আটকে থাকবে না এবং লুপ চলবে।
+            // ২. Force-Clear লজিক (১৫ সেকেন্ড ডেডলাইন)
+            // রিওয়ার্ড অ্যাডের ফুল ইম্প্রেশন পেতে ১৫ সেকেন্ড থাকা জরুরি
             setTimeout(() => {
-                handleCompletion();
+                processNext();
             }, 15000); 
         }
 
-        function handleCompletion() {
+        function processNext() {
             // Increment Count
-            let count = parseInt(localStorage.getItem('v3_imp_count') || 0);
-            localStorage.setItem('v3_imp_count', count + 1);
+            let current = parseInt(localStorage.getItem('premium_reward_count') || 0);
+            localStorage.setItem('premium_reward_count', current + 1);
             
-            // Premium Haptic Feedback
+            // Haptic feedback (Premium feel)
             if (tele.HapticFeedback) {
                 tele.HapticFeedback.notificationOccurred('success');
             }
 
-            // Hard Reload to clear DOM and start fresh session
+            // Force hard-reload to refresh session and bypass capping
             location.reload();
         }
 
-        // Auto-Resume on reload
+        // Auto-restart logic
         window.onload = () => {
-            if (localStorage.getItem('v3_active') === 'true') {
-                igniteEngine();
+            if (localStorage.getItem('engine_running') === 'true') {
+                startEngine();
             }
         };
     </script>
