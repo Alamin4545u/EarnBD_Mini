@@ -7,33 +7,31 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Dynamic Ad Tag will be loaded here -->
-    <div id="ad_script_container"></div>
+    <div id="ad_tag_container"></div>
 </head>
-<body class="bg-black text-white">
+<body class="bg-slate-950 text-white min-h-screen">
 
-    <div class="p-5 flex justify-between items-center bg-gray-900">
-        <div id="u_name" class="font-bold">Loading...</div>
-        <div id="proxy_badge" class="px-2 py-1 rounded text-xs bg-red-600">Checking Proxy...</div>
+    <div class="p-5 flex justify-between items-center bg-slate-900 border-b border-slate-800">
+        <div id="u_name" class="font-bold text-sm">Loading...</div>
+        <div id="proxy_badge" class="px-3 py-1 rounded-full text-[10px] bg-red-600">IP Check...</div>
     </div>
 
-    <div class="p-10 text-center space-y-6">
+    <div class="p-8 space-y-6">
         <div class="grid grid-cols-2 gap-4">
-            <div class="bg-gray-800 p-5 rounded-xl">
-                <div class="text-xs text-gray-400">Impressions</div>
-                <div id="impr_txt" class="text-3xl font-bold">0</div>
+            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 text-center">
+                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Impressions</div>
+                <div id="impr_txt" class="text-3xl font-black text-blue-500">0</div>
             </div>
-            <div class="bg-gray-800 p-5 rounded-xl">
-                <div class="text-xs text-gray-400">Limit</div>
-                <div id="limit_txt" class="text-3xl font-bold">0/0</div>
+            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 text-center">
+                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Target</div>
+                <div id="limit_txt" class="text-3xl font-black text-yellow-500">0</div>
             </div>
         </div>
 
-        <button onclick="showAd()" id="ad_btn" disabled class="w-full bg-blue-600 disabled:bg-gray-700 py-4 rounded-2xl font-bold text-xl">
+        <button onclick="handleAdClick()" id="ad_btn" disabled class="w-full bg-blue-600 disabled:bg-slate-800 py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-95 transition-all">
             Watch Ad ⚡
         </button>
-        <p id="msg" class="text-sm text-yellow-500"></p>
+        <p id="msg" class="text-center text-xs text-yellow-500 font-medium"></p>
     </div>
 
     <script>
@@ -42,87 +40,85 @@
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
         const tg = window.Telegram.WebApp;
 
-        let user = tg.initDataUnsafe.user || {id: '12345', first_name: 'Guest'};
+        let user = tg.initDataUnsafe.user || {id: 'tester_id', first_name: 'Tester'};
         let dbUser = null;
-        let settings = {};
+        let config = {};
 
         async function init() {
             document.getElementById('u_name').innerText = user.first_name;
             
-            // 1. Load Admin Settings
-            const { data: sData } = await supabase.from('settings').select('*');
-            sData.forEach(s => settings[s.key] = s.value);
+            // ১. সেটিংস লোড করা
+            const { data } = await supabase.from('settings').select('*');
+            if(data) data.forEach(s => config[s.key] = s.value);
 
-            // 2. Load Ad Script
-            const script = document.createElement('script');
-            script.src = `//alwingulla.com/88/tag.min.js`;
-            script.dataset.zone = settings.ad_zone_id;
-            document.getElementById('ad_script_container').appendChild(script);
+            // ২. অ্যাড ট্যাগ লোড করা
+            const adScript = document.createElement('script');
+            adScript.src = `//alwingulla.com/88/tag.min.js`;
+            adScript.dataset.zone = config.ad_zone_id;
+            document.getElementById('ad_tag_container').appendChild(adScript);
 
-            // 3. Check Proxy/Country
-            await checkProxy();
-            
-            // 4. Load/Sync User
-            await syncUser();
+            // ৩. প্রক্সি চেক এবং ইউজার ডাটা সিঙ্ক
+            await checkIPAndSync();
         }
 
-        async function checkProxy() {
+        async function checkIPAndSync() {
             try {
                 const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                const userCountry = data.country_name;
-                const allowed = settings.allowed_countries.split(',').map(c => c.trim());
+                const ipData = await res.json();
+                const userCountry = ipData.country_name;
+                const allowed = config.allowed_countries.split(',').map(c => c.trim());
 
-                const badge = document.getElementById('proxy_badge');
-                badge.innerText = userCountry;
-
-                if (allowed.includes(userCountry)) {
-                    badge.classList.replace('bg-red-600', 'bg-green-600');
-                    document.getElementById('ad_btn').disabled = false;
-                    document.getElementById('msg').innerText = "✅ Proxy match! You can work.";
+                // ইউজার ডাটাবেসে আছে কি না দেখা
+                let { data: uData } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
+                
+                if(!uData) {
+                    const { data: newUser } = await supabase.from('users').insert([{
+                        telegram_id: user.id.toString(),
+                        first_name: user.first_name,
+                        country: userCountry,
+                        daily_limit: parseInt(config.default_limit)
+                    }]).select().single();
+                    uData = newUser;
                 } else {
-                    document.getElementById('msg').innerText = `❌ Connect to one of these: ${settings.allowed_countries}`;
+                    await supabase.from('users').update({ country: userCountry }).eq('telegram_id', user.id);
                 }
+                
+                dbUser = uData;
+                updateAppUI(allowed.includes(userCountry), userCountry);
             } catch (e) { console.error(e); }
         }
 
-        async function syncUser() {
-            let { data } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
-            if (!data) {
-                const { data: newUser } = await supabase.from('users').insert([{
-                    telegram_id: user.id.toString(),
-                    first_name: user.first_name,
-                    daily_limit: parseInt(settings.default_limit)
-                }]).select().single();
-                dbUser = newUser;
-            } else {
-                dbUser = data;
-            }
-            updateUI();
-        }
-
-        function updateUI() {
+        function updateAppUI(isAllowed, country) {
             document.getElementById('impr_txt').innerText = dbUser.impressions;
-            document.getElementById('limit_txt').innerText = `${dbUser.impressions}/${dbUser.daily_limit}`;
-            if(dbUser.impressions >= dbUser.daily_limit) {
-                document.getElementById('ad_btn').disabled = true;
-                document.getElementById('msg').innerText = "🚫 Daily Limit Over!";
+            document.getElementById('limit_txt').innerText = dbUser.daily_limit;
+            const badge = document.getElementById('proxy_badge');
+            badge.innerText = country;
+
+            if (isAllowed) {
+                badge.classList.replace('bg-red-600', 'bg-green-600');
+                if(dbUser.impressions < dbUser.daily_limit) {
+                    document.getElementById('ad_btn').disabled = false;
+                    document.getElementById('msg').innerText = "✅ High CPM Proxy Connected!";
+                } else {
+                    document.getElementById('msg').innerText = "🚫 Limit Over for today!";
+                }
+            } else {
+                document.getElementById('msg').innerText = `❌ Connect to: ${config.allowed_countries}`;
             }
         }
 
-        function showAd() {
-            const functionName = `show_${settings.ad_zone_id}`;
-            if (typeof window[functionName] === 'function') {
-                window[functionName]().then(async () => {
-                    // Update DB
+        async function handleAdClick() {
+            const adFn = `show_${config.ad_zone_id}`;
+            if (typeof window[adFn] === 'function') {
+                window[adFn]().then(async () => {
                     const { data } = await supabase.from('users')
                         .update({ impressions: dbUser.impressions + 1 })
                         .eq('telegram_id', user.id).select().single();
                     dbUser = data;
-                    updateUI();
+                    updateAppUI(true, dbUser.country);
                 });
             } else {
-                alert("Ad not ready or wrong Zone ID!");
+                alert("Ad script not ready. Check Zone ID.");
             }
         }
 
