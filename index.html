@@ -3,248 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ad-Boost Pro | Monetag Edition</title>
-    <!-- Telegram SDK -->
+    <title>TMA Earning App</title>
+    
+    <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Monetag SDK -->
-    <script src='//wheageit.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
+
+    <!-- Monetag/Libtl SDK (আপনার দেওয়া স্ক্রিপ্ট) -->
+    <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
 
     <style>
-        :root {
-            --primary: #00f2fe;
-            --secondary: #4facfe;
-            --bg: #080a12;
-            --card: #121625;
-            --text: #ffffff;
-            --accent: #ff007a;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
-
         body {
-            background-color: var(--bg);
-            color: var(--text);
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            overflow: hidden;
-        }
-
-        .main-container {
-            width: 90%;
-            max-width: 380px;
-            background: var(--card);
-            border-radius: 30px;
-            padding: 25px;
+            margin: 0;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-            position: relative;
         }
-
-        .glow-effect {
-            position: absolute;
-            top: -10%; left: -10%;
-            width: 120%; height: 120%;
-            background: radial-gradient(circle, rgba(79, 172, 254, 0.1) 0%, transparent 70%);
-            z-index: -1;
+        .container {
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 80%;
         }
-
-        h1 {
-            font-size: 20px;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            letter-spacing: 1px;
-        }
-
-        .status-pill {
-            display: inline-block;
-            padding: 6px 15px;
-            background: rgba(0, 242, 254, 0.1);
-            color: var(--primary);
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: bold;
-            margin-bottom: 25px;
-            border: 1px solid rgba(0, 242, 254, 0.3);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .stat-box {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .stat-value {
-            font-size: 26px;
-            font-weight: 800;
-            color: var(--text);
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #7a829e;
-            text-transform: uppercase;
-            margin-top: 5px;
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            transition: width 0.1s linear;
-        }
-
-        .timer-text {
-            font-size: 13px;
-            color: #7a829e;
-        }
-
-        #timer-num {
-            color: var(--primary);
-            font-weight: bold;
-        }
-
-        /* Animations */
-        .pulse { animation: pulse-animation 2s infinite; }
-        @keyframes pulse-animation {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
+        h1 { font-size: 20px; color: #0088cc; }
+        .status { margin-top: 20px; font-size: 14px; color: #666; }
+        .btn {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <div class="glow-effect"></div>
-        <h1>AD-BOOST PRO</h1>
-        <div class="status-pill" id="status">INITIALIZING SYSTEM...</div>
-
-        <div class="stats-grid">
-            <div class="stat-box">
-                <span class="stat-value" id="imp-count">0</span>
-                <span class="stat-label">Impressions</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-value" id="clk-count">0</span>
-                <span class="stat-label">Clicks</span>
-            </div>
-        </div>
-
-        <div class="progress-container">
-            <div class="progress-bar" id="pb"></div>
-        </div>
-        <div class="timer-text">
-            Action: <span id="timer-label">Waiting</span> (<span id="timer-num">2s</span>)
-        </div>
+    <div class="container">
+        <h1>Welcome to Mini App</h1>
+        <p>অটোমেটিক বিজ্ঞাপন লোড হচ্ছে...</p>
+        <div id="ad-status" class="status">পরবর্তী অ্যাড লোড হওয়ার অপেক্ষায়...</div>
+        <button class="btn" onclick="triggerAd()">ম্যানুয়ালি অ্যাড দেখুন</button>
     </div>
 
     <script>
+        // Telegram WebApp Initialize
         const tg = window.Telegram.WebApp;
-        tg.expand();
         tg.ready();
+        tg.expand();
 
-        let impressions = localStorage.getItem('monetag_imp') || 0;
-        let clicks = localStorage.getItem('monetag_clk') || 0;
-
-        const statusEl = document.getElementById('status');
-        const impEl = document.getElementById('imp-count');
-        const clkEl = document.getElementById('clk-count');
-        const barEl = document.getElementById('pb');
-        const timerNumEl = document.getElementById('timer-num');
-        const timerLabelEl = document.getElementById('timer-label');
-
-        function updateUI() {
-            impEl.innerText = impressions;
-            clkEl.innerText = clicks;
-            localStorage.setItem('monetag_imp', impressions);
-            localStorage.setItem('monetag_clk', clicks);
-        }
-
-        updateUI();
-
-        // Function for the 15-second Ad watch simulation
-        async function startAdViewing() {
-            statusEl.innerText = "AD RUNNING...";
-            statusEl.classList.add('pulse');
-            timerLabelEl.innerText = "Viewing Ad";
+        // অ্যাড ফাংশন (আপনার SDK অনুযায়ী)
+        function triggerAd() {
+            document.getElementById('ad-status').innerText = "অ্যাড লোড করার চেষ্টা করা হচ্ছে...";
             
-            // Monetag Call
             if (typeof show_10197154 === 'function') {
                 show_10197154().then(() => {
-                    // This block runs when ad is finished/rewarded
-                    impressions++;
-                    updateUI();
+                    document.getElementById('ad-status').innerText = "অ্যাড সফলভাবে দেখা হয়েছে!";
+                }).catch((error) => {
+                    console.error("Ad Error:", error);
+                    document.getElementById('ad-status').innerText = "অ্যাড লোড হতে ব্যর্থ হয়েছে।";
                 });
+            } else {
+                document.getElementById('ad-status').innerText = "SDK এখনো লোড হয়নি।";
             }
-
-            // Visual countdown for 15 seconds
-            let timeLeft = 15;
-            let total = 15;
-            
-            const watchInterval = setInterval(() => {
-                timeLeft -= 0.1;
-                let percent = ((total - timeLeft) / total) * 100;
-                barEl.style.width = percent + "%";
-                timerNumEl.innerText = Math.ceil(timeLeft) + "s";
-
-                if (timeLeft <= 0) {
-                    clearInterval(watchInterval);
-                    statusEl.classList.remove('pulse');
-                    startBreak();
-                }
-            }, 100);
         }
 
-        // Function for 2-second break
-        function startBreak() {
-            statusEl.innerText = "COOLING DOWN...";
-            timerLabelEl.innerText = "Next Ad In";
-            barEl.style.width = "0%";
-            
-            let timeLeft = 2;
-            const breakInterval = setInterval(() => {
-                timeLeft -= 1;
-                timerNumEl.innerText = timeLeft + "s";
-                if (timeLeft <= 0) {
-                    clearInterval(breakInterval);
-                    startAdViewing();
-                }
-            }, 1000);
-        }
+        // Auto Impression Logic (প্রতি ৩০ সেকেন্ড পর পর অ্যাড দেখাবে)
+        // সময় পরিবর্তন করতে চাইলে 30000 কমিয়ে বা বাড়িয়ে দিন (মিলি-সেকেন্ড)
+        setInterval(() => {
+            console.log("Auto-triggering Ad...");
+            triggerAd();
+        }, 30000); 
 
-        // Click tracking (estimate)
-        window.onblur = function() {
-            clicks++;
-            updateUI();
+        // অ্যাপ ওপেন হওয়ার সাথে সাথেই প্রথম অ্যাড দেখাবে
+        window.onload = () => {
+            setTimeout(triggerAd, 2000); // ২ সেকেন্ড পর প্রথম অ্যাড
         };
-
-        // Start the process
-        setTimeout(startAdViewing, 2000);
-
     </script>
+
 </body>
 </html>
