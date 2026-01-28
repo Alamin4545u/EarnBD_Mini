@@ -3,191 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnBD Mini - High Quality App</title>
+    <title>EarnPro Mini App</title>
     <!-- SDKs -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-    <style>
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
-        .btn-premium {
-            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
-            transition: all 0.3s ease;
-        }
-        .btn-premium:active { transform: scale(0.95); }
-        .btn-premium:disabled { background: #1e293b; box-shadow: none; opacity: 0.5; }
-        
-        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
-        .shine-effect { position: relative; overflow: hidden; }
-        .shine-effect::after {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
-            transform: skewX(-25deg); animation: shine 3s infinite;
-        }
-    </style>
+    <div id="script_container"></div>
 </head>
-<body class="bg-[#05070a] text-white font-sans overflow-x-hidden">
+<body class="bg-[#0b0e14] text-white font-sans">
 
-    <!-- Header -->
-    <header class="p-5 flex justify-between items-center glass sticky top-0 z-50 rounded-b-3xl">
-        <div class="flex items-center space-x-3">
-            <img id="u_photo" class="w-10 h-10 rounded-full border-2 border-blue-500/50" src="https://via.placeholder.com/100">
-            <div>
-                <h1 id="u_name" class="text-xs font-black tracking-wide uppercase opacity-80">Loading...</h1>
-                <p id="u_status" class="text-[9px] text-green-400 font-bold flex items-center">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1 animate-pulse"></span> SYSTEM ACTIVE
-                </p>
-            </div>
+    <!-- Navbar -->
+    <header class="p-4 bg-slate-900 flex justify-between items-center border-b border-white/5">
+        <div class="flex items-center gap-3">
+            <img id="u_photo" class="w-10 h-10 rounded-full border border-blue-500" src="">
+            <span id="u_name" class="font-bold text-sm text-gray-300">Syncing...</span>
         </div>
         <div class="text-right">
-            <span class="text-[10px] text-gray-500 font-bold block uppercase tracking-tighter">Connection</span>
-            <span id="proxy_info" class="text-[9px] text-blue-400 font-mono">SECURED</span>
+            <span id="ip_txt" class="text-[9px] block text-gray-500 font-mono">0.0.0.0</span>
+            <span id="country_txt" class="text-[10px] text-blue-400 font-bold">DETECTING IP...</span>
         </div>
     </header>
 
-    <main class="p-6 max-w-md mx-auto space-y-8">
-        <!-- Stats Section -->
-        <section class="grid grid-cols-2 gap-4">
-            <div class="glass p-6 rounded-[2rem] text-center">
-                <p class="text-[9px] text-gray-500 font-black uppercase tracking-[0.2em] mb-2">Impressions</p>
-                <h2 id="impr_count" class="text-4xl font-black text-blue-500">0</h2>
-            </div>
-            <div class="glass p-6 rounded-[2rem] text-center">
-                <p class="text-[9px] text-gray-500 font-black uppercase tracking-[0.2em] mb-2">Target</p>
-                <h2 id="limit_display" class="text-4xl font-black text-yellow-500">0</h2>
-            </div>
-        </section>
+    <!-- Stats -->
+    <div class="p-8 space-y-8 max-w-md mx-auto">
+        <div class="bg-slate-900/50 p-8 rounded-[2.5rem] border border-white/5 text-center shadow-2xl backdrop-blur-md">
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-black mb-2">My Impressions</p>
+            <h2 id="impr_txt" class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-purple-600">0</h2>
+        </div>
 
-        <!-- Main Button -->
-        <div class="pt-4">
-            <button onclick="watchAd()" id="ad_btn" disabled class="w-full btn-premium py-5 rounded-[2rem] font-black text-xl shine-effect flex items-center justify-center space-x-3">
-                <span>WATCH AD</span>
-                <i class="fas fa-play-circle"></i>
+        <div class="space-y-4 text-center">
+            <button id="start_btn" onclick="toggleAuto()" class="w-full bg-blue-600 hover:bg-blue-700 py-5 rounded-3xl font-black text-xl shadow-lg transition-all active:scale-95">
+                START AUTO MODE ⚡
             </button>
-            <p id="msg" class="text-center text-[10px] mt-4 text-gray-500 font-medium uppercase tracking-widest"></p>
+            <p id="status_msg" class="text-xs text-yellow-500 italic font-medium">System ready. Click start.</p>
         </div>
-
-        <!-- Info Card -->
-        <div class="glass p-5 rounded-3xl border-dashed border-white/10">
-            <div class="flex items-center space-x-3 opacity-60">
-                <i class="fas fa-shield-alt text-blue-400"></i>
-                <p class="text-[10px] leading-relaxed">
-                    Work with a high-quality proxy to maximize your earnings. Your connection details are monitored by the admin.
-                </p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Ad script holder -->
-    <div id="script_container"></div>
+    </div>
 
     <script>
-        // CONFIG
-        const SB_URL = 'https://shynfkdspsjyllytsmfd.supabase.co';
-        const SB_KEY = 'sb_publishable_JenZz9hQLPduBYTLapuBzQ_xiQztzWF';
-        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-        const tg = window.Telegram.WebApp;
-
-        let user = tg.initDataUnsafe.user || {id: 'dev_user', first_name: 'Developer'};
-        let config = {};
-        let dbUser = null;
-
-        async function init() {
-            // ১. সেটিংস লোড
-            const { data: sData } = await supabase.from('settings').select('*');
-            sData.forEach(s => config[s.key] = s.value);
-
-            // ২. অ্যাড স্ক্রিপ্ট লোড
-            const s = document.createElement('script');
-            s.src = `//alwingulla.com/88/tag.min.js`;
-            s.dataset.zone = config.ad_zone_id;
-            document.getElementById('script_container').appendChild(s);
-
-            // ৩. ইউজার ডাটা এবং আইপি সিঙ্ক (নন-ব্লকিং)
-            updateUserAndIP();
+        // --- সুনির্দিষ্টভাবে একবারই ডিক্লেয়ার করা হয়েছে ---
+        (function() {
+            const SB_URL = 'https://shynfkdspsjyllytsmfd.supabase.co';
+            const SB_KEY = 'sb_publishable_JenZz9hQLPduBYTLapuBzQ_xiQztzWF';
             
-            document.getElementById('u_name').innerText = user.first_name;
-            if(user.photo_url) document.getElementById('u_photo').src = user.photo_url;
-        }
+            // supabase ডিক্লেয়ার করার আগে চেক করে নেওয়া হচ্ছে
+            const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+            const tg = window.Telegram.WebApp;
 
-        async function updateUserAndIP() {
-            try {
-                // ব্যাকগ্রাউন্ডে আইপি আনা
-                const ipRes = await fetch('https://ipapi.co/json/');
-                const ipData = await ipRes.json();
-                const country = ipData.country_name || 'Unknown';
-                const ip = ipData.ip || '0.0.0.0';
+            let user = tg.initDataUnsafe.user || {id: 'tester', first_name: 'Guest'};
+            let zoneId = "";
+            let isRunning = false;
 
-                document.getElementById('proxy_info').innerText = country;
-
-                // ডাটাবেস চেক ও আপডেট
-                let { data: uData } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
-                
-                if(!uData) {
-                    const { data: newUser } = await supabase.from('users').insert([{
-                        telegram_id: user.id.toString(),
-                        first_name: user.first_name,
-                        country: country + ` (${ip})`,
-                        daily_limit: parseInt(config.default_limit)
-                    }]).select().single();
-                    uData = newUser;
+            // Global Scope এ ফাংশনটি দিয়ে দেওয়া হলো যাতে বাটন খুঁজে পায়
+            window.toggleAuto = function() {
+                isRunning = !isRunning;
+                const btn = document.getElementById('start_btn');
+                if(isRunning) {
+                    btn.innerText = "STOP AUTO MODE 🛑";
+                    btn.classList.replace('bg-blue-600', 'bg-red-600');
+                    startLoop();
                 } else {
-                    // আইপি ও দেশ আপডেট করা (অ্যাডমিন দেখবে)
-                    await supabase.from('users').update({ country: country + ` (${ip})` }).eq('telegram_id', user.id);
+                    location.reload(); 
                 }
-                
-                dbUser = uData;
-                refreshUI();
-            } catch (e) {
-                console.log("IP Sync failed, proceeding with default.");
-                // আইপি ফেইল করলেও অ্যাপ বন্ধ হবে না
-                let { data: uData } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
-                dbUser = uData;
-                refreshUI();
-            }
-        }
+            };
 
-        function refreshUI() {
-            if(!dbUser) return;
-            document.getElementById('impr_count').innerText = dbUser.impressions;
-            document.getElementById('limit_display').innerText = dbUser.daily_limit;
-            
-            if(dbUser.impressions < dbUser.daily_limit) {
-                document.getElementById('ad_btn').disabled = false;
-                document.getElementById('msg').innerText = "Ready to Earn";
-            } else {
-                document.getElementById('ad_btn').disabled = true;
-                document.getElementById('msg').innerText = "Limit Over!";
-                document.getElementById('msg').classList.replace('text-gray-500', 'text-red-500');
-            }
-        }
+            async function init() {
+                try {
+                    // ১. সেটিংস থেকে জোন আইডি আনা
+                    const { data: config } = await supabase.from('settings').select('*').eq('key', 'ad_zone_id').single();
+                    if(config) zoneId = config.value;
 
-        function watchAd() {
-            const showFn = `show_${config.ad_zone_id}`;
-            if (typeof window[showFn] === 'function') {
-                document.getElementById('ad_btn').disabled = true;
-                document.getElementById('msg').innerText = "Ad Loading...";
-                
-                window[showFn]().then(async () => {
-                    const { data } = await supabase.from('users')
-                        .update({ impressions: dbUser.impressions + 1 })
-                        .eq('telegram_id', user.id).select().single();
-                    dbUser = data;
-                    refreshUI();
-                    tg.HapticFeedback.impactOccurred('medium');
-                }).catch(e => {
-                    alert("Ad failed! Try again.");
-                    refreshUI();
-                });
-            } else {
-                alert("Please wait 3 seconds...");
-            }
-        }
+                    // ২. জোন আইডি অনুযায়ী স্ক্রিপ্ট লোড
+                    if(zoneId) {
+                        const s = document.createElement('script');
+                        s.src = `//alwingulla.com/88/tag.min.js`;
+                        s.dataset.zone = zoneId;
+                        document.getElementById('script_container').appendChild(s);
+                    }
 
-        init();
+                    // ৩. আইপি এবং ইউজার সিঙ্ক
+                    const ipRes = await fetch('https://ip-api.com/json/');
+                    const ipData = await ipRes.json();
+                    
+                    document.getElementById('u_name').innerText = user.first_name;
+                    if(user.photo_url) document.getElementById('u_photo').src = user.photo_url;
+                    document.getElementById('ip_txt').innerText = ipData.query;
+                    document.getElementById('country_txt').innerText = ipData.country;
+
+                    let { data: uData } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
+                    if(!uData) {
+                        const { data: created } = await supabase.from('users').insert([{
+                            telegram_id: user.id.toString(),
+                            first_name: user.first_name,
+                            username: user.username,
+                            photo_url: user.photo_url,
+                            country: ipData.country,
+                            ip_address: ipData.query
+                        }]).select().single();
+                        uData = created;
+                    }
+                    document.getElementById('impr_txt').innerText = uData.impressions || 0;
+                } catch (e) { console.error("Init Error:", e); }
+            }
+
+            async function startLoop() {
+                if(!isRunning) return;
+                document.getElementById('status_msg').innerText = "Waiting 15s for next ad...";
+                setTimeout(() => {
+                    if(isRunning) showAd();
+                }, 15000);
+            }
+
+            function showAd() {
+                const showFn = `show_${zoneId}`;
+                if (typeof window[showFn] === 'function') {
+                    document.getElementById('status_msg').innerText = "Ad is loading...";
+                    window[showFn]().then(async () => {
+                        // ইমপ্রেশন আপডেট
+                        await supabase.rpc('increment_stats', { tid: user.id.toString(), col_name: 'impressions' });
+                        const { data } = await supabase.from('users').select('impressions').eq('telegram_id', user.id).single();
+                        document.getElementById('impr_txt').innerText = data.impressions;
+                        tg.HapticFeedback.notificationOccurred('success');
+                        
+                        document.getElementById('status_msg').innerText = "Success! 2s gap...";
+                        setTimeout(startLoop, 2000);
+                    }).catch(() => {
+                        document.getElementById('status_msg').innerText = "Ad failed! Retrying...";
+                        setTimeout(startLoop, 5000);
+                    });
+                } else {
+                    document.getElementById('status_msg').innerText = "Waiting for ad script...";
+                    setTimeout(startLoop, 3000);
+                }
+            }
+
+            init();
+        })();
     </script>
 </body>
 </html>
