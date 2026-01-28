@@ -3,132 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Auto Impression Bot</title>
-    <!-- Telegram Web App SDK -->
+    <title>Ad-Boost Pro | Monetag Edition</title>
+    <!-- Telegram SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Monetag SDK for your Zone -->
+    <!-- Monetag SDK -->
     <script src='//wheageit.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
 
     <style>
         :root {
-            --bg-color: #0b0e14;
-            --card-bg: #161b22;
-            --primary-glow: #00d2ff;
-            --secondary-glow: #3a7bd5;
-            --text-main: #ffffff;
-            --text-dim: #8b949e;
-            --accent: #ff3e60;
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg: #080a12;
+            --card: #121625;
+            --text: #ffffff;
+            --accent: #ff007a;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: var(--bg);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
         }
 
-        .app-container {
+        .main-container {
             width: 90%;
-            max-width: 400px;
-            background: var(--card-bg);
+            max-width: 380px;
+            background: var(--card);
             border-radius: 30px;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
-        /* Glowing Background Effect */
-        .app-container::before {
-            content: '';
+        .glow-effect {
             position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, var(--primary-glow), var(--secondary-glow));
+            top: -10%; left: -10%;
+            width: 120%; height: 120%;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.1) 0%, transparent 70%);
             z-index: -1;
-            border-radius: 32px;
-            filter: blur(10px);
-            opacity: 0.3;
         }
 
-        .header h1 {
-            font-size: 24px;
-            font-weight: 800;
-            background: linear-gradient(to right, #00d2ff, #3a7bd5);
+        h1 {
+            font-size: 20px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
         }
 
-        .status-box {
-            background: rgba(0, 210, 255, 0.1);
-            color: var(--primary-glow);
-            padding: 8px 20px;
+        .status-pill {
+            display: inline-block;
+            padding: 6px 15px;
+            background: rgba(0, 242, 254, 0.1);
+            color: var(--primary);
             border-radius: 50px;
             font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 30px;
-            border: 1px solid rgba(0, 210, 255, 0.2);
-        }
-
-        /* Circular Loader */
-        .loader-ring {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            border: 5px solid #1c2128;
-            border-top: 5px solid var(--primary-glow);
-            margin: 0 auto 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            animation: rotate 2s linear infinite;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loader-text {
-            animation: none;
-            transform: rotate(0deg);
-            position: absolute;
             font-weight: bold;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
         }
 
-        .loader-ring::after {
-            content: '';
-            position: absolute;
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            box-shadow: 0 0 15px var(--primary-glow);
-            opacity: 0.2;
-        }
-
-        /* Stats Grid */
-        .stats-container {
+        .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
-        .stat-item {
+        .stat-box {
             background: rgba(255, 255, 255, 0.03);
             padding: 15px;
             border-radius: 20px;
@@ -136,152 +88,163 @@
         }
 
         .stat-value {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
             display: block;
-            font-size: 22px;
-            font-weight: 700;
-            color: #fff;
         }
 
         .stat-label {
             font-size: 11px;
-            color: var(--text-dim);
+            color: #7a829e;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-top: 5px;
         }
 
-        .timer-info {
-            font-size: 14px;
-            color: var(--text-dim);
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
         }
 
-        #timer-count {
-            color: var(--accent);
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            transition: width 0.1s linear;
+        }
+
+        .timer-text {
+            font-size: 13px;
+            color: #7a829e;
+        }
+
+        #timer-num {
+            color: var(--primary);
             font-weight: bold;
         }
 
-        .footer-note {
-            margin-top: 20px;
-            font-size: 10px;
-            color: #444;
+        /* Animations */
+        .pulse { animation: pulse-animation 2s infinite; }
+        @keyframes pulse-animation {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <div class="header">
-            <h1>ULTRA IMPRESSION</h1>
-            <div class="status-box" id="system-status">SYSTEM ACTIVE</div>
-        </div>
+    <div class="main-container">
+        <div class="glow-effect"></div>
+        <h1>AD-BOOST PRO</h1>
+        <div class="status-pill" id="status">INITIALIZING SYSTEM...</div>
 
-        <div class="loader-ring" id="loader">
-            <div class="loader-text" style="animation: none; transform: rotate(0deg) !important;">
-                <span id="center-status" style="transform: rotate(0deg); display: block;">RUNNING</span>
-            </div>
-        </div>
-
-        <div class="stats-container">
-            <div class="stat-item">
-                <span class="stat-value" id="imp-total">0</span>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-value" id="imp-count">0</span>
                 <span class="stat-label">Impressions</span>
             </div>
-            <div class="stat-item">
-                <span class="stat-value" id="clk-total">0</span>
+            <div class="stat-box">
+                <span class="stat-value" id="clk-count">0</span>
                 <span class="stat-label">Clicks</span>
             </div>
         </div>
 
-        <div class="timer-info">
-            Next Ad in: <span id="timer-count">2s</span>
+        <div class="progress-container">
+            <div class="progress-bar" id="pb"></div>
         </div>
-
-        <div class="footer-note">
-            Premium Ad-Network Integration Active
+        <div class="timer-text">
+            Action: <span id="timer-label">Waiting</span> (<span id="timer-num">2s</span>)
         </div>
     </div>
 
     <script>
-        // Initialize Telegram WebApp
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
-        // Local Data Persistence
-        let impressions = localStorage.getItem('imp_count') || 0;
-        let clicks = localStorage.getItem('clk_count') || 0;
+        let impressions = localStorage.getItem('monetag_imp') || 0;
+        let clicks = localStorage.getItem('monetag_clk') || 0;
 
-        // UI Elements
-        const impDisplay = document.getElementById('imp-total');
-        const clkDisplay = document.getElementById('clk-total');
-        const timerDisplay = document.getElementById('timer-count');
-        const centerStatus = document.getElementById('center-status');
+        const statusEl = document.getElementById('status');
+        const impEl = document.getElementById('imp-count');
+        const clkEl = document.getElementById('clk-count');
+        const barEl = document.getElementById('pb');
+        const timerNumEl = document.getElementById('timer-num');
+        const timerLabelEl = document.getElementById('timer-label');
 
-        function updateStats() {
-            impDisplay.innerText = impressions;
-            clkDisplay.innerText = clicks;
-            localStorage.setItem('imp_count', impressions);
-            localStorage.setItem('clk_count', clicks);
+        function updateUI() {
+            impEl.innerText = impressions;
+            clkEl.innerText = clicks;
+            localStorage.setItem('monetag_imp', impressions);
+            localStorage.setItem('monetag_clk', clicks);
         }
 
-        // Initialize UI
-        updateStats();
+        updateUI();
 
-        // Main Ad Logic
-        function runAdCycle() {
-            centerStatus.innerText = "LOADING";
-            centerStatus.style.color = "#ff3e60";
-
-            // Using your provided code function
+        // Function for the 15-second Ad watch simulation
+        async function startAdViewing() {
+            statusEl.innerText = "AD RUNNING...";
+            statusEl.classList.add('pulse');
+            timerLabelEl.innerText = "Viewing Ad";
+            
+            // Monetag Call
             if (typeof show_10197154 === 'function') {
                 show_10197154().then(() => {
-                    // Ad finished/rewarded
+                    // This block runs when ad is finished/rewarded
                     impressions++;
-                    updateStats();
-                    centerStatus.innerText = "SUCCESS";
-                    centerStatus.style.color = "#00d2ff";
-                    
-                    // Wait 2 seconds before next ad
-                    startCountdown(2);
-                }).catch((err) => {
-                    console.error("Ad Error:", err);
-                    // If error, try again in 5 seconds
-                    startCountdown(5);
+                    updateUI();
                 });
-            } else {
-                console.log("SDK not loaded yet...");
-                setTimeout(runAdCycle, 3000);
             }
+
+            // Visual countdown for 15 seconds
+            let timeLeft = 15;
+            let total = 15;
+            
+            const watchInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                let percent = ((total - timeLeft) / total) * 100;
+                barEl.style.width = percent + "%";
+                timerNumEl.innerText = Math.ceil(timeLeft) + "s";
+
+                if (timeLeft <= 0) {
+                    clearInterval(watchInterval);
+                    statusEl.classList.remove('pulse');
+                    startBreak();
+                }
+            }, 100);
         }
 
-        function startCountdown(seconds) {
-            let timeLeft = seconds;
-            timerDisplay.innerText = timeLeft + "s";
-            centerStatus.innerText = "WAITING";
-            centerStatus.style.color = "#8b949e";
-
-            const timer = setInterval(() => {
-                timeLeft--;
+        // Function for 2-second break
+        function startBreak() {
+            statusEl.innerText = "COOLING DOWN...";
+            timerLabelEl.innerText = "Next Ad In";
+            barEl.style.width = "0%";
+            
+            let timeLeft = 2;
+            const breakInterval = setInterval(() => {
+                timeLeft -= 1;
+                timerNumEl.innerText = timeLeft + "s";
                 if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    runAdCycle();
-                } else {
-                    timerDisplay.innerText = timeLeft + "s";
+                    clearInterval(breakInterval);
+                    startAdViewing();
                 }
             }, 1000);
         }
 
-        // Click Tracking (Estimate)
-        // Note: Direct click tracking on iFrame ads is restricted, 
-        // so we track if the user leaves the window focus.
+        // Click tracking (estimate)
         window.onblur = function() {
             clicks++;
-            updateStats();
+            updateUI();
         };
 
-        // Start the process immediately on boot
-        window.onload = () => {
-            startCountdown(2);
-        };
+        // Start the process
+        setTimeout(startAdViewing, 2000);
+
     </script>
 </body>
 </html>
