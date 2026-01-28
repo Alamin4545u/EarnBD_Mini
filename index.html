@@ -3,182 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultimate Ad Bot</title>
+    <title>Ultra Auto Ad Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Premium Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+
+    <!-- 🔥 MONETAG SDK 🔥 -->
+    <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
 
     <style>
         body {
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Teko', sans-serif;
+            background-color: #050505;
+            color: #00ffcc;
+            font-family: 'Orbitron', sans-serif;
             margin: 0;
             height: 100vh;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
+            user-select: none;
         }
 
-        .dashboard {
-            z-index: 1;
+        .main-container {
+            width: 85%;
+            max-width: 400px;
+            padding: 30px;
+            background: rgba(0, 255, 204, 0.03);
+            border: 1px solid rgba(0, 255, 204, 0.2);
+            border-radius: 20px;
             text-align: center;
-            border: 2px solid #0f0;
-            padding: 20px;
-            border-radius: 10px;
-            background: rgba(0, 255, 0, 0.05);
-            width: 80%;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.1);
+            position: relative;
+            backdrop-filter: blur(10px);
         }
 
-        .timer { font-size: 60px; font-weight: bold; line-height: 1; }
-        .label { font-size: 20px; color: #888; }
-        .stats { display: flex; justify-content: space-between; margin-top: 20px; font-size: 24px; }
-        
-        .btn {
-            margin-top: 20px;
-            padding: 10px 40px;
+        h1 {
             font-size: 20px;
-            background: #0f0;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #00ffcc;
+        }
+
+        .status-box {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 10px;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .timer-display {
+            font-size: 60px;
+            font-weight: 900;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        .info-item .val { font-size: 24px; font-weight: bold; color: #00ffcc; }
+        .info-item .lbl { font-size: 10px; color: #666; letter-spacing: 1px; }
+
+        .btn-start {
+            background: #00ffcc;
             color: #000;
             border: none;
+            padding: 15px 40px;
+            font-size: 18px;
             font-weight: bold;
+            border-radius: 50px;
             cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+            transition: all 0.3s;
         }
 
-        /* Iframe কন্টেইনার যা স্ক্রিনের উপরে আসবে */
-        #ad-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 9999; /* সবার উপরে */
-            background: black; /* লোড হওয়ার আগে কালো দেখাবে */
-            display: none; /* শুরুতে লুকানো থাকবে */
+        .btn-start:active { transform: scale(0.95); }
+        
+        /* Loading Animation */
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
         }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
         }
     </style>
 </head>
 <body>
 
-    <div class="dashboard">
-        <div class="label" id="status">SYSTEM IDLE</div>
-        <div class="timer" id="timer">00</div>
+    <div class="main-container">
+        <h1>AUTO AD SYSTEM</h1>
+        
+        <div class="status-box" id="statusText">WAITING TO START</div>
+        <div class="timer-display" id="timer">00</div>
 
-        <div class="stats">
-            <div>IMP: <span id="imp">0</span></div>
-            <div>CYC: <span id="cyc">0</span></div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="val" id="totalImp">0</div>
+                <div class="lbl">VALID IMPRESSIONS</div>
+            </div>
+            <div class="info-item">
+                <div class="val" id="totalCycles">0</div>
+                <div class="lbl">TOTAL CYCLES</div>
+            </div>
         </div>
 
-        <button class="btn" onclick="startSystem()" id="startBtn">START</button>
+        <button class="btn-start" id="startBtn" onclick="activateSystem()">START AUTO</button>
+        <button onclick="stopSystem()" style="background:transparent; border:1px solid #333; color:#555; margin-top:15px; padding:5px 15px; border-radius:10px; cursor:pointer;">STOP & RESET</button>
     </div>
-
-    <!-- এই ডিভ এর ভেতর ডায়নামিক আইফ্রেম তৈরি হবে -->
-    <div id="ad-container"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const AD_TIME = 15;
-        const GAP_TIME = 2;
+        // --- CONFIGURATION ---
+        const GAP_TIME = 2000;      // 2 Seconds Gap (Milliseconds)
+        const AD_SHOW_TIME = 15;    // 15 Seconds Waiting
         
-        let impressions = 0;
-        let cycles = 0;
-        let isRunning = false;
-
-        const container = document.getElementById('ad-container');
+        // --- ELEMENTS ---
+        const statusEl = document.getElementById('statusText');
         const timerEl = document.getElementById('timer');
-        const statusEl = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const impEl = document.getElementById('totalImp');
+        const cycEl = document.getElementById('totalCycles');
 
-        function startSystem() {
-            if(isRunning) return;
+        // --- STATE MANAGEMENT (LOCAL STORAGE) ---
+        let isRunning = localStorage.getItem('auto_active') === 'true';
+        let impressions = parseInt(localStorage.getItem('imp_count')) || 0;
+        let cycles = parseInt(localStorage.getItem('cycle_count')) || 0;
+
+        // UI Update Initialization
+        impEl.innerText = impressions;
+        cycEl.innerText = cycles;
+
+        // --- AUTO START LOGIC ---
+        // যদি আগে থেকেই বোট চালু থাকে, পেজ লোড হওয়ার সাথে সাথে কাজ শুরু করবে
+        if (isRunning) {
+            startBtn.style.display = 'none';
+            // পেজ লোড হওয়ার পর ২ সেকেন্ড অপেক্ষা করে প্রসেস শুরু
+            setTimeout(runAdSequence, GAP_TIME);
+            statusEl.innerText = `GAP PHASE (${GAP_TIME/1000}s)...`;
+        }
+
+        function activateSystem() {
+            localStorage.setItem('auto_active', 'true');
             isRunning = true;
-            document.getElementById('startBtn').style.display = 'none';
-            runCycle();
+            startBtn.style.display = 'none';
+            // প্রথম ক্লিকে সরাসরি ২ সেকেন্ড গ্যাপ শুরু
+            statusEl.innerText = "INITIALIZING...";
+            setTimeout(runAdSequence, GAP_TIME);
         }
 
-        async function runCycle() {
-            // ১. গ্যাপ টাইম (২ সেকেন্ড)
-            container.style.display = 'none'; // আগের ফ্রেম লুকানো
-            container.innerHTML = ''; // আগের ফ্রেম ধ্বংস করা (Memory Clear)
+        function stopSystem() {
+            localStorage.setItem('auto_active', 'false');
+            localStorage.setItem('imp_count', '0'); // চাইলে রিসেট নাও করতে পারেন
+            localStorage.setItem('cycle_count', '0');
+            location.reload();
+        }
+
+        async function runAdSequence() {
+            // STEP 1: LOADING STATE
+            // যতক্ষণ অ্যাড লোড না হচ্ছে, ততক্ষণ এই লেখা থাকবে
+            statusEl.innerHTML = "LOADING AD<span class='loading-dots'></span>";
             
-            await countdown(GAP_TIME, "PREPARING...", false);
+            // আমরা অ্যাড কল করব
+            let adLoaded = false;
+            
+            try {
+                if (typeof show_10197154 === 'function') {
+                    // অ্যাড রিকোয়েস্ট পাঠানো হলো
+                    show_10197154().then(() => {
+                        // এই .then() ব্লক সাধারণত অ্যাড ক্লোজ হলে রান হয়, তাই আমরা এখানে কিছু করছি না
+                    });
 
-            // ২. নতুন ফ্রেম তৈরি এবং অ্যাড লোড
-            statusEl.innerText = "LOADING AD...";
-            createAdFrame();
+                    // যেহেতু Monetag এর JS callback নেই যে "Ad Shown", 
+                    // আমরা ধরে নিচ্ছি ফাংশন কলের ১-২ সেকেন্ডের মধ্যে অ্যাড স্ক্রিনে চলে আসবে।
+                    // কিন্তু ইউজারকে "Loading" দেখাবো যতক্ষণ না আমরা টাইমার শুরু করছি।
+                    
+                    setTimeout(() => {
+                        // ২ সেকেন্ড পর আমরা ধরে নিব অ্যাড লোড হয়েছে এবং টাইমার শুরু করব
+                        startAdTimer();
+                    }, 2500); // 2.5 সেকেন্ড সময় দিচ্ছি লোড হওয়ার জন্য
 
-            // ৩. অ্যাড দেখার সময় (১৫ সেকেন্ড)
-            // এখানে আমরা ফ্রেম শো করব
-            container.style.display = 'block'; 
-            await countdown(AD_TIME, "WATCHING AD...", true);
+                } else {
+                    // যদি নেটওয়ার্কের কারণে স্ক্রিপ্ট লোড না হয়
+                    statusEl.innerText = "SCRIPT ERROR! RELOADING...";
+                    setTimeout(() => location.reload(), 2000);
+                }
+            } catch (e) {
+                statusEl.innerText = "ERROR! RETRYING...";
+                setTimeout(() => location.reload(), 2000);
+            }
+        }
 
-            // ৪. সাইকেল শেষ
-            impressions++; // ধরে নিচ্ছি অ্যাড লোড হয়েছে
+        function startAdTimer() {
+            // STEP 2: AD SHOWING (15 Seconds)
+            statusEl.innerText = "AD IS ACTIVE - DO NOT CLOSE";
+            statusEl.style.color = "#ff3333"; // লাল রঙ সতর্কতার জন্য
+            
+            let timeLeft = AD_SHOW_TIME;
+            
+            const interval = setInterval(() => {
+                timerEl.innerText = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
+                timeLeft--;
+
+                if (timeLeft < 0) {
+                    clearInterval(interval);
+                    finishCycle();
+                }
+            }, 1000);
+        }
+
+        function finishCycle() {
+            // STEP 3: CYCLE COMPLETE & AUTO CLOSE
+            statusEl.innerText = "SUCCESS! CLOSING & RELOADING...";
+            statusEl.style.color = "#00ffcc";
+
+            // শুধুমাত্র এখনই ইম্প্রেশন কাউন্ট হবে
+            impressions++;
             cycles++;
-            document.getElementById('imp').innerText = impressions;
-            document.getElementById('cyc').innerText = cycles;
-
-            // ৫. লুপ
-            runCycle();
-        }
-
-        function createAdFrame() {
-            // একটি নতুন আইফ্রেম তৈরি করা হচ্ছে
-            const iframe = document.createElement('iframe');
             
-            // আইফ্রেমের ভেতর Monetag স্ক্রিপ্ট রাইট করা হচ্ছে
-            // এটি ব্রাউজারের কাছে প্রতিবার 'নতুন পেজ' হিসেবে গণ্য হবে
-            const htmlContent = `
-                <!DOCTYPE html>
-                <body style="margin:0;padding:0;background:black;display:flex;justify-content:center;align-items:center;height:100vh;color:white;">
-                    <h2 style="font-family:sans-serif;">LOADING AD...</h2>
-                    
-                    <!-- MONETAG SCRIPT -->
-                    <script src="//libtl.com/sdk.js" data-zone="10197154" data-sdk="show_10197154"><\/script>
-                    
-                    <script>
-                        // স্ক্রিপ্ট লোড হলেই অ্যাড কল করবে
-                        window.onload = function() {
-                            if(typeof show_10197154 === 'function') {
-                                show_10197154().then(() => {
-                                    console.log('Ad Done');
-                                });
-                            }
-                        };
-                    <\/script>
-                </body>
-            `;
+            // ডেটা সেভ করা
+            localStorage.setItem('imp_count', impressions);
+            localStorage.setItem('cycle_count', cycles);
 
-            container.appendChild(iframe);
-            
-            // আইফ্রেমের ডকুমেন্টে কন্টেন্ট পুশ করা
-            iframe.contentWindow.document.open();
-            iframe.contentWindow.document.write(htmlContent);
-            iframe.contentWindow.document.close();
-        }
+            // UI আপডেট (যদিও রিলোড হবে, তবুও ইউজার দেখবে)
+            impEl.innerText = impressions;
+            cycEl.innerText = cycles;
 
-        function countdown(seconds, text, isAd) {
-            return new Promise(resolve => {
-                statusEl.innerText = text;
-                let timeLeft = seconds;
-                const interval = setInterval(() => {
-                    timerEl.innerText = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
-                    timeLeft--;
-                    if (timeLeft < 0) {
-                        clearInterval(interval);
-                        resolve();
-                    }
-                }, 1000);
-            });
+            // 🔥 AUTO CLOSE = PAGE RELOAD 🔥
+            // পেজ রিলোড হলে অ্যাড গায়েব হয়ে যাবে এবং নতুন সেশন শুরু হবে
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
         }
     </script>
 </body>
