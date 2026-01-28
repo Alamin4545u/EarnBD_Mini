@@ -3,142 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnPro Mini App</title>
-    <!-- SDKs -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Reward Ads App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <div id="script_container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; background: #111; color: white; text-align: center; padding: 20px; }
+        .btn { background: #0088cc; border: none; padding: 15px 25px; color: white; border-radius: 10px; cursor: pointer; font-size: 18px; }
+        .stats { margin-top: 20px; background: #222; padding: 15px; border-radius: 10px; }
+    </style>
 </head>
-<body class="bg-[#0b0e14] text-white font-sans">
+<body>
 
-    <!-- Navbar -->
-    <header class="p-4 bg-slate-900 flex justify-between items-center border-b border-white/5">
-        <div class="flex items-center gap-3">
-            <img id="u_photo" class="w-10 h-10 rounded-full border border-blue-500" src="">
-            <span id="u_name" class="font-bold text-sm text-gray-300">Syncing...</span>
-        </div>
-        <div class="text-right">
-            <span id="ip_txt" class="text-[9px] block text-gray-500 font-mono">0.0.0.0</span>
-            <span id="country_txt" class="text-[10px] text-blue-400 font-bold">DETECTING IP...</span>
-        </div>
-    </header>
-
-    <!-- Stats -->
-    <div class="p-8 space-y-8 max-w-md mx-auto">
-        <div class="bg-slate-900/50 p-8 rounded-[2.5rem] border border-white/5 text-center shadow-2xl backdrop-blur-md">
-            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-black mb-2">My Impressions</p>
-            <h2 id="impr_txt" class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-purple-600">0</h2>
-        </div>
-
-        <div class="space-y-4 text-center">
-            <button id="start_btn" onclick="toggleAuto()" class="w-full bg-blue-600 hover:bg-blue-700 py-5 rounded-3xl font-black text-xl shadow-lg transition-all active:scale-95">
-                START AUTO MODE ⚡
-            </button>
-            <p id="status_msg" class="text-xs text-yellow-500 italic font-medium">System ready. Click start.</p>
-        </div>
+    <h2>Welcome to Reward App</h2>
+    <div class="stats">
+        <p>Your Country: <span id="country">Loading...</span></p>
+        <p>Total Impressions: <span id="imp_count">0</span></p>
     </div>
+    <br>
+    <button class="btn" onclick="showRewardAd()">Watch Ad to Earn</button>
 
     <script>
-        // --- সুনির্দিষ্টভাবে একবারই ডিক্লেয়ার করা হয়েছে ---
-        (function() {
-            const SB_URL = 'https://shynfkdspsjyllytsmfd.supabase.co';
-            const SB_KEY = 'sb_publishable_JenZz9hQLPduBYTLapuBzQ_xiQztzWF';
-            
-            // supabase ডিক্লেয়ার করার আগে চেক করে নেওয়া হচ্ছে
-            const supabase = window.supabase.createClient(SB_URL, SB_KEY);
-            const tg = window.Telegram.WebApp;
+        // Supabase Configuration (Change with your own keys)
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            let user = tg.initDataUnsafe.user || {id: 'tester', first_name: 'Guest'};
-            let zoneId = "";
-            let isRunning = false;
+        let user = window.Telegram.WebApp.initDataUnsafe.user;
+        let zoneId = "10197154"; // Default
 
-            // Global Scope এ ফাংশনটি দিয়ে দেওয়া হলো যাতে বাটন খুঁজে পায়
-            window.toggleAuto = function() {
-                isRunning = !isRunning;
-                const btn = document.getElementById('start_btn');
-                if(isRunning) {
-                    btn.innerText = "STOP AUTO MODE 🛑";
-                    btn.classList.replace('bg-blue-600', 'bg-red-600');
-                    startLoop();
-                } else {
-                    location.reload(); 
-                }
-            };
-
-            async function init() {
-                try {
-                    // ১. সেটিংস থেকে জোন আইডি আনা
-                    const { data: config } = await supabase.from('settings').select('*').eq('key', 'ad_zone_id').single();
-                    if(config) zoneId = config.value;
-
-                    // ২. জোন আইডি অনুযায়ী স্ক্রিপ্ট লোড
-                    if(zoneId) {
-                        const s = document.createElement('script');
-                        s.src = `//alwingulla.com/88/tag.min.js`;
-                        s.dataset.zone = zoneId;
-                        document.getElementById('script_container').appendChild(s);
-                    }
-
-                    // ৩. আইপি এবং ইউজার সিঙ্ক
-                    const ipRes = await fetch('https://ip-api.com/json/');
-                    const ipData = await ipRes.json();
-                    
-                    document.getElementById('u_name').innerText = user.first_name;
-                    if(user.photo_url) document.getElementById('u_photo').src = user.photo_url;
-                    document.getElementById('ip_txt').innerText = ipData.query;
-                    document.getElementById('country_txt').innerText = ipData.country;
-
-                    let { data: uData } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
-                    if(!uData) {
-                        const { data: created } = await supabase.from('users').insert([{
-                            telegram_id: user.id.toString(),
-                            first_name: user.first_name,
-                            username: user.username,
-                            photo_url: user.photo_url,
-                            country: ipData.country,
-                            ip_address: ipData.query
-                        }]).select().single();
-                        uData = created;
-                    }
-                    document.getElementById('impr_txt').innerText = uData.impressions || 0;
-                } catch (e) { console.error("Init Error:", e); }
+        // ১. জোন আইডি এবং ইউজার ডাটা লোড করা
+        async function initApp() {
+            // Fetch Zone ID from Admin
+            const { data: settings } = await supabase.from('settings').select('zone_id').single();
+            if (settings) {
+                zoneId = settings.zone_id;
+                loadAdScript(zoneId);
             }
 
-            async function startLoop() {
-                if(!isRunning) return;
-                document.getElementById('status_msg').innerText = "Waiting 15s for next ad...";
-                setTimeout(() => {
-                    if(isRunning) showAd();
-                }, 15000);
-            }
+            // Get Country
+            fetch('https://ipapi.co/json/').then(res => res.json()).then(data => {
+                document.getElementById('country').innerText = data.country_name;
+                updateUserRecord(data.country_name);
+            });
 
-            function showAd() {
-                const showFn = `show_${zoneId}`;
-                if (typeof window[showFn] === 'function') {
-                    document.getElementById('status_msg').innerText = "Ad is loading...";
-                    window[showFn]().then(async () => {
-                        // ইমপ্রেশন আপডেট
-                        await supabase.rpc('increment_stats', { tid: user.id.toString(), col_name: 'impressions' });
-                        const { data } = await supabase.from('users').select('impressions').eq('telegram_id', user.id).single();
-                        document.getElementById('impr_txt').innerText = data.impressions;
-                        tg.HapticFeedback.notificationOccurred('success');
-                        
-                        document.getElementById('status_msg').innerText = "Success! 2s gap...";
-                        setTimeout(startLoop, 2000);
-                    }).catch(() => {
-                        document.getElementById('status_msg').innerText = "Ad failed! Retrying...";
-                        setTimeout(startLoop, 5000);
-                    });
-                } else {
-                    document.getElementById('status_msg').innerText = "Waiting for ad script...";
-                    setTimeout(startLoop, 3000);
-                }
-            }
+            loadUserStats();
+        }
 
-            init();
-        })();
+        // ২. অ্যাড স্ক্রিপ্ট ইনজেক্ট করা
+        function loadAdScript(id) {
+            const script = document.createElement('script');
+            script.src = `https://pizoflow.com/act/show_${id}.js`; // Example provider link
+            document.head.appendChild(script);
+        }
+
+        // ৩. ইউজার ডাটাবেস আপডেট
+        async function updateUserRecord(country) {
+            if (!user) return;
+            const { data } = await supabase.from('user_stats').upsert({
+                telegram_id: user.id,
+                username: user.username || user.first_name,
+                country: country,
+                last_active: new Date()
+            });
+        }
+
+        async function loadUserStats() {
+            if (!user) return;
+            const { data } = await supabase.from('user_stats').select('*').eq('telegram_id', user.id).single();
+            if (data) document.getElementById('imp_count').innerText = data.impressions;
+        }
+
+        // ৪. অ্যাড দেখানো এবং রিওয়ার্ড দেওয়া
+        function showRewardAd() {
+            if (typeof window[`show_${zoneId}`] === 'function') {
+                window[`show_${zoneId}`]().then(async () => {
+                    alert('Reward Granted!');
+                    // ইমপ্রেশন আপডেট
+                    const { data } = await supabase.rpc('increment_impression', { row_id: user.id }); 
+                    // বি:দ্র: Supabase এ একটি Function লিখে নিতে হবে increment এর জন্য
+                    // অথবা নিচের মত সাধারণ আপডেট:
+                    const { data: current } = await supabase.from('user_stats').select('impressions').eq('telegram_id', user.id).single();
+                    await supabase.from('user_stats').update({ impressions: current.impressions + 1 }).eq('telegram_id', user.id);
+                    loadUserStats();
+                });
+            } else {
+                alert("Ad not ready or Invalid Zone ID");
+            }
+        }
+
+        initApp();
     </script>
 </body>
 </html>
