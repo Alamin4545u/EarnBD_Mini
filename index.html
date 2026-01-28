@@ -3,217 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Auto Ad</title>
+    <title>Ultimate Ad Bot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         body {
-            background-color: #050505;
-            color: #00e5ff;
-            font-family: 'Orbitron', sans-serif;
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Teko', sans-serif;
             margin: 0;
             height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
         }
 
         .dashboard {
-            width: 85%;
-            padding: 25px;
-            background: rgba(0, 229, 255, 0.05);
-            border: 1px solid rgba(0, 229, 255, 0.3);
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
-            position: relative;
             z-index: 1;
+            text-align: center;
+            border: 2px solid #0f0;
+            padding: 20px;
+            border-radius: 10px;
+            background: rgba(0, 255, 0, 0.05);
+            width: 80%;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
         }
 
-        h2 { margin: 0 0 20px 0; font-size: 22px; letter-spacing: 2px; }
-
-        .loader-ring {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid rgba(0, 229, 255, 0.1);
-            border-top: 4px solid #00e5ff;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: spin 1s linear infinite;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
-        }
-
-        .timer-text {
-            font-size: 40px;
-            font-weight: bold;
-            animation: none; /* Text shouldn't spin */
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Stop spinning when waiting */
-        .loader-ring.paused { animation: none; border-color: #333; }
-
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
+        .timer { font-size: 60px; font-weight: bold; line-height: 1; }
+        .label { font-size: 20px; color: #888; }
+        .stats { display: flex; justify-content: space-between; margin-top: 20px; font-size: 24px; }
+        
         .btn {
-            background: #00e5ff;
+            margin-top: 20px;
+            padding: 10px 40px;
+            font-size: 20px;
+            background: #0f0;
             color: #000;
             border: none;
-            padding: 12px 30px;
-            font-weight: 800;
-            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
-            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
-            margin-top: 20px;
         }
-        
-        #status { font-size: 12px; color: #888; margin-top: 5px; }
+
+        /* Iframe কন্টেইনার যা স্ক্রিনের উপরে আসবে */
+        #ad-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999; /* সবার উপরে */
+            background: black; /* লোড হওয়ার আগে কালো দেখাবে */
+            display: none; /* শুরুতে লুকানো থাকবে */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
 
     <div class="dashboard">
-        <h2>AUTO AD SYSTEM</h2>
-
-        <div class="loader-ring" id="ring">
-            <div class="timer-text" id="timer">00</div>
-        </div>
-        <div id="status">READY TO START</div>
+        <div class="label" id="status">SYSTEM IDLE</div>
+        <div class="timer" id="timer">00</div>
 
         <div class="stats">
-            <div>
-                <div style="font-size:10px; color:#aaa;">IMPRESSIONS</div>
-                <div id="imp" style="font-size:20px;">0</div>
-            </div>
-            <div>
-                <div style="font-size:10px; color:#aaa;">CYCLES</div>
-                <div id="cyc" style="font-size:20px;">0</div>
-            </div>
+            <div>IMP: <span id="imp">0</span></div>
+            <div>CYC: <span id="cyc">0</span></div>
         </div>
 
-        <button class="btn" id="startBtn" onclick="startSystem()">START ENGINE</button>
+        <button class="btn" onclick="startSystem()" id="startBtn">START</button>
     </div>
 
-    <!-- Script Container (Dynamic injection happen here) -->
-    <div id="ad-script-container"></div>
+    <!-- এই ডিভ এর ভেতর ডায়নামিক আইফ্রেম তৈরি হবে -->
+    <div id="ad-container"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        const AD_DURATION = 15;
-        const GAP_DURATION = 3; // Gap একটু বাড়ালাম যাতে স্ক্রিপ্ট লোড হতে সময় পায়
-
-        let isRunning = false;
+        const AD_TIME = 15;
+        const GAP_TIME = 2;
+        
         let impressions = 0;
         let cycles = 0;
+        let isRunning = false;
 
+        const container = document.getElementById('ad-container');
         const timerEl = document.getElementById('timer');
         const statusEl = document.getElementById('status');
-        const ringEl = document.getElementById('ring');
-        const impEl = document.getElementById('imp');
-        const cycEl = document.getElementById('cyc');
 
         function startSystem() {
-            if (isRunning) return;
+            if(isRunning) return;
             isRunning = true;
             document.getElementById('startBtn').style.display = 'none';
-            runLoop();
+            runCycle();
         }
 
-        async function runLoop() {
-            // ১. গ্যাপ ফেইজ (পুরানো সব ক্লিন করা)
-            cleanupAds();
-            ringEl.classList.add('paused');
-            await countdown(GAP_DURATION, "LOADING NEW AD...");
+        async function runCycle() {
+            // ১. গ্যাপ টাইম (২ সেকেন্ড)
+            container.style.display = 'none'; // আগের ফ্রেম লুকানো
+            container.innerHTML = ''; // আগের ফ্রেম ধ্বংস করা (Memory Clear)
+            
+            await countdown(GAP_TIME, "PREPARING...", false);
 
-            // ২. নতুন স্ক্রিপ্ট লোড করা (Re-Injection)
-            statusEl.innerText = "REQUESTING AD...";
-            loadAdScript();
+            // ২. নতুন ফ্রেম তৈরি এবং অ্যাড লোড
+            statusEl.innerText = "LOADING AD...";
+            createAdFrame();
 
-            // ৩. অ্যাড শো করার জন্য একটু সময় দেওয়া (১ সেকেন্ড)
-            await new Promise(r => setTimeout(r, 1500)); 
+            // ৩. অ্যাড দেখার সময় (১৫ সেকেন্ড)
+            // এখানে আমরা ফ্রেম শো করব
+            container.style.display = 'block'; 
+            await countdown(AD_TIME, "WATCHING AD...", true);
 
-            // ৪. অ্যাড দেখানোর চেষ্টা
-            tryShowAd();
-
-            // ৫. অ্যাড দেখার সময় (১৫ সেকেন্ড)
-            ringEl.classList.remove('paused');
-            await countdown(AD_DURATION, "WATCHING AD...");
-
-            // ৬. লুপ শেষ, কাউন্টার আপডেট
+            // ৪. সাইকেল শেষ
+            impressions++; // ধরে নিচ্ছি অ্যাড লোড হয়েছে
             cycles++;
-            cycEl.innerText = cycles;
+            document.getElementById('imp').innerText = impressions;
+            document.getElementById('cyc').innerText = cycles;
+
+            // ৫. লুপ
+            runCycle();
+        }
+
+        function createAdFrame() {
+            // একটি নতুন আইফ্রেম তৈরি করা হচ্ছে
+            const iframe = document.createElement('iframe');
             
-            // ৭. আবার শুরু
-            runLoop();
-        }
+            // আইফ্রেমের ভেতর Monetag স্ক্রিপ্ট রাইট করা হচ্ছে
+            // এটি ব্রাউজারের কাছে প্রতিবার 'নতুন পেজ' হিসেবে গণ্য হবে
+            const htmlContent = `
+                <!DOCTYPE html>
+                <body style="margin:0;padding:0;background:black;display:flex;justify-content:center;align-items:center;height:100vh;color:white;">
+                    <h2 style="font-family:sans-serif;">LOADING AD...</h2>
+                    
+                    <!-- MONETAG SCRIPT -->
+                    <script src="//libtl.com/sdk.js" data-zone="10197154" data-sdk="show_10197154"><\/script>
+                    
+                    <script>
+                        // স্ক্রিপ্ট লোড হলেই অ্যাড কল করবে
+                        window.onload = function() {
+                            if(typeof show_10197154 === 'function') {
+                                show_10197154().then(() => {
+                                    console.log('Ad Done');
+                                });
+                            }
+                        };
+                    <\/script>
+                </body>
+            `;
 
-        function loadAdScript() {
-            // পুরানো কন্টেইনার খালি করা
-            const container = document.getElementById('ad-script-container');
-            container.innerHTML = ''; 
-
-            // নতুন স্ক্রিপ্ট তৈরি
-            const script = document.createElement('script');
-            // Cache এড়ানোর জন্য টাইমস্ট্যাম্প যোগ করা হলো (?t=...)
-            script.src = '//libtl.com/sdk.js?t=' + Date.now(); 
-            script.setAttribute('data-zone', '10197154');
-            script.setAttribute('data-sdk', 'show_10197154');
+            container.appendChild(iframe);
             
-            container.appendChild(script);
+            // আইফ্রেমের ডকুমেন্টে কন্টেন্ট পুশ করা
+            iframe.contentWindow.document.open();
+            iframe.contentWindow.document.write(htmlContent);
+            iframe.contentWindow.document.close();
         }
 
-        function tryShowAd() {
-            try {
-                if (typeof show_10197154 === 'function') {
-                    show_10197154().then(() => {
-                        console.log("Ad shown");
-                    });
-                    impressions++;
-                    impEl.innerText = impressions;
-                } else {
-                    console.log("Ad function not ready yet");
-                }
-            } catch (e) { console.error(e); }
-        }
-
-        function cleanupAds() {
-            console.log("Cleaning up...");
-            // iframe রিমুভ
-            document.querySelectorAll('iframe').forEach(el => el.remove());
-            // পপআপ ডিভ রিমুভ
-            document.querySelectorAll('div').forEach(el => {
-                const style = window.getComputedStyle(el);
-                if (style.position === 'fixed' && style.zIndex > 999) {
-                    el.remove();
-                }
-            });
-            // পুরানো স্ক্রিপ্ট রিমুভ (যদিও loadAdScript এটা হ্যান্ডেল করে, তবুও সেফটি)
-            document.getElementById('ad-script-container').innerHTML = '';
-        }
-
-        function countdown(seconds, text) {
+        function countdown(seconds, text, isAd) {
             return new Promise(resolve => {
                 statusEl.innerText = text;
                 let timeLeft = seconds;
-                
                 const interval = setInterval(() => {
                     timerEl.innerText = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
                     timeLeft--;
