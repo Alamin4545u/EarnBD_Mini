@@ -3,126 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Impression App</title>
+    <title>EarnBD Pro - High eCPM</title>
+    <!-- SDKs -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <div id="ad_tag_container"></div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        .btn-grad { background-image: linear-gradient(to right, #2563eb 0%, #7c3aed 51%, #2563eb 100%); transition: 0.5s; background-size: 200% auto; }
+        .btn-grad:hover { background-position: right center; }
+        @keyframes pulse-ring { 0% { transform: scale(.33); opacity: 1; } 80%, 100% { opacity: 0; } }
+        .status-dot { position: relative; width: 10px; height: 10px; border-radius: 50%; }
+        .status-dot::before { content: ''; position: absolute; width: 300%; height: 300%; left: -100%; top: -100%; border-radius: 50%; background-color: inherit; animation: pulse-ring 1.25s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+    </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen">
+<body class="bg-[#0b0e14] text-white font-sans selection:bg-blue-500/30">
 
-    <div class="p-5 flex justify-between items-center bg-slate-900 border-b border-slate-800">
-        <div id="u_name" class="font-bold text-sm">Loading...</div>
-        <div id="proxy_badge" class="px-3 py-1 rounded-full text-[10px] bg-red-600">IP Check...</div>
-    </div>
-
-    <div class="p-8 space-y-6">
-        <div class="grid grid-cols-2 gap-4">
-            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 text-center">
-                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Impressions</div>
-                <div id="impr_txt" class="text-3xl font-black text-blue-500">0</div>
+    <!-- Header -->
+    <header class="p-4 flex justify-between items-center glass border-b border-white/10 sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <div id="u_photo_container" class="relative">
+                <img id="u_photo" class="w-10 h-10 rounded-full border border-blue-500/50" src="https://via.placeholder.com/100">
+                <div id="online_dot" class="status-dot bg-gray-500 absolute bottom-0 right-0"></div>
             </div>
-            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 text-center">
-                <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Target</div>
-                <div id="limit_txt" class="text-3xl font-black text-yellow-500">0</div>
+            <div>
+                <h1 id="u_name" class="text-sm font-bold tracking-tight">Syncing...</h1>
+                <p id="ip_address" class="text-[10px] text-gray-400 font-mono">0.0.0.0</p>
             </div>
         </div>
+        <div id="proxy_badge" class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-800 text-gray-400 border border-white/5">
+            Checking...
+        </div>
+    </header>
 
-        <button onclick="handleAdClick()" id="ad_btn" disabled class="w-full bg-blue-600 disabled:bg-slate-800 py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-95 transition-all">
-            Watch Ad ⚡
-        </button>
-        <p id="msg" class="text-center text-xs text-yellow-500 font-medium"></p>
-    </div>
+    <main class="p-6 max-w-md mx-auto space-y-8">
+        <!-- Stats Card -->
+        <section class="grid grid-cols-2 gap-4">
+            <div class="glass p-5 rounded-3xl border border-white/5 text-center relative overflow-hidden group">
+                <div class="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-1">Impressions</p>
+                <h2 id="impr_count" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-blue-600">0</h2>
+            </div>
+            <div class="glass p-5 rounded-3xl border border-white/5 text-center relative overflow-hidden group">
+                <div class="absolute inset-0 bg-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-1">Daily Goal</p>
+                <h2 id="limit_display" class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-yellow-400 to-yellow-600">0</h2>
+            </div>
+        </section>
+
+        <!-- Status Message -->
+        <div id="status_box" class="text-center">
+            <p id="msg" class="text-sm font-medium text-blue-400/80 animate-pulse italic">Connecting to secure server...</p>
+        </div>
+
+        <!-- Action Button -->
+        <div class="relative pt-4">
+            <button onclick="triggerAd()" id="ad_btn" disabled class="w-full btn-grad py-5 rounded-3xl font-black text-lg shadow-[0_10px_40px_-10px_rgba(37,99,235,0.4)] disabled:opacity-30 disabled:grayscale transition-all active:scale-95 flex items-center justify-center space-x-3">
+                <span>WATCH AD</span>
+                <i class="fas fa-bolt text-yellow-300"></i>
+            </button>
+        </div>
+
+        <!-- Progress Footer -->
+        <div class="pt-10">
+            <div class="flex justify-between text-[10px] text-gray-500 font-bold uppercase mb-2">
+                <span>Progress</span>
+                <span id="progress_percent">0%</span>
+            </div>
+            <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                <div id="progress_bar" class="bg-gradient-to-r from-blue-600 to-purple-600 h-full w-0 transition-all duration-500"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Monetag Script Container -->
+    <div id="ad_script_holder"></div>
 
     <script>
+        // --- SECURE CONFIGURATION ---
         const SB_URL = 'https://shynfkdspsjyllytsmfd.supabase.co';
         const SB_KEY = 'sb_publishable_JenZz9hQLPduBYTLapuBzQ_xiQztzWF';
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
         const tg = window.Telegram.WebApp;
 
-        let user = tg.initDataUnsafe.user || {id: 'tester_id', first_name: 'Tester'};
+        let currentUser = tg.initDataUnsafe.user || {id: 'tester_01', first_name: 'Developer'};
+        let appConfig = {};
         let dbUser = null;
-        let config = {};
+        let isIPValid = false;
 
-        async function init() {
-            document.getElementById('u_name').innerText = user.first_name;
-            
-            // ১. সেটিংস লোড করা
-            const { data } = await supabase.from('settings').select('*');
-            if(data) data.forEach(s => config[s.key] = s.value);
+        async function initApp() {
+            try {
+                // 1. Load Admin Settings First
+                const { data: settingsData } = await supabase.from('settings').select('*');
+                settingsData.forEach(s => appConfig[s.key] = s.value);
 
-            // ২. অ্যাড ট্যাগ লোড করা
-            const adScript = document.createElement('script');
-            adScript.src = `//alwingulla.com/88/tag.min.js`;
-            adScript.dataset.zone = config.ad_zone_id;
-            document.getElementById('ad_tag_container').appendChild(adScript);
+                // 2. Load Ad Script
+                const script = document.createElement('script');
+                script.src = `//alwingulla.com/88/tag.min.js`;
+                script.dataset.zone = appConfig.ad_zone_id;
+                document.getElementById('ad_script_holder').appendChild(script);
 
-            // ৩. প্রক্সি চেক এবং ইউজার ডাটা সিঙ্ক
-            await checkIPAndSync();
+                // 3. Setup UI
+                document.getElementById('u_name').innerText = currentUser.first_name;
+                if(currentUser.photo_url) document.getElementById('u_photo').src = currentUser.photo_url;
+
+                // 4. IP Check & User Sync
+                await runValidation();
+            } catch (err) {
+                console.error("Initialization Failed:", err);
+                document.getElementById('msg').innerText = "❌ System Error. Refresh App.";
+            }
         }
 
-        async function checkIPAndSync() {
+        async function runValidation() {
             try {
-                const res = await fetch('https://ipapi.co/json/');
+                const res = await fetch('https://ip-api.com/json/?fields=status,country,query');
                 const ipData = await res.json();
-                const userCountry = ipData.country_name;
-                const allowed = config.allowed_countries.split(',').map(c => c.trim());
+                
+                document.getElementById('ip_address').innerText = ipData.query;
+                const userCountry = ipData.country;
+                const allowedCountries = appConfig.allowed_countries.split(',').map(c => c.trim());
 
-                // ইউজার ডাটাবেসে আছে কি না দেখা
-                let { data: uData } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
+                // Sync with DB
+                let { data: uData } = await supabase.from('users').select('*').eq('telegram_id', currentUser.id).single();
                 
                 if(!uData) {
                     const { data: newUser } = await supabase.from('users').insert([{
-                        telegram_id: user.id.toString(),
-                        first_name: user.first_name,
+                        telegram_id: currentUser.id.toString(),
+                        first_name: currentUser.first_name,
                         country: userCountry,
-                        daily_limit: parseInt(config.default_limit)
+                        daily_limit: parseInt(appConfig.default_limit)
                     }]).select().single();
                     uData = newUser;
                 } else {
-                    await supabase.from('users').update({ country: userCountry }).eq('telegram_id', user.id);
+                    await supabase.from('users').update({ country: userCountry }).eq('telegram_id', currentUser.id);
                 }
                 
                 dbUser = uData;
-                updateAppUI(allowed.includes(userCountry), userCountry);
-            } catch (e) { console.error(e); }
+                isIPValid = allowedCountries.includes(userCountry);
+                updateUI(userCountry);
+            } catch (e) {
+                document.getElementById('msg').innerText = "⚠️ Network unstable. Re-checking...";
+                setTimeout(runValidation, 3000);
+            }
         }
 
-        function updateAppUI(isAllowed, country) {
-            document.getElementById('impr_txt').innerText = dbUser.impressions;
-            document.getElementById('limit_txt').innerText = dbUser.daily_limit;
-            const badge = document.getElementById('proxy_badge');
-            badge.innerText = country;
+        function updateUI(country) {
+            const impr = dbUser.impressions || 0;
+            const limit = dbUser.daily_limit || 10;
+            const progress = Math.min((impr / limit) * 100, 100);
 
-            if (isAllowed) {
-                badge.classList.replace('bg-red-600', 'bg-green-600');
-                if(dbUser.impressions < dbUser.daily_limit) {
+            document.getElementById('impr_count').innerText = impr;
+            document.getElementById('limit_display').innerText = limit;
+            document.getElementById('progress_percent').innerText = Math.round(progress) + "%";
+            document.getElementById('progress_bar').style.width = progress + "%";
+            document.getElementById('proxy_badge').innerText = country;
+
+            if (isIPValid) {
+                document.getElementById('proxy_badge').className = "px-3 py-1 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20";
+                document.getElementById('online_dot').className = "status-dot bg-green-500 absolute bottom-0 right-0";
+                
+                if (impr < limit) {
                     document.getElementById('ad_btn').disabled = false;
-                    document.getElementById('msg').innerText = "✅ High CPM Proxy Connected!";
+                    document.getElementById('msg').className = "text-sm font-medium text-green-400";
+                    document.getElementById('msg').innerText = "⚡ System Ready. Watch ad to earn.";
                 } else {
-                    document.getElementById('msg').innerText = "🚫 Limit Over for today!";
+                    document.getElementById('ad_btn').disabled = true;
+                    document.getElementById('msg').innerText = "🚫 Daily limit reached. Come back tomorrow!";
                 }
             } else {
-                document.getElementById('msg').innerText = `❌ Connect to: ${config.allowed_countries}`;
+                document.getElementById('proxy_badge').className = "px-3 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20";
+                document.getElementById('ad_btn').disabled = true;
+                document.getElementById('msg').className = "text-sm font-medium text-red-400";
+                document.getElementById('msg').innerText = `❌ Only Allowed: ${appConfig.allowed_countries}`;
             }
         }
 
-        async function handleAdClick() {
-            const adFn = `show_${config.ad_zone_id}`;
-            if (typeof window[adFn] === 'function') {
-                window[adFn]().then(async () => {
-                    const { data } = await supabase.from('users')
+        function triggerAd() {
+            const zoneId = appConfig.ad_zone_id;
+            const showFunction = `show_${zoneId}`;
+
+            if (typeof window[showFunction] === 'function') {
+                document.getElementById('ad_btn').disabled = true;
+                document.getElementById('msg').innerText = "🔄 Ad is loading... Please wait.";
+
+                window[showFunction]().then(async () => {
+                    // Ad Successful
+                    const { data: updatedUser } = await supabase.from('users')
                         .update({ impressions: dbUser.impressions + 1 })
-                        .eq('telegram_id', user.id).select().single();
-                    dbUser = data;
-                    updateAppUI(true, dbUser.country);
+                        .eq('telegram_id', currentUser.id)
+                        .select()
+                        .single();
+                    
+                    dbUser = updatedUser;
+                    updateUI(dbUser.country);
+                    tg.HapticFeedback.notificationOccurred('success');
+                }).catch(e => {
+                    alert("Ad failed to load. Please try again.");
+                    document.getElementById('ad_btn').disabled = false;
                 });
             } else {
-                alert("Ad script not ready. Check Zone ID.");
+                alert("Ad System Busy. Please wait 5 seconds.");
             }
         }
 
-        init();
+        initApp();
     </script>
 </body>
 </html>
