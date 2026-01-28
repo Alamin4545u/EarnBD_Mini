@@ -2,222 +2,219 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Reward Pro Max - Ultra Fast</title>
-
-    <!-- Monetag SDK - Priority Load -->
-    <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
-
-    <!-- Telegram WebApp SDK -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Impression Pro</title>
+    <!-- SDKs -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <style>
-        :root {
-            --neon: #00ffcc;
-            --bg: #05080a;
-            --card: rgba(255, 255, 255, 0.03);
-        }
-
-        body {
-            background-color: var(--bg);
-            color: #ffffff;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .app-container {
-            width: 90%;
-            max-width: 360px;
-            background: var(--card);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 40px 20px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 40px rgba(0, 255, 204, 0.1);
-        }
-
-        .header-title {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: var(--neon);
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .status-badge {
-            font-size: 10px;
-            background: rgba(0, 255, 204, 0.1);
-            padding: 5px 15px;
-            border-radius: 50px;
-            color: var(--neon);
-            border: 1px solid var(--neon);
-            display: inline-block;
-            margin-bottom: 25px;
-        }
-
-        #timer {
-            font-size: 90px;
-            font-weight: 900;
-            margin: 10px 0;
-            background: linear-gradient(180deg, #fff, var(--neon));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .stats-box {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .count-val {
-            font-size: 32px;
-            font-weight: bold;
-            color: #ffffff;
-            display: block;
-        }
-
-        .count-label {
-            font-size: 11px;
-            color: #666;
-            text-transform: uppercase;
-        }
-
-        .btn-ignite {
-            width: 100%;
-            padding: 18px;
-            background: var(--neon);
-            color: #000;
-            border: none;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 255, 204, 0.2);
-            transition: 0.3s;
-        }
-
-        .btn-ignite:active { transform: scale(0.95); }
-
-        .loader-text {
-            font-size: 13px;
-            color: #888;
-            margin-top: 15px;
-            height: 20px;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Monetag Rewarded Interstitial Script -->
+    <script src="//alwingulla.com/88/tag.min.js" data-zone="10197154" async data-cfasync="false"></script>
 </head>
-<body>
+<body class="bg-gray-950 text-white font-sans">
 
-    <div class="app-container">
-        <div class="header-title">Reward Engine</div>
-        <div class="status-badge" id="status-pill">SYSTEM READY</div>
-
-        <div id="start-screen">
-            <p style="color: #666; margin-bottom: 30px;">Premium High-CPM Reward Only Mode</p>
-            <button class="btn-ignite" onclick="startEngine()">IGNITE ENGINE</button>
-        </div>
-
-        <div id="active-screen" style="display: none;">
-            <div id="timer">03</div>
-            <div class="loader-text" id="msg">Awaiting Ad-Server...</div>
-            
-            <div class="stats-box">
-                <span class="count-val" id="total-imp">0</span>
-                <span class="count-label">Verified Reward Impressions</span>
+    <!-- Header Section -->
+    <div class="p-5 bg-gray-900 border-b border-gray-800 flex justify-between items-center shadow-md">
+        <div class="flex items-center space-x-3">
+            <img id="u_photo" class="w-12 h-12 rounded-full border-2 border-blue-500 shadow-lg" src="https://via.placeholder.com/50">
+            <div>
+                <h2 id="u_name" class="font-bold text-sm">Loading...</h2>
+                <div id="proxy_status" class="text-[10px] text-red-400 font-semibold">Checking Proxy...</div>
             </div>
+        </div>
+        <div class="text-right">
+            <p class="text-[10px] text-gray-400">DAILY LIMIT</p>
+            <p id="limit_display" class="text-xs font-bold text-yellow-500">0/10</p>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="p-6 grid grid-cols-2 gap-4">
+        <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center shadow-inner">
+            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Impressions</p>
+            <h3 id="impr_count" class="text-3xl font-black text-blue-500">0</h3>
+        </div>
+        <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center shadow-inner">
+            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Clicks</p>
+            <h3 id="click_count" class="text-3xl font-black text-green-500">0</h3>
+        </div>
+    </div>
+
+    <!-- Control Section -->
+    <div class="px-6 space-y-4">
+        <div id="status_msg" class="text-center text-xs font-medium text-gray-500 min-h-[1rem]"></div>
+        
+        <button onclick="runAutoImpression()" id="main_btn" class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 py-4 rounded-2xl font-bold text-lg shadow-lg transform active:scale-95 transition-all">
+            Start Auto Impression ⚡
+        </button>
+
+        <button onclick="handleManualClick()" class="w-full bg-gray-800 hover:bg-gray-700 py-3 rounded-xl font-semibold text-sm transition-all border border-gray-700">
+            Claim Click Bonus ✅
+        </button>
+
+        <!-- Admin Access -->
+        <button id="admin_btn" onclick="toggleAdmin()" class="hidden w-full mt-6 text-gray-600 text-[10px] uppercase font-bold tracking-tighter underline">
+            Admin Panel Control
+        </button>
+    </div>
+
+    <!-- Admin Panel (Overlay) -->
+    <div id="admin_panel" class="hidden fixed inset-0 bg-white text-black z-50 overflow-y-auto p-4">
+        <div class="flex justify-between items-center mb-6 border-b pb-2">
+            <h2 class="text-xl font-bold">Live Admin Dashboard</h2>
+            <button onclick="toggleAdmin()" class="bg-red-500 text-white px-3 py-1 rounded-lg font-bold">Close</button>
+        </div>
+        <div id="admin_content" class="text-xs">
+            <table class="w-full border-collapse border">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border p-1">User</th>
+                        <th class="border p-1">Proxy</th>
+                        <th class="border p-1">Imp/Clk</th>
+                    </tr>
+                </thead>
+                <tbody id="user_table"></tbody>
+            </table>
         </div>
     </div>
 
     <script>
-        const tele = window.Telegram.WebApp;
-        tele.expand();
-        tele.headerColor = "#05080a";
+        // --- CONFIGURATION ---
+        const SB_URL = 'https://shynfkdspsjyllytsmfd.supabase.co';
+        const SB_KEY = 'sb_publishable_JenZz9hQLPduBYTLapuBzQ_xiQztzWF';
+        const TARGET_COUNTRY = 'Canada'; // আপনি যে দেশ চান
 
-        let totalCount = localStorage.getItem('premium_reward_count') || 0;
-        document.getElementById('total-imp').innerText = totalCount;
+        const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        function startEngine() {
-            localStorage.setItem('engine_running', 'true');
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('active-screen').style.display = 'block';
-            document.getElementById('status-pill').innerText = "LIVE TUNNEL ACTIVE";
+        let user = tg.initDataUnsafe.user || {id: 'test_user', first_name: 'Browser User'};
+        let dbUser = null;
+        let isCanada = false;
+
+        // --- APP INITIALIZATION ---
+        async function init() {
+            document.getElementById('u_name').innerText = user.first_name;
+            if(user.photo_url) document.getElementById('u_photo').src = user.photo_url;
             
-            runTimer();
-        }
-
-        function runTimer() {
-            let timeLeft = 2; // Ultra-fast 3-second timer
-            const timerEl = document.getElementById('timer');
-            const msgEl = document.getElementById('msg');
-
-            const countdown = setInterval(() => {
-                timeLeft--;
-                timerEl.innerText = timeLeft < 10 ? "0" + timeLeft : timeLeft;
-
-                if (timeLeft <= 1) {
-                    msgEl.innerText = "⚡ Requesting Reward Ad...";
-                    msgEl.style.color = "#00ffcc";
-                }
-
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    showPremiumAd();
-                }
-            }, 1000);
-        }
-
-        async function showPremiumAd() {
-            // ১. শুধুমাত্র Reward Interstitial কল করা
-            if (typeof show_10197154 === 'function') {
-                try {
-                    show_10197154().then(() => {
-                        processNext();
-                    }).catch(e => {
-                        console.error("Ad Failed");
-                        setTimeout(processNext, 2000);
-                    });
-                } catch (err) {
-                    setTimeout(processNext, 2000);
-                }
-            }
-
-            // ২. Force-Clear লজিক (১৫ সেকেন্ড ডেডলাইন)
-            // রিওয়ার্ড অ্যাডের ফুল ইম্প্রেশন পেতে ১৫ সেকেন্ড থাকা জরুরি
-            setTimeout(() => {
-                processNext();
-            }, 15000); 
-        }
-
-        function processNext() {
-            // Increment Count
-            let current = parseInt(localStorage.getItem('premium_reward_count') || 0);
-            localStorage.setItem('premium_reward_count', current + 1);
+            // Proxy Check
+            await checkIP();
+            // DB Sync
+            await syncUser();
             
-            // Haptic feedback (Premium feel)
-            if (tele.HapticFeedback) {
-                tele.HapticFeedback.notificationOccurred('success');
-            }
-
-            // Force hard-reload to refresh session and bypass capping
-            location.reload();
+            // Admin Check (আপনার আইডি বসাবেন)
+            if(user.id == 12345678) document.getElementById('admin_btn').classList.remove('hidden');
         }
 
-        // Auto-restart logic
-        window.onload = () => {
-            if (localStorage.getItem('engine_running') === 'true') {
-                startEngine();
+        async function checkIP() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                const country = data.country_name;
+                const badge = document.getElementById('proxy_status');
+                
+                if(country === TARGET_COUNTRY) {
+                    badge.innerText = `PROXY: ${country} ✅`;
+                    badge.className = "text-[10px] text-green-400 font-semibold";
+                    isCanada = true;
+                } else {
+                    badge.innerText = `PROXY: ${country} ❌`;
+                    document.getElementById('main_btn').disabled = true;
+                    document.getElementById('status_msg').innerText = `Connect to ${TARGET_COUNTRY} to work!`;
+                }
+            } catch (e) { console.log("IP Check failed"); }
+        }
+
+        async function syncUser() {
+            let { data, error } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
+
+            if (!data) {
+                const { data: newUser } = await supabase.from('users').insert([{
+                    telegram_id: user.id.toString(),
+                    first_name: user.first_name,
+                    daily_limit: 10
+                }]).select().single();
+                dbUser = newUser;
+            } else {
+                dbUser = data;
             }
-        };
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('impr_count').innerText = dbUser.impressions;
+            document.getElementById('click_count').innerText = dbUser.clicks;
+            document.getElementById('limit_display').innerText = `${dbUser.impressions}/${dbUser.daily_limit}`;
+            
+            if(dbUser.impressions >= dbUser.daily_limit) {
+                document.getElementById('main_btn').disabled = true;
+                document.getElementById('main_btn').innerText = "Daily Limit Reached!";
+            }
+        }
+
+        // --- AD LOGIC ---
+        async function runAutoImpression() {
+            if(!isCanada) return alert("Proxy required!");
+
+            document.getElementById('main_btn').disabled = true;
+            document.getElementById('status_msg').innerText = "Ad is loading...";
+
+            // Calling your provided Monetag function
+            if (typeof show_10197154 !== 'undefined') {
+                show_10197154().then(async () => {
+                    await updateDB('impressions');
+                    document.getElementById('status_msg').innerText = "Impression Added! Wait 5s...";
+                    setTimeout(() => {
+                        if(dbUser.impressions < dbUser.daily_limit) {
+                            document.getElementById('main_btn').disabled = false;
+                        }
+                    }, 5000);
+                });
+            } else {
+                alert("Ad script not loaded yet!");
+            }
+        }
+
+        async function handleManualClick() {
+            if(confirm("Did you click the ad and stay for 30s?")) {
+                await updateDB('clicks');
+            }
+        }
+
+        async function updateDB(column) {
+            const { data } = await supabase
+                .from('users')
+                .update({ [column]: dbUser[column] + 1 })
+                .eq('telegram_id', user.id)
+                .select().single();
+            dbUser = data;
+            updateUI();
+        }
+
+        // --- ADMIN PANEL ---
+        function toggleAdmin() {
+            const panel = document.getElementById('admin_panel');
+            panel.classList.toggle('hidden');
+            if(!panel.classList.contains('hidden')) loadAdminData();
+        }
+
+        async function loadAdminData() {
+            const { data } = await supabase.from('users').select('*');
+            const table = document.getElementById('user_table');
+            table.innerHTML = "";
+            data.forEach(u => {
+                table.innerHTML += `
+                    <tr>
+                        <td class="border p-1">${u.first_name}</td>
+                        <td class="border p-1 font-bold ${u.country === TARGET_COUNTRY ? 'text-green-600' : 'text-red-600'}">${u.country}</td>
+                        <td class="border p-1">${u.impressions}/${u.clicks}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        init();
     </script>
 </body>
 </html>
