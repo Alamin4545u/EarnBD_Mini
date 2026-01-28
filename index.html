@@ -3,137 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Impression Pro</title>
-    <!-- SDKs -->
+    <title>Auto Impression App</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Monetag Rewarded Interstitial Script -->
-    <script src="//alwingulla.com/88/tag.min.js" data-zone="10197154" async data-cfasync="false"></script>
+    <!-- Dynamic Ad Tag will be loaded here -->
+    <div id="ad_script_container"></div>
 </head>
-<body class="bg-gray-950 text-white font-sans">
+<body class="bg-black text-white">
 
-    <!-- Header Section -->
-    <div class="p-5 bg-gray-900 border-b border-gray-800 flex justify-between items-center shadow-md">
-        <div class="flex items-center space-x-3">
-            <img id="u_photo" class="w-12 h-12 rounded-full border-2 border-blue-500 shadow-lg" src="https://via.placeholder.com/50">
-            <div>
-                <h2 id="u_name" class="font-bold text-sm">Loading...</h2>
-                <div id="proxy_status" class="text-[10px] text-red-400 font-semibold">Checking Proxy...</div>
+    <div class="p-5 flex justify-between items-center bg-gray-900">
+        <div id="u_name" class="font-bold">Loading...</div>
+        <div id="proxy_badge" class="px-2 py-1 rounded text-xs bg-red-600">Checking Proxy...</div>
+    </div>
+
+    <div class="p-10 text-center space-y-6">
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-800 p-5 rounded-xl">
+                <div class="text-xs text-gray-400">Impressions</div>
+                <div id="impr_txt" class="text-3xl font-bold">0</div>
+            </div>
+            <div class="bg-gray-800 p-5 rounded-xl">
+                <div class="text-xs text-gray-400">Limit</div>
+                <div id="limit_txt" class="text-3xl font-bold">0/0</div>
             </div>
         </div>
-        <div class="text-right">
-            <p class="text-[10px] text-gray-400">DAILY LIMIT</p>
-            <p id="limit_display" class="text-xs font-bold text-yellow-500">0/10</p>
-        </div>
-    </div>
 
-    <!-- Stats Section -->
-    <div class="p-6 grid grid-cols-2 gap-4">
-        <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center shadow-inner">
-            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Impressions</p>
-            <h3 id="impr_count" class="text-3xl font-black text-blue-500">0</h3>
-        </div>
-        <div class="bg-gray-900 p-4 rounded-2xl border border-gray-800 text-center shadow-inner">
-            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Clicks</p>
-            <h3 id="click_count" class="text-3xl font-black text-green-500">0</h3>
-        </div>
-    </div>
-
-    <!-- Control Section -->
-    <div class="px-6 space-y-4">
-        <div id="status_msg" class="text-center text-xs font-medium text-gray-500 min-h-[1rem]"></div>
-        
-        <button onclick="runAutoImpression()" id="main_btn" class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 py-4 rounded-2xl font-bold text-lg shadow-lg transform active:scale-95 transition-all">
-            Start Auto Impression ⚡
+        <button onclick="showAd()" id="ad_btn" disabled class="w-full bg-blue-600 disabled:bg-gray-700 py-4 rounded-2xl font-bold text-xl">
+            Watch Ad ⚡
         </button>
-
-        <button onclick="handleManualClick()" class="w-full bg-gray-800 hover:bg-gray-700 py-3 rounded-xl font-semibold text-sm transition-all border border-gray-700">
-            Claim Click Bonus ✅
-        </button>
-
-        <!-- Admin Access -->
-        <button id="admin_btn" onclick="toggleAdmin()" class="hidden w-full mt-6 text-gray-600 text-[10px] uppercase font-bold tracking-tighter underline">
-            Admin Panel Control
-        </button>
-    </div>
-
-    <!-- Admin Panel (Overlay) -->
-    <div id="admin_panel" class="hidden fixed inset-0 bg-white text-black z-50 overflow-y-auto p-4">
-        <div class="flex justify-between items-center mb-6 border-b pb-2">
-            <h2 class="text-xl font-bold">Live Admin Dashboard</h2>
-            <button onclick="toggleAdmin()" class="bg-red-500 text-white px-3 py-1 rounded-lg font-bold">Close</button>
-        </div>
-        <div id="admin_content" class="text-xs">
-            <table class="w-full border-collapse border">
-                <thead>
-                    <tr class="bg-gray-200">
-                        <th class="border p-1">User</th>
-                        <th class="border p-1">Proxy</th>
-                        <th class="border p-1">Imp/Clk</th>
-                    </tr>
-                </thead>
-                <tbody id="user_table"></tbody>
-            </table>
-        </div>
+        <p id="msg" class="text-sm text-yellow-500"></p>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const SB_URL = 'https://shynfkdspsjyllytsmfd.supabase.co';
         const SB_KEY = 'sb_publishable_JenZz9hQLPduBYTLapuBzQ_xiQztzWF';
-        const TARGET_COUNTRY = 'Canada'; // আপনি যে দেশ চান
-
         const supabase = window.supabase.createClient(SB_URL, SB_KEY);
         const tg = window.Telegram.WebApp;
-        tg.expand();
 
-        let user = tg.initDataUnsafe.user || {id: 'test_user', first_name: 'Browser User'};
+        let user = tg.initDataUnsafe.user || {id: '12345', first_name: 'Guest'};
         let dbUser = null;
-        let isCanada = false;
+        let settings = {};
 
-        // --- APP INITIALIZATION ---
         async function init() {
             document.getElementById('u_name').innerText = user.first_name;
-            if(user.photo_url) document.getElementById('u_photo').src = user.photo_url;
             
-            // Proxy Check
-            await checkIP();
-            // DB Sync
+            // 1. Load Admin Settings
+            const { data: sData } = await supabase.from('settings').select('*');
+            sData.forEach(s => settings[s.key] = s.value);
+
+            // 2. Load Ad Script
+            const script = document.createElement('script');
+            script.src = `//alwingulla.com/88/tag.min.js`;
+            script.dataset.zone = settings.ad_zone_id;
+            document.getElementById('ad_script_container').appendChild(script);
+
+            // 3. Check Proxy/Country
+            await checkProxy();
+            
+            // 4. Load/Sync User
             await syncUser();
-            
-            // Admin Check (আপনার আইডি বসাবেন)
-            if(user.id == 12345678) document.getElementById('admin_btn').classList.remove('hidden');
         }
 
-        async function checkIP() {
+        async function checkProxy() {
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const data = await res.json();
-                const country = data.country_name;
-                const badge = document.getElementById('proxy_status');
-                
-                if(country === TARGET_COUNTRY) {
-                    badge.innerText = `PROXY: ${country} ✅`;
-                    badge.className = "text-[10px] text-green-400 font-semibold";
-                    isCanada = true;
+                const userCountry = data.country_name;
+                const allowed = settings.allowed_countries.split(',').map(c => c.trim());
+
+                const badge = document.getElementById('proxy_badge');
+                badge.innerText = userCountry;
+
+                if (allowed.includes(userCountry)) {
+                    badge.classList.replace('bg-red-600', 'bg-green-600');
+                    document.getElementById('ad_btn').disabled = false;
+                    document.getElementById('msg').innerText = "✅ Proxy match! You can work.";
                 } else {
-                    badge.innerText = `PROXY: ${country} ❌`;
-                    document.getElementById('main_btn').disabled = true;
-                    document.getElementById('status_msg').innerText = `Connect to ${TARGET_COUNTRY} to work!`;
+                    document.getElementById('msg').innerText = `❌ Connect to one of these: ${settings.allowed_countries}`;
                 }
-            } catch (e) { console.log("IP Check failed"); }
+            } catch (e) { console.error(e); }
         }
 
         async function syncUser() {
-            let { data, error } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
-
+            let { data } = await supabase.from('users').select('*').eq('telegram_id', user.id).single();
             if (!data) {
                 const { data: newUser } = await supabase.from('users').insert([{
                     telegram_id: user.id.toString(),
                     first_name: user.first_name,
-                    daily_limit: 10
+                    daily_limit: parseInt(settings.default_limit)
                 }]).select().single();
                 dbUser = newUser;
             } else {
@@ -143,75 +102,28 @@
         }
 
         function updateUI() {
-            document.getElementById('impr_count').innerText = dbUser.impressions;
-            document.getElementById('click_count').innerText = dbUser.clicks;
-            document.getElementById('limit_display').innerText = `${dbUser.impressions}/${dbUser.daily_limit}`;
-            
+            document.getElementById('impr_txt').innerText = dbUser.impressions;
+            document.getElementById('limit_txt').innerText = `${dbUser.impressions}/${dbUser.daily_limit}`;
             if(dbUser.impressions >= dbUser.daily_limit) {
-                document.getElementById('main_btn').disabled = true;
-                document.getElementById('main_btn').innerText = "Daily Limit Reached!";
+                document.getElementById('ad_btn').disabled = true;
+                document.getElementById('msg').innerText = "🚫 Daily Limit Over!";
             }
         }
 
-        // --- AD LOGIC ---
-        async function runAutoImpression() {
-            if(!isCanada) return alert("Proxy required!");
-
-            document.getElementById('main_btn').disabled = true;
-            document.getElementById('status_msg').innerText = "Ad is loading...";
-
-            // Calling your provided Monetag function
-            if (typeof show_10197154 !== 'undefined') {
-                show_10197154().then(async () => {
-                    await updateDB('impressions');
-                    document.getElementById('status_msg').innerText = "Impression Added! Wait 5s...";
-                    setTimeout(() => {
-                        if(dbUser.impressions < dbUser.daily_limit) {
-                            document.getElementById('main_btn').disabled = false;
-                        }
-                    }, 5000);
+        function showAd() {
+            const functionName = `show_${settings.ad_zone_id}`;
+            if (typeof window[functionName] === 'function') {
+                window[functionName]().then(async () => {
+                    // Update DB
+                    const { data } = await supabase.from('users')
+                        .update({ impressions: dbUser.impressions + 1 })
+                        .eq('telegram_id', user.id).select().single();
+                    dbUser = data;
+                    updateUI();
                 });
             } else {
-                alert("Ad script not loaded yet!");
+                alert("Ad not ready or wrong Zone ID!");
             }
-        }
-
-        async function handleManualClick() {
-            if(confirm("Did you click the ad and stay for 30s?")) {
-                await updateDB('clicks');
-            }
-        }
-
-        async function updateDB(column) {
-            const { data } = await supabase
-                .from('users')
-                .update({ [column]: dbUser[column] + 1 })
-                .eq('telegram_id', user.id)
-                .select().single();
-            dbUser = data;
-            updateUI();
-        }
-
-        // --- ADMIN PANEL ---
-        function toggleAdmin() {
-            const panel = document.getElementById('admin_panel');
-            panel.classList.toggle('hidden');
-            if(!panel.classList.contains('hidden')) loadAdminData();
-        }
-
-        async function loadAdminData() {
-            const { data } = await supabase.from('users').select('*');
-            const table = document.getElementById('user_table');
-            table.innerHTML = "";
-            data.forEach(u => {
-                table.innerHTML += `
-                    <tr>
-                        <td class="border p-1">${u.first_name}</td>
-                        <td class="border p-1 font-bold ${u.country === TARGET_COUNTRY ? 'text-green-600' : 'text-red-600'}">${u.country}</td>
-                        <td class="border p-1">${u.impressions}/${u.clicks}</td>
-                    </tr>
-                `;
-            });
         }
 
         init();
