@@ -2,142 +2,176 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monetag Auto Bot</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>High CPM Secure Node</title>
     
-    <!-- Telegram SDK -->
+    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- Monetag SDK -->
-    <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
-
     <style>
-        body {
+        * {
+            box-sizing: border-box;
             margin: 0;
-            background-color: #0b141d;
+            padding: 0;
+            user-select: none; /* টেক্সট কপি করা বন্ধ */
+        }
+
+        body {
+            background-color: #0f0f0f;
             color: #ffffff;
-            font-family: sans-serif;
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
             overflow: hidden;
         }
-        .main-card {
-            text-align: center;
-            background: #1c2733;
-            padding: 40px 20px;
+
+        .container {
+            background: #1e1e1e;
+            padding: 30px;
             border-radius: 20px;
-            width: 85%;
-            border: 1px solid #3390ec;
-            box-shadow: 0 0 20px rgba(51, 144, 236, 0.2);
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid #333;
+            position: relative;
         }
-        .counter-grid {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
+
+        .status-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #4da6ff;
         }
-        .counter-box h1 { margin: 0; color: #3390ec; font-size: 35px; }
-        .counter-box p { margin: 5px 0; font-size: 12px; color: #aaa; text-transform: uppercase; }
-        .status-bar {
-            margin-top: 25px;
+
+        .sub-text {
             font-size: 14px;
-            color: #4CAF50;
-            font-weight: bold;
+            color: #aaaaaa;
+            margin-bottom: 25px;
         }
-        #timer { color: #f44336; }
+
+        /* Loading Spinner Animation */
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #0088cc; /* Telegram Blue */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #333;
+            border-radius: 10px;
+            height: 8px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0088cc, #00d2ff);
+            border-radius: 10px;
+            transition: width 0.1s linear;
+        }
+
+        .timer {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #777;
+        }
+
+        /* Hidden overlay to capture clicks if needed by ad script */
+        #click-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: none;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="main-card">
-        <h2 style="margin-top:0;">Auto Impression System</h2>
-        
-        <div class="counter-grid">
-            <div class="counter-box">
-                <h1 id="imp-val">0</h1>
-                <p>Impressions</p>
-            </div>
-            <div class="counter-box">
-                <h1 id="click-val">0</h1>
-                <p>Clicks</p>
-            </div>
-        </div>
+    <div class="container">
+        <!-- Spinner -->
+        <div class="spinner"></div>
 
-        <div class="status-bar" id="status-text">Initializing Engine...</div>
-        <p id="timer-text" style="display:none; font-size:12px;">Closing in: <span id="timer">15</span>s</p>
+        <!-- Texts -->
+        <div class="status-text">Connecting to Server...</div>
+        <div class="sub-text">Optimizing network for rewards.</div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="timer">Next check in: <span id="countdown">15</span>s</div>
     </div>
 
+    <!-- YOUR AD SCRIPT HERE (Zone ID: 10197154) -->
+    <!-- এই স্ক্রিপ্ট অটোমেটিক কাজ করবে -->
+    <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
+
     <script>
-        // Telegram Setup
+        // Telegram Web App Expand
         const tg = window.Telegram.WebApp;
-        tg.ready();
         tg.expand();
+        tg.enableClosingConfirmation(); // অ্যাপ বন্ধ করার আগে কনফার্মেশন চাইবে (User Stay Time বাড়ায়)
 
-        let impressions = 0;
-        let clicks = 0;
+        // Configuration
+        const reloadTime = 15; // কত সেকেন্ড পর পেজ রিলোড হবে (কমপক্ষে ১৫ রাখা ভালো)
+        let timeLeft = reloadTime;
 
-        // ক্লিক ডিটেকশন (উইন্ডো ফোকাস চলে গেলে)
-        window.addEventListener('blur', () => {
-            clicks++;
-            document.getElementById('click-val').innerText = clicks;
-        });
+        // UI Elements
+        const progressBar = document.getElementById('progressBar');
+        const countdownEl = document.getElementById('countdown');
+        const statusText = document.querySelector('.status-text');
 
-        // মেইন ফাংশন (অটো লুপ)
-        async function startAutoAds() {
-            while (true) {
-                // ১. স্ট্যাটাস আপডেট
-                updateStatus("Searching for Ad...");
-                
-                // ২. ২ সেকেন্ড বিরতি (পরের অ্যাড আসার আগে)
-                await new Promise(r => setTimeout(r, 2000));
+        // Countdown & Auto Reload Logic
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            countdownEl.innerText = timeLeft;
 
-                // ৩. অ্যাড দেখানো শুরু
-                if (typeof show_10197154 === 'function') {
-                    updateStatus("Ad Displaying...");
-                    show_10197154(); // অ্যাড কল
-                    
-                    // ৪. ১৫ সেকেন্ড কাউন্টডাউন ও অপেক্ষা
-                    document.getElementById('timer-text').style.display = "block";
-                    let timeLeft = 15;
-                    while (timeLeft > 0) {
-                        document.getElementById('timer').innerText = timeLeft;
-                        await new Promise(r => setTimeout(r, 1000));
-                        timeLeft--;
-                    }
-                    document.getElementById('timer-text').style.display = "none";
+            // Update Progress Bar
+            const percentage = ((reloadTime - timeLeft) / reloadTime) * 100;
+            progressBar.style.width = percentage + "%";
 
-                    // ৫. অ্যাড জোর করে বন্ধ করা (Force Close)
-                    closeAllAds();
-                    
-                    // ৬. ইমপ্রেশন আপডেট
-                    impressions++;
-                    document.getElementById('imp-val').innerText = impressions;
-                    updateStatus("Ad Closed Successfully!");
-                }
+            // Status Updates based on time
+            if (timeLeft === 10) statusText.innerText = "Analyzing Traffic...";
+            if (timeLeft === 5) statusText.innerText = "Fetching High CPM Data...";
+            if (timeLeft === 2) statusText.innerText = "Reloading Node...";
+
+            // Reload Action
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                window.location.reload(); // পেজ রিলোড হবে এবং নতুন ইম্প্রেশন কাউন্ট হবে
             }
-        }
+        }, 1000);
 
-        function updateStatus(msg) {
-            document.getElementById('status-text').innerText = msg;
+        // Anti-Sleep (স্ক্রিন যাতে বন্ধ না হয় - হ্যাক)
+        try {
+            if (navigator.wakeLock) {
+                navigator.wakeLock.request('screen');
+            }
+        } catch (err) {
+            console.log("Wake Lock not supported");
         }
-
-        // সব ধরনের পপআপ বা আইফ্রেম রিমুভ করার ফাংশন
-        function closeAllAds() {
-            // Monetag সাধারণত আইফ্রেম বা নির্দিষ্ট কিছু ডিভ ব্যবহার করে
-            const ads = document.querySelectorAll('iframe, [id^="monetag"], [class^="monetag"], div[style*="z-index: 9999999"]');
-            ads.forEach(ad => ad.remove());
-            
-            // বডির ওভারফ্লো ঠিক করা (যদি স্ক্রল লক হয়ে যায়)
-            document.body.style.overflow = 'auto';
-            document.documentElement.style.overflow = 'auto';
-            console.log("Ad elements removed.");
-        }
-
-        // অ্যাপ ওপেন হওয়ার ৩ সেকেন্ড পর লুপ শুরু হবে
-        window.onload = () => {
-            setTimeout(startAutoAds, 3000);
-        };
     </script>
 </body>
 </html>
