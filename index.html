@@ -3,102 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Impression Bot</title>
+    <title>Monetag Auto Impression Pro</title>
     
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- Monetag SDK (আপনার দেওয়া স্ক্রিপ্ট) -->
+    <!-- Monetag SDK -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
 
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #0e1621; /* Telegram dark theme color */
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0e1621;
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
-            overflow: hidden;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .status-box {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
             text-align: center;
         }
-        #counter {
+        .container {
+            width: 90%;
+            background: #17212b;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #2b5278;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background: #242f3d;
+            padding: 15px;
+            border-radius: 12px;
+            border-bottom: 3px solid #0088cc;
+        }
+        .stat-box h2 {
+            margin: 0;
             font-size: 24px;
-            font-weight: bold;
+            color: #6ab3f3;
+        }
+        .stat-box p {
+            margin: 5px 0 0;
+            font-size: 12px;
+            color: #8393a3;
+            text-transform: uppercase;
+        }
+        .progress-container {
+            width: 100%;
+            background: #242f3d;
+            height: 8px;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0088cc, #6ab3f3);
+            transition: width 0.1s linear;
+        }
+        .status-text {
+            font-size: 14px;
             color: #0088cc;
+            font-weight: bold;
+            height: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="loader"></div>
-    <div class="status-box">
-        <h3>Auto Impression Active</h3>
-        <p>Total Impressions: <span id="counter">0</span></p>
-        <p id="msg" style="font-size: 12px; color: #aaa;">বিজ্ঞাপন লোড হচ্ছে...</p>
+<div class="container">
+    <div class="stats-grid">
+        <div class="stat-box">
+            <h2 id="impression-count">0</h2>
+            <p>Impressions</p>
+        </div>
+        <div class="stat-box">
+            <h2 id="click-count">0</h2>
+            <p>Total Clicks</p>
+        </div>
     </div>
 
-    <script>
-        // Telegram Setup
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+    <div class="status-text" id="status">Initializing...</div>
 
-        let count = 0;
-        const adInterval = 25000; // ২৫ সেকেন্ড পরপর অ্যাড আসবে (নিরাপদ থাকার জন্য)
+    <div class="progress-container">
+        <div id="progress-bar"></div>
+    </div>
 
-        function showAutoAd() {
-            document.getElementById('msg').innerText = "বিজ্ঞাপন খোঁজা হচ্ছে...";
+    <p style="font-size: 11px; color: #5b6d7f;">Ads will refresh automatically every 15s</p>
+</div>
 
-            // Monetag SDK Function Call
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    let impressions = 0;
+    let clicks = 0;
+    const adViewTime = 15000; // ১৫ সেকেন্ড
+    const gapTime = 2000;    // ২ সেকেন্ড গ্যাপ
+
+    // ক্লিক ট্র্যাকিং লজিক (Monetag window focus change detect করে)
+    window.addEventListener('blur', () => {
+        // যদি ইউজার অ্যাডে ক্লিক করে অন্য পেজে যায়, তবে ব্লার ইভেন্ট কাজ করবে
+        clicks++;
+        document.getElementById('click-count').innerText = clicks;
+        console.log("Click Detected!");
+    });
+
+    async function startAdEngine() {
+        while (true) {
+            updateStatus("Finding New Ad...");
+            
+            // ২ সেকেন্ড গ্যাপ
+            await new Promise(resolve => setTimeout(resolve, gapTime));
+
             if (typeof show_10197154 === 'function') {
+                updateStatus("Showing Ad (15s)...");
+                
+                // অ্যাড কল করা
                 show_10197154().then(() => {
-                    // অ্যাড সফলভাবে দেখা হলে
-                    count++;
-                    document.getElementById('counter').innerText = count;
-                    document.getElementById('msg').innerText = "সফলভাবে বিজ্ঞাপন দেখানো হয়েছে।";
-                    console.log("Impression Count: " + count);
-                }).catch((err) => {
-                    document.getElementById('msg').innerText = "অ্যাড লোড হতে সমস্যা হয়েছে।";
-                    console.error("Ad Error: ", err);
-                });
+                    console.log("Ad instance finished.");
+                }).catch(e => console.error("Ad failed", e));
+
+                // ১৫ সেকেন্ড প্রগ্রেস বার এবং টাইমার
+                await runProgressBar(adViewTime);
+
+                // ইমপ্রেশন কাউন্ট বাড়ানো
+                impressions++;
+                document.getElementById('impression-count').innerText = impressions;
+                
+                updateStatus("Waiting for Next Ad...");
             } else {
-                document.getElementById('msg').innerText = "SDK লোড হচ্ছে, অপেক্ষা করুন...";
+                updateStatus("SDK Error! Retrying...");
+                await new Promise(resolve => setTimeout(resolve, 3000));
             }
         }
+    }
 
-        // অ্যাপ ওপেন হওয়ার ৫ সেকেন্ড পর প্রথম অ্যাড আসবে
-        setTimeout(() => {
-            showAutoAd();
-        }, 5000);
+    function updateStatus(text) {
+        document.getElementById('status').innerText = text;
+    }
 
-        // নির্দিষ্ট সময় পর পর অটোমেটিক অ্যাড চলতে থাকবে (Loop)
-        setInterval(() => {
-            showAutoAd();
-        }, adInterval);
+    function runProgressBar(ms) {
+        return new Promise(resolve => {
+            const bar = document.getElementById('progress-bar');
+            let start = 0;
+            const interval = 100;
+            const step = (interval / ms) * 100;
 
-    </script>
+            const timer = setInterval(() => {
+                start += step;
+                bar.style.width = start + "%";
+                if (start >= 100) {
+                    clearInterval(timer);
+                    bar.style.width = "0%";
+                    resolve();
+                }
+            }, interval);
+        });
+    }
+
+    // অ্যাপ লোড হওয়ার ৩ সেকেন্ড পর অটোমেটিক ইঞ্জিন শুরু হবে
+    window.onload = () => {
+        setTimeout(startAdEngine, 3000);
+    };
+</script>
+
 </body>
 </html>
