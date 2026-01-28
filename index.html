@@ -3,174 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>High CPM Secure Node</title>
-    
-    <!-- Telegram Web App SDK -->
+    <title>Auto Ad Machine</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- 🔥 MONETAG SDK 🔥 -->
+    <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
+
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none; /* টেক্সট কপি করা বন্ধ */
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --bg: #090910;
+            --surface: #14141f;
+            --text: #ffffff;
         }
 
         body {
-            background-color: #0f0f0f;
-            color: #ffffff;
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
             overflow: hidden;
         }
 
-        .container {
-            background: #1e1e1e;
+        .dashboard {
+            background: var(--surface);
             padding: 30px;
             border-radius: 20px;
-            box-shadow: 0 0 20px rgba(0, 123, 255, 0.2);
-            text-align: center;
-            width: 90%;
+            width: 85%;
             max-width: 400px;
-            border: 1px solid #333;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
             position: relative;
+            z-index: 1; /* Ensure dashboard stays behind ads initially */
         }
 
-        .status-text {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #4da6ff;
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .sub-text {
-            font-size: 14px;
-            color: #aaaaaa;
-            margin-bottom: 25px;
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 15px;
         }
 
-        /* Loading Spinner Animation */
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top: 5px solid #0088cc; /* Telegram Blue */
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-val {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .timer-circle {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px auto;
+            background: conic-gradient(var(--primary) 0%, transparent 0%);
+            transition: background 0.5s;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .timer-inner {
+            width: 130px;
+            height: 130px;
+            background: var(--surface);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
         }
 
-        /* Progress Bar */
-        .progress-container {
-            width: 100%;
-            background-color: #333;
-            border-radius: 10px;
-            height: 8px;
-            margin-top: 20px;
-            overflow: hidden;
+        .time-big {
+            font-size: 42px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #0088cc, #00d2ff);
-            border-radius: 10px;
-            transition: width 0.1s linear;
-        }
-
-        .timer {
-            margin-top: 10px;
+        .status-badge {
             font-size: 12px;
-            color: #777;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            margin-top: 5px;
         }
 
-        /* Hidden overlay to capture clicks if needed by ad script */
-        #click-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
-            display: none;
+        .btn-start {
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 210, 255, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .btn-start:active {
+            transform: scale(0.95);
         }
 
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Spinner -->
-        <div class="spinner"></div>
-
-        <!-- Texts -->
-        <div class="status-text">Connecting to Server...</div>
-        <div class="sub-text">Optimizing network for rewards.</div>
-
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
+    <div class="dashboard">
+        <h1>AUTO AD SYSTEM</h1>
         
-        <div class="timer">Next check in: <span id="countdown">15</span>s</div>
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-val" id="impressions">0</span>
+                <span class="stat-label">Impressions</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-val" id="cycles">0</span>
+                <span class="stat-label">Cycles</span>
+            </div>
+        </div>
+
+        <div class="timer-circle" id="progressRing">
+            <div class="timer-inner">
+                <div class="time-big" id="timer">00</div>
+                <div class="status-badge" id="status">STOPPED</div>
+            </div>
+        </div>
+
+        <button class="btn-start" onclick="startEngine()" id="startBtn">START BOT</button>
     </div>
 
-    <!-- YOUR AD SCRIPT HERE (Zone ID: 10197154) -->
-    <!-- এই স্ক্রিপ্ট অটোমেটিক কাজ করবে -->
-    <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
-
     <script>
-        // Telegram Web App Expand
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation(); // অ্যাপ বন্ধ করার আগে কনফার্মেশন চাইবে (User Stay Time বাড়ায়)
 
         // Configuration
-        const reloadTime = 15; // কত সেকেন্ড পর পেজ রিলোড হবে (কমপক্ষে ১৫ রাখা ভালো)
-        let timeLeft = reloadTime;
+        const SHOW_TIME = 15; // 15 Seconds Ad Show
+        const GAP_TIME = 2;   // 2 Seconds Gap
+        
+        let impressionCount = 0;
+        let cycleCount = 0;
+        let isRunning = false;
 
-        // UI Elements
-        const progressBar = document.getElementById('progressBar');
-        const countdownEl = document.getElementById('countdown');
-        const statusText = document.querySelector('.status-text');
+        const timerEl = document.getElementById('timer');
+        const statusEl = document.getElementById('status');
+        const impEl = document.getElementById('impressions');
+        const cycleEl = document.getElementById('cycles');
+        const ringEl = document.getElementById('progressRing');
+        const startBtn = document.getElementById('startBtn');
 
-        // Countdown & Auto Reload Logic
-        const timerInterval = setInterval(() => {
-            timeLeft--;
-            countdownEl.innerText = timeLeft;
+        function startEngine() {
+            if(isRunning) return;
+            isRunning = true;
+            startBtn.style.display = 'none';
+            runCycle();
+        }
 
-            // Update Progress Bar
-            const percentage = ((reloadTime - timeLeft) / reloadTime) * 100;
-            progressBar.style.width = percentage + "%";
+        async function runCycle() {
+            // Step 1: Gap Phase (2 Seconds)
+            await runTimer(GAP_TIME, "PREPARING...", false);
 
-            // Status Updates based on time
-            if (timeLeft === 10) statusText.innerText = "Analyzing Traffic...";
-            if (timeLeft === 5) statusText.innerText = "Fetching High CPM Data...";
-            if (timeLeft === 2) statusText.innerText = "Reloading Node...";
+            // Step 2: Show Ad
+            showAdLogic();
 
-            // Reload Action
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                window.location.reload(); // পেজ রিলোড হবে এবং নতুন ইম্প্রেশন কাউন্ট হবে
+            // Step 3: Ad Showing Phase (15 Seconds)
+            await runTimer(SHOW_TIME, "WATCHING AD...", true);
+
+            // Step 4: AUTO CLOSE (The Magic Part)
+            forceCloseAd();
+
+            // Step 5: Update Stats & Loop
+            cycleCount++;
+            cycleEl.innerText = cycleCount;
+            runCycle(); // Loop Again
+        }
+
+        function showAdLogic() {
+            try {
+                if (typeof show_10197154 === 'function') {
+                    show_10197154(); // Ad Call
+                    impressionCount++;
+                    impEl.innerText = impressionCount;
+                }
+            } catch (e) {
+                console.log("Ad Blocked or Error");
             }
-        }, 1000);
+        }
 
-        // Anti-Sleep (স্ক্রিন যাতে বন্ধ না হয় - হ্যাক)
-        try {
-            if (navigator.wakeLock) {
-                navigator.wakeLock.request('screen');
-            }
-        } catch (err) {
-            console.log("Wake Lock not supported");
+        // 🔥 এই ফাংশনটি অটোমেটিক অ্যাড রিমুভ করবে 🔥
+        function forceCloseAd() {
+            console.log("Auto closing ad...");
+            
+            // Monetag সাধারণত iframe বা নতুন div তৈরি করে। আমরা সেগুলোকে টার্গেট করে রিমুভ করব।
+            
+            // Method 1: Remove all iframes (সবচেয়ে কার্যকরী)
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(el => el.remove());
+
+            // Method 2: Remove typical ad overlay divs (High Z-Index)
+            // এটি একটু রিস্কি, তবে আমরা চেষ্টা করব পপআপ কন্টেইনার ডিলিট করার
+            const divs = document.querySelectorAll('div');
+            divs.forEach(div => {
+                const style = window.getComputedStyle(div);
+                // যদি এলিমেন্টটি ফিক্সড পজিশনে থাকে এবং পুরো স্ক্রিন জুড়ে থাকে
+                if (style.position === 'fixed' && style.zIndex > 999) {
+                    div.remove();
+                }
+            });
+
+            // Status Update
+            statusEl.innerText = "AD CLOSED";
+        }
+
+        function runTimer(seconds, text, isAdPhase) {
+            return new Promise(resolve => {
+                statusEl.innerText = text;
+                let timeLeft = seconds;
+                
+                // Color logic
+                if(isAdPhase) {
+                    ringEl.style.background = `conic-gradient(#ff416c 100%, transparent 0%)`; // Red for Ad
+                } else {
+                    ringEl.style.background = `conic-gradient(#00d2ff 100%, transparent 0%)`; // Blue for Gap
+                }
+
+                const interval = setInterval(() => {
+                    timerEl.innerText = timeLeft < 10 ? `0${timeLeft}` : timeLeft;
+                    
+                    // Visual Ring Animation
+                    const percentage = (timeLeft / seconds) * 100;
+                    const color = isAdPhase ? '#ff416c' : '#00d2ff';
+                    ringEl.style.background = `conic-gradient(${color} ${percentage}%, transparent 0%)`;
+
+                    timeLeft--;
+
+                    if (timeLeft < 0) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 1000);
+            });
         }
     </script>
 </body>
