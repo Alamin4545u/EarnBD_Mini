@@ -3,90 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TMA Earning App</title>
+    <title>Auto Impression Bot</title>
     
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- Monetag/Libtl SDK (আপনার দেওয়া স্ক্রিপ্ট) -->
+    <!-- Monetag SDK (আপনার দেওয়া স্ক্রিপ্ট) -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #0e1621; /* Telegram dark theme color */
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
+            overflow: hidden;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
             text-align: center;
         }
-        .container {
-            padding: 20px;
-            background: #fff;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            width: 80%;
-        }
-        h1 { font-size: 20px; color: #0088cc; }
-        .status { margin-top: 20px; font-size: 14px; color: #666; }
-        .btn {
-            background-color: #0088cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 15px;
+        #counter {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0088cc;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Welcome to Mini App</h1>
-        <p>অটোমেটিক বিজ্ঞাপন লোড হচ্ছে...</p>
-        <div id="ad-status" class="status">পরবর্তী অ্যাড লোড হওয়ার অপেক্ষায়...</div>
-        <button class="btn" onclick="triggerAd()">ম্যানুয়ালি অ্যাড দেখুন</button>
+    <div class="loader"></div>
+    <div class="status-box">
+        <h3>Auto Impression Active</h3>
+        <p>Total Impressions: <span id="counter">0</span></p>
+        <p id="msg" style="font-size: 12px; color: #aaa;">বিজ্ঞাপন লোড হচ্ছে...</p>
     </div>
 
     <script>
-        // Telegram WebApp Initialize
+        // Telegram Setup
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
 
-        // অ্যাড ফাংশন (আপনার SDK অনুযায়ী)
-        function triggerAd() {
-            document.getElementById('ad-status').innerText = "অ্যাড লোড করার চেষ্টা করা হচ্ছে...";
-            
+        let count = 0;
+        const adInterval = 25000; // ২৫ সেকেন্ড পরপর অ্যাড আসবে (নিরাপদ থাকার জন্য)
+
+        function showAutoAd() {
+            document.getElementById('msg').innerText = "বিজ্ঞাপন খোঁজা হচ্ছে...";
+
+            // Monetag SDK Function Call
             if (typeof show_10197154 === 'function') {
                 show_10197154().then(() => {
-                    document.getElementById('ad-status').innerText = "অ্যাড সফলভাবে দেখা হয়েছে!";
-                }).catch((error) => {
-                    console.error("Ad Error:", error);
-                    document.getElementById('ad-status').innerText = "অ্যাড লোড হতে ব্যর্থ হয়েছে।";
+                    // অ্যাড সফলভাবে দেখা হলে
+                    count++;
+                    document.getElementById('counter').innerText = count;
+                    document.getElementById('msg').innerText = "সফলভাবে বিজ্ঞাপন দেখানো হয়েছে।";
+                    console.log("Impression Count: " + count);
+                }).catch((err) => {
+                    document.getElementById('msg').innerText = "অ্যাড লোড হতে সমস্যা হয়েছে।";
+                    console.error("Ad Error: ", err);
                 });
             } else {
-                document.getElementById('ad-status').innerText = "SDK এখনো লোড হয়নি।";
+                document.getElementById('msg').innerText = "SDK লোড হচ্ছে, অপেক্ষা করুন...";
             }
         }
 
-        // Auto Impression Logic (প্রতি ৩০ সেকেন্ড পর পর অ্যাড দেখাবে)
-        // সময় পরিবর্তন করতে চাইলে 30000 কমিয়ে বা বাড়িয়ে দিন (মিলি-সেকেন্ড)
+        // অ্যাপ ওপেন হওয়ার ৫ সেকেন্ড পর প্রথম অ্যাড আসবে
+        setTimeout(() => {
+            showAutoAd();
+        }, 5000);
+
+        // নির্দিষ্ট সময় পর পর অটোমেটিক অ্যাড চলতে থাকবে (Loop)
         setInterval(() => {
-            console.log("Auto-triggering Ad...");
-            triggerAd();
-        }, 30000); 
+            showAutoAd();
+        }, adInterval);
 
-        // অ্যাপ ওপেন হওয়ার সাথে সাথেই প্রথম অ্যাড দেখাবে
-        window.onload = () => {
-            setTimeout(triggerAd, 2000); // ২ সেকেন্ড পর প্রথম অ্যাড
-        };
     </script>
-
 </body>
 </html>
