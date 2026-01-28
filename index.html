@@ -3,101 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monetag Auto Impression Pro</title>
+    <title>Monetag Auto Impression Bot</title>
     
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <!-- Monetag SDK -->
+    <!-- Monetag SDK (আপনার দেওয়া স্ক্রিপ্ট) -->
     <script src='//libtl.com/sdk.js' data-zone='10197154' data-sdk='show_10197154'></script>
 
     <style>
         body {
             margin: 0;
             padding: 0;
-            background-color: #0e1621;
+            background: radial-gradient(circle, #1c2a38 0%, #0e1621 100%);
             color: #ffffff;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            text-align: center;
+            overflow: hidden;
         }
         .container {
-            width: 90%;
+            width: 85%;
             background: #17212b;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
             border: 1px solid #2b5278;
+            text-align: center;
         }
-        .stats-grid {
+        .header h2 { margin: 0; color: #6ab3f3; font-size: 22px; }
+        .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-bottom: 20px;
+            margin: 25px 0;
         }
-        .stat-box {
+        .stat-card {
             background: #242f3d;
             padding: 15px;
-            border-radius: 12px;
-            border-bottom: 3px solid #0088cc;
+            border-radius: 15px;
+            border-bottom: 4px solid #0088cc;
         }
-        .stat-box h2 {
-            margin: 0;
-            font-size: 24px;
-            color: #6ab3f3;
+        .stat-card h3 { margin: 0; font-size: 28px; color: #fff; }
+        .stat-card p { margin: 5px 0 0; font-size: 11px; color: #8393a3; text-transform: uppercase; }
+        
+        #status {
+            font-size: 14px;
+            color: #0088cc;
+            font-weight: bold;
+            margin-bottom: 15px;
+            height: 20px;
         }
-        .stat-box p {
-            margin: 5px 0 0;
-            font-size: 12px;
-            color: #8393a3;
-            text-transform: uppercase;
+
+        .btn-start {
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
+            transition: transform 0.2s;
         }
+        .btn-start:active { transform: scale(0.95); }
+        .btn-start:disabled { background: #4e5e6e; cursor: not-allowed; box-shadow: none; }
+
         .progress-container {
             width: 100%;
             background: #242f3d;
-            height: 8px;
-            border-radius: 5px;
-            margin: 20px 0;
+            height: 6px;
+            border-radius: 10px;
+            margin-top: 20px;
             overflow: hidden;
+            display: none;
         }
         #progress-bar {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, #0088cc, #6ab3f3);
+            background: #6ab3f3;
             transition: width 0.1s linear;
-        }
-        .status-text {
-            font-size: 14px;
-            color: #0088cc;
-            font-weight: bold;
-            height: 20px;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="stats-grid">
-        <div class="stat-box">
-            <h2 id="impression-count">0</h2>
+    <div class="header">
+        <h2>Auto Earning Bot</h2>
+    </div>
+
+    <div class="stats">
+        <div class="stat-card">
+            <h3 id="imp-count">0</h3>
             <p>Impressions</p>
         </div>
-        <div class="stat-box">
-            <h2 id="click-count">0</h2>
-            <p>Total Clicks</p>
+        <div class="stat-card">
+            <h3 id="click-count">0</h3>
+            <p>Clicks</p>
         </div>
     </div>
 
-    <div class="status-text" id="status">Initializing...</div>
+    <div id="status">Ready to Start</div>
 
-    <div class="progress-container">
+    <button id="startBtn" class="btn-start" onclick="startAutoProcess()">Start Auto Impression</button>
+
+    <div class="progress-container" id="prog-cont">
         <div id="progress-bar"></div>
     </div>
-
-    <p style="font-size: 11px; color: #5b6d7f;">Ads will refresh automatically every 15s</p>
+    
+    <p style="margin-top: 20px; font-size: 10px; color: #5b6d7f;">Note: Don't close the app while running.</p>
 </div>
 
 <script>
@@ -107,74 +126,82 @@
 
     let impressions = 0;
     let clicks = 0;
-    const adViewTime = 15000; // ১৫ সেকেন্ড
-    const gapTime = 2000;    // ২ সেকেন্ড গ্যাপ
+    let isRunning = false;
 
-    // ক্লিক ট্র্যাকিং লজিক (Monetag window focus change detect করে)
-    window.addEventListener('blur', () => {
-        // যদি ইউজার অ্যাডে ক্লিক করে অন্য পেজে যায়, তবে ব্লার ইভেন্ট কাজ করবে
-        clicks++;
-        document.getElementById('click-count').innerText = clicks;
-        console.log("Click Detected!");
-    });
+    // স্লিপ ফাংশন
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    async function startAdEngine() {
-        while (true) {
-            updateStatus("Finding New Ad...");
+    async function startAutoProcess() {
+        if (isRunning) return;
+        isRunning = true;
+        
+        const btn = document.getElementById('startBtn');
+        const progCont = document.getElementById('prog-cont');
+        btn.disabled = true;
+        btn.innerText = "Process Running...";
+        progCont.style.display = "block";
+
+        while (isRunning) {
+            updateStatus("Loading New Ad...");
             
-            // ২ সেকেন্ড গ্যাপ
-            await new Promise(resolve => setTimeout(resolve, gapTime));
-
-            if (typeof show_10197154 === 'function') {
-                updateStatus("Showing Ad (15s)...");
+            try {
+                // Monetag Ad Call (show_10197154)
+                // এটি একটি Promise রিটার্ন করে যা অ্যাড শেষ হলে বা ক্লিক হলে রেজাল্ট দেয়
+                const result = await show_10197154();
                 
-                // অ্যাড কল করা
-                show_10197154().then(() => {
-                    console.log("Ad instance finished.");
-                }).catch(e => console.error("Ad failed", e));
+                // Impression ও Click ট্র্যাকিং
+                if (result && result.event_type === 'impression') {
+                    impressions++;
+                    document.getElementById('imp-count').innerText = impressions;
+                }
+                if (result && result.event_type === 'click') {
+                    clicks++;
+                    document.getElementById('click-count').innerText = clicks;
+                }
 
-                // ১৫ সেকেন্ড প্রগ্রেস বার এবং টাইমার
-                await runProgressBar(adViewTime);
-
-                // ইমপ্রেশন কাউন্ট বাড়ানো
-                impressions++;
-                document.getElementById('impression-count').innerText = impressions;
+                updateStatus("Ad Viewed! 2s Break...");
+                await runProgressBar(2000); // ২ সেকেন্ড বিরতি এবং প্রগ্রেস বার
                 
-                updateStatus("Waiting for Next Ad...");
-            } else {
-                updateStatus("SDK Error! Retrying...");
-                await new Promise(resolve => setTimeout(resolve, 3000));
+            } catch (error) {
+                console.error("Ad Error:", error);
+                updateStatus("Ad Failed! Retrying in 5s...");
+                await sleep(5000);
             }
         }
     }
 
-    function updateStatus(text) {
-        document.getElementById('status').innerText = text;
+    function updateStatus(msg) {
+        document.getElementById('status').innerText = msg;
     }
 
+    // প্রগ্রেস বার এনিমেশন
     function runProgressBar(ms) {
         return new Promise(resolve => {
             const bar = document.getElementById('progress-bar');
-            let start = 0;
-            const interval = 100;
-            const step = (interval / ms) * 100;
+            let width = 0;
+            const intervalTime = 50; 
+            const step = (intervalTime / ms) * 100;
 
-            const timer = setInterval(() => {
-                start += step;
-                bar.style.width = start + "%";
-                if (start >= 100) {
-                    clearInterval(timer);
+            const interval = setInterval(() => {
+                width += step;
+                bar.style.width = width + "%";
+                if (width >= 100) {
+                    clearInterval(interval);
                     bar.style.width = "0%";
                     resolve();
                 }
-            }, interval);
+            }, intervalTime);
         });
     }
 
-    // অ্যাপ লোড হওয়ার ৩ সেকেন্ড পর অটোমেটিক ইঞ্জিন শুরু হবে
-    window.onload = () => {
-        setTimeout(startAdEngine, 3000);
-    };
+    // উইন্ডো ব্লার হলে ক্লিক কাউন্ট করার বিকল্প উপায় (যদি SDK রেজাল্ট মিস করে)
+    window.addEventListener('blur', () => {
+        if (isRunning) {
+            console.log("Possible Click Detected via Window Blur");
+            // এখানে আপনি চাইলে ম্যানুয়ালি ক্লিক কাউন্ট ১ বাড়াতে পারেন, তবে SDK রেজাল্ট বেশি নির্ভরযোগ্য।
+        }
+    });
+
 </script>
 
 </body>
