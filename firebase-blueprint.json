@@ -1,0 +1,96 @@
+{
+  "entities": {
+    "users": {
+      "fields": {
+        "userId": { "type": "string" },
+        "telegramId": { "type": "string" },
+        "username": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "vip": { "type": "boolean" }
+      }
+    },
+    "coins": {
+      "fields": {
+        "symbol": { "type": "string" },
+        "baseAsset": { "type": "string" },
+        "sector": { "type": "string" },
+        "price": { "type": "number" },
+        "change24h": { "type": "number" },
+        "volume24h": { "type": "number" },
+        "lastUpdated": { "type": "number" }
+      }
+    },
+    "market_data": {
+      "fields": {
+        "timestamp": { "type": "number" },
+        "btcPrice": { "type": "number" },
+        "btcChange24h": { "type": "number" },
+        "totalTrend": { "type": "string" }
+      }
+    },
+    "signals": {
+      "fields": {
+        "symbol": { "type": "string" },
+        "direction": { "type": "string" },
+        "score": { "type": "number" },
+        "classification": { "type": "string" },
+        "risk": { "type": "string" },
+        "timeframe": { "type": "string" },
+        "reasons": { "type": "array" },
+        "priceAtSignal": { "type": "number" },
+        "timestamp": { "type": "number" },
+        "expiresAt": { "type": "number" }
+      }
+    },
+    "signal_history": {
+      "fields": {
+        "signalId": { "type": "string" },
+        "symbol": { "type": "string" },
+        "direction": { "type": "string" },
+        "score": { "type": "number" },
+        "entryPrice": { "type": "number" },
+        "price1h": { "type": "number" },
+        "price6h": { "type": "number" },
+        "price12h": { "type": "number" },
+        "price24h": { "type": "number" },
+        "outcome": { "type": "string" }
+      }
+    },
+    "sectors": {
+      "fields": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "score": { "type": "number" },
+        "status": { "type": "string" },
+        "avgMomentum": { "type": "number" },
+        "volumeChange": { "type": "number" }
+      }
+    },
+    "watchlists": {
+      "fields": {
+        "userId": { "type": "string" },
+        "symbols": { "type": "array" },
+        "updatedAt": { "type": "number" }
+      }
+    },
+    "notifications": {
+      "fields": {
+        "coinSymbol": { "type": "string" },
+        "direction": { "type": "string" },
+        "score": { "type": "number" },
+        "chatId": { "type": "string" },
+        "sentAt": { "type": "number" }
+      }
+    },
+    "settings": {
+      "fields": {
+        "userId": { "type": "string" },
+        "bullishAlerts": { "type": "boolean" },
+        "bearishAlerts": { "type": "boolean" },
+        "highScoreAlerts": { "type": "boolean" },
+        "sectorAlerts": { "type": "boolean" },
+        "minScore": { "type": "number" }
+      }
+    }
+  }
+}

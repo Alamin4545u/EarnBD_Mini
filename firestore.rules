@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Public read-only market data and active signals
+    match /coins/{coinId} {
+      allow read: if true;
+      allow write: if false; // Only server backend writes
+    }
+    match /market_data/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /signals/{signalId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /signal_history/{historyId} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /sectors/{sectorId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // User-specific documents (User profile, Watchlist, Settings)
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /watchlists/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /settings/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    match /notifications/{notifId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+  }
+}

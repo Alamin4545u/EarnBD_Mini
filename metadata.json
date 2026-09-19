@@ -1,0 +1,7 @@
+{
+  "name": "Crypto Market Intelligence & Signal Telegram Mini App",
+  "description": "Production-ready Crypto Market Intelligence & Signal Telegram Mini App with automated Binance analysis, technical indicator scoring, and Telegram Bot alerts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
